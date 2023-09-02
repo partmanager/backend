@@ -1,0 +1,83 @@
+[
+    {
+        "manufacturer": "TestBalunManufacturer",
+        "partNumber": "TESTBALUN#",
+        "productionStatus": "",
+        "markingCode": "",
+        "partType": "Balun",
+        "series": {
+            "name": "TestBalunSeries",
+            "description": "Test Balun Series"
+        },
+        "description": "Test Balun description",
+        "productUrl": "",
+        "notes": "",
+        "tags": [],
+        "storageConditions": {
+            "temperature": "-40\u00b0C ~ 85\u00b0C",
+            "humidity": "",
+            "MSLevel": ""
+        },
+        "parameters": {
+            "Technology": "LTCC",
+            "Operating Frequency Range": {
+                "value": "673MHz ~ 2700MHz"
+            },
+            "Unbalanced Port Impedance": {
+                "value": "50R"
+            },
+            "Balanced Port Impedance": {
+                "value": "100R"
+            },
+            "Unbalanced Port Return Loss": {
+                "value": "9dB -1dB"
+            },
+            "Phase Balance": {
+                "value": "190\u00b0 +5\u00b0/-25\u00b0"
+            },
+            "Amplitude Balance": {
+                "value": "-0.8dB -0.7dB/+2.3dB"
+            },
+            "Insertion Loss": {
+                "value": "1.62dB +2.5dB"
+            },
+            "Power Rating": {
+                "value": "max. 1W"
+            }
+        },
+        "files": {},
+        "package": {},
+        "symbol&footprint": {
+            "symbolName": "balun",
+            "pinmap": {},
+            "footprints": []
+        },
+        "orderNumbers": {
+            "TESTBALUNA": {
+                "Packaging Code": "A",
+                "Packaging Type": "Embossed Tape / Reel",
+                "Packaging Qty": "1000",
+                "Packaging Data": {
+                    "Reel Diameter": "7\u201d",
+                    "Reel Width": "",
+                    "Tape Pin 1 Quadrant": "Q1",
+                    "Tape W": "12mm \u00b10.3mm",
+                    "Tape E": "1.75mm \u00b10.10mm",
+                    "Tape F": "5.50mm \u00b10.10mm",
+                    "Tape SO": "",
+                    "Tape P0": "4.00mm \u00b10.10mm",
+                    "Tape P1": "8.00mm \u00b10.10mm",
+                    "Tape P2": "2.00mm \u00b10.05mm",
+                    "Tape D": "1.50mm \u00b10.10mm",
+                    "Tape D1": "1.00mm \u00b10.10mm",
+                    "Tape A0": "3.30mm \u00b10.10mm",
+                    "Tape A1": "",
+                    "Tape B0": "3.30mm \u00b10.10mm",
+                    "Tape B1": "",
+                    "Tape T": "0.30mm \u00b10.05mm",
+                    "Tape K": "1.10mm \u00b10.10mm"
+                }
+            }
+        }
+    }
+]

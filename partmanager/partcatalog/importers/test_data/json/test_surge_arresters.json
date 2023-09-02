@@ -1,0 +1,64 @@
+[
+    {
+        "manufacturer": "TestSurgeArresterManufacturer",
+        "partNumber": "TESTSURGEARRESTER#",
+        "productionStatus": "",
+        "markingCode": "A",
+        "partType": "Surge arrester",
+        "series": {
+            "name": "TestSurgeArrester",
+            "description": "Test Surge Arrester"
+        },
+        "description": "",
+        "productUrl": "",
+        "notes": "",
+        "tags": [],
+        "storageConditions": {
+            "temperature": "5\u00b0C ~ 35\u00b0C",
+            "humidity": "",
+            "MSLevel": "Level 1"
+        },
+        "parameters": {
+            "Capacitance": {
+                "value": "max. 0.4pF",
+                "conditions": {
+                    "f": "1MHz"
+                }
+            }
+        },
+        "files": {},
+        "package": {},
+        "symbol&footprint": {
+            "symbolName": "surge_arrester_2_pin",
+            "pinmap": {},
+            "footprints": []
+        },
+        "orderNumbers": {
+            "TESTSURGEARRESTERA": {
+                "Packaging Code": "A",
+                "Packaging Type": "Embossed Tape / Reel",
+                "Packaging Qty": "2000",
+                "Packaging Data": {
+                    "Reel Diameter": "",
+                    "Reel Width": "",
+                    "Tape Pin 1 Quadrant": "Q1",
+                    "Tape W": "12mm",
+                    "Tape E": "",
+                    "Tape F": "",
+                    "Tape SO": "",
+                    "Tape P0": "4.00mm",
+                    "Tape P1": "8.00mm",
+                    "Tape P2": "2.00mm",
+                    "Tape D": "",
+                    "Tape D1": "1.5mm",
+                    "Tape A0": "4.9mm",
+                    "Tape A1": "",
+                    "Tape B0": "3.65mm",
+                    "Tape B1": "",
+                    "Tape T": "0.40mm",
+                    "Tape K": "3.4mm"
+                }
+            }
+        }
+    }
+]

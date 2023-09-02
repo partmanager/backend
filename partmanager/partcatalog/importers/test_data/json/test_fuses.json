@@ -1,0 +1,66 @@
+[
+    {
+        "manufacturer": "TestFuseManufacturer",
+        "partNumber": "TESTFUSE#",
+        "productionStatus": "",
+        "markingCode": "",
+        "partType": "Fuse",
+        "series": {
+            "name": "",
+            "description": ""
+        },
+        "description": "",
+        "productUrl": "",
+        "notes": "",
+        "tags": [],
+        "storageConditions": {
+            "temperature": "",
+            "humidity": "",
+            "MSLevel": ""
+        },
+        "parameters": {
+            "Rated Current": {
+                "value": "max. 1A"
+            },
+            "Rated Voltage": {
+                "value": "max. 63V"
+            }
+        },
+        "files": {},
+        "package": {
+            "name": "Chip 1206"
+        },
+        "symbol&footprint": {
+            "symbolName": "fuse",
+            "pinmap": {},
+            "footprints": []
+        },
+        "orderNumbers": {
+            "TESTFUSEA": {
+                "Packaging Code": "A",
+                "Packaging Type": "Paper Tape / Reel",
+                "Packaging Qty": "",
+                "Packaging Data": {
+                    "Reel Diameter": "",
+                    "Reel Width": "",
+                    "Tape Pin 1 Quadrant": "Q1",
+                    "Tape W": "8mm",
+                    "Tape E": "",
+                    "Tape F": "",
+                    "Tape SO": "",
+                    "Tape P0": "",
+                    "Tape P1": "",
+                    "Tape P2": "",
+                    "Tape D": "",
+                    "Tape D1": "",
+                    "Tape A0": "",
+                    "Tape A1": "",
+                    "Tape B0": "",
+                    "Tape B1": "",
+                    "Tape T": "",
+                    "Tape K": ""
+                }
+            }
+        }
+    }
+]

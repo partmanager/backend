@@ -1,0 +1,43 @@
+[
+    {
+        "manufacturer": "TestRelayManufacturer",
+        "partNumber": "TESTRELAY#",
+        "productionStatus": "",
+        "markingCode": "",
+        "partType": "Relay",
+        "series": {
+            "name": "TestRelaySeries",
+            "description": "TestRelaySeries"
+        },
+        "description": "",
+        "productUrl": "",
+        "notes": "",
+        "tags": [],
+        "storageConditions": {
+            "temperature": "",
+            "humidity": "",
+            "MSLevel": ""
+        },
+        "parameters": {
+            "Coil Voltage":{
+                "value": "12V"
+            },
+            "Contact Configuration": "SPDT"
+        },
+        "files": {},
+        "package": {},
+        "symbol&footprint": {
+            "symbolName": "relay_spst_6p",
+            "pinmap": {},
+            "footprints": []
+        },
+        "orderNumbers": {
+            "TESTRELAYA": {
+                "Packaging Code": "A",
+                "Packaging Type": "",
+                "Packaging Qty": "1",
+                "Packaging Data": {}
+            }
+        }
+    }
+]

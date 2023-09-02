@@ -1,0 +1,31 @@
+version: "3.3"
+
+services:
+  db:
+    image: postgres:14.6
+    shm_size: 1g
+    volumes:
+      - ./containers_data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+  backend:
+    build: .
+    command: /bin/bash create_initial_migration.sh
+    volumes:
+      - ./partmanager:/code
+      - ../partdb:/var/partsdb
+      - ./containers_data/static:/var/static
+      - ./containers_data/media:/var/media
+      - ./containers_data/var_log_shelftracker:/var/log/shelftracker
+      - ./containers_data/etc/shelftracker:/etc/shelftracker
+      - ./containers_data/tmp:/tmp
+    ports:
+      - "8000:8000"
+    environment:
+      - POSTGRES_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    depends_on:
+      - db

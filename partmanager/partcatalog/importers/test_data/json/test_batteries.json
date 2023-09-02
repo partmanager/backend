@@ -1,0 +1,65 @@
+[
+    {
+        "manufacturer": "TestBatteryManufacturer",
+        "partNumber": "TESTBATTERY#",
+        "productionStatus": "",
+        "markingCode": "",
+        "partType": "Battery",
+        "series": {
+            "name": "TestBatterySeries",
+            "description": "Test Battery Series"
+        },
+        "description": "",
+        "productUrl": "",
+        "notes": "",
+        "tags": [],
+        "storageConditions": {
+            "temperature": "",
+            "humidity": "",
+            "MSLevel": ""
+        },
+        "parameters": {
+            "Battery Type": "AA, R6",
+            "Battery Classification": "Alkaline",
+            "Nominal Voltage": {
+                "value": "1.5V"
+            },
+            "Nominal Internal Resistance": {
+                "value": "150mR ~ 300mR"
+            },
+            "Capacity": [
+                {
+                    "value": "3000mAh",
+                    "conditions": {
+                        "Id": "25mA",
+                        "TA": "21\u00b0C"
+                    }
+                },
+                {
+                    "value": "2000mAh",
+                    "conditions": {
+                        "Id": "250mA",
+                        "TA": "21\u00b0C"
+                    }
+                }
+            ]
+        },
+        "files": {},
+        "package": {
+            "name": "battery_aa"
+        },
+        "symbol&footprint": {
+            "symbolName": "battery",
+            "pinmap": {},
+            "footprints": []
+        },
+        "orderNumbers": {
+            "TESTBATTERYA": {
+                "Packaging Code": "A",
+                "Packaging Type": "Foil",
+                "Packaging Qty": "2",
+                "Packaging Data": {}
+            }
+        }
+    }
+]

@@ -1,0 +1,43 @@
+[
+    {
+        "manufacturer": "TestBatteryHolderManufacturer",
+        "partNumber": "TESTBATTERYHOLDER#",
+        "productionStatus": "",
+        "markingCode": "",
+        "partType": "Battery Holder",
+        "series": {
+            "name": "TestBatteryHolderSeries",
+            "description": "Test Battery Holder Series"
+        },
+        "description": "Test Battery holder 3x AA, R6, PCB mount",
+        "productUrl": "",
+        "notes": "",
+        "tags": [],
+        "storageConditions": {
+            "temperature": "",
+            "humidity": "",
+            "MSLevel": ""
+        },
+        "parameters": {
+            "Battery Type": "R6",
+            "Battery Count": {
+                "value": "3"
+            }
+        },
+        "files": {},
+        "package": {},
+        "symbol&footprint": {
+            "symbolName": "battery_holder_3xR6",
+            "pinmap": {},
+            "footprints": []
+        },
+        "orderNumbers": {
+            "TESTBATTERYHOLDERA": {
+                "Packaging Code": "A",
+                "Packaging Type": "",
+                "Packaging Qty": "",
+                "Packaging Data": {}
+            }
+        }
+    }
+]

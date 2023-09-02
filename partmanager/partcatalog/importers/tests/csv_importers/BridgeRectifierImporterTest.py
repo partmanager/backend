@@ -1,0 +1,102 @@
+from django.test import TestCase
+from partcatalog.importers.csv_to_json import CSVToJson
+from manufacturers.models import Manufacturer
+from partcatalog.models.part import Part
+from partcatalog.models.bridge_rectifier import BridgeRectifier
+from decimal import Decimal
+
+
+class BridgeRectifierCSVImportTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        Part.objects.all().delete()
+
+        manufacturer = Manufacturer(name="Diodes Incorporated", full_name="Diodes Incorporated")
+        manufacturer.save()
+
+        # Set up non-modified objects used by all test methods
+        csv_importer = CSVToJson()
+        csv_importer.parts_load('partcatalog/importers/test_data/csv/test_bridge_rectifier.csv')
+        csv_importer.export("/tmp/test_bridge_rectifier.json")
+        csv_importer.run(dry=False)
+
+    def test_imported_part(self):
+        parts = BridgeRectifier.objects.all()
+        self.assertEqual(len(parts), 1)
+        part = parts[0]
+        self.assertEqual(part.part_type, 'BRG')
+        self.assertEqual(part.manufacturer_part_number, "HDS10M")
+        self.assertEqual(part.manufacturer.name, "Diodes Incorporated")
+        self.assertEqual(part.series, '')
+        self.assertEqual(part.series_description, '')
+        self.assertEqual(part.description, 'Bridge Rectifier 1A, min. 1000V')
+        self.assertEqual(part.production_status, 'UNK')
+        self.assertEqual(part.device_marking_code, 'HDS10M')
+        self.assertEqual(part.notes, None)
+        self.assertEqual(part.comment, None)
+        self.assertEqual(part.product_url, None)
+        self.assertEqual(part.storage_conditions.temperature_min, -55)
+        self.assertEqual(part.storage_conditions.temperature_max, 150)
+        self.assertEqual(part.storage_conditions.humidity_min, None)
+        self.assertEqual(part.storage_conditions.humidity_max, None)
+        self.assertEqual(part.storage_conditions.msl_level, 1)
+        self.assertEqual(part.symbol.name, 'bridge_rectifier')
+        #self.assertEqual(part.files,)
+        self.assertEqual(part.repetitive_peak_reverse_voltage.min, None)
+        self.assertEqual(part.repetitive_peak_reverse_voltage.typ, 1000)
+        self.assertEqual(part.repetitive_peak_reverse_voltage.max, None)
+        self.assertEqual(part.repetitive_peak_reverse_voltage.at_temp, 25)
+        self.assertEqual(part.working_peak_reverse_voltage.min, None)
+        self.assertEqual(part.working_peak_reverse_voltage.typ, 1000)
+        self.assertEqual(part.working_peak_reverse_voltage.max, None)
+        self.assertEqual(part.working_peak_reverse_voltage.at_temp, 25)
+        self.assertEqual(part.dc_blocking_voltage.min, None)
+        self.assertEqual(part.dc_blocking_voltage.typ, 1000)
+        self.assertEqual(part.dc_blocking_voltage.max, None)
+        self.assertEqual(part.dc_blocking_voltage.at_temp, 25)
+        self.assertEqual(part.rms_blocking_voltage.min, None)
+        self.assertEqual(part.rms_blocking_voltage.typ, 700)
+        self.assertEqual(part.rms_blocking_voltage.max, None)
+        self.assertEqual(part.rms_blocking_voltage.at_temp, 25)
+        self.assertEqual(part.average_rectified_current.min, None)
+        self.assertEqual(part.average_rectified_current.typ, 1)
+        self.assertEqual(part.average_rectified_current.max, None)
+        self.assertEqual(part.average_rectified_current.at_temp, 95)
+        self.assertEqual(part.thermal_resistance_junction_to_ambient_per_element.min, None)
+        self.assertEqual(part.thermal_resistance_junction_to_ambient_per_element.typ, 40)
+        self.assertEqual(part.thermal_resistance_junction_to_ambient_per_element.max, None)
+        self.assertEqual(part.thermal_resistance_junction_to_case_per_element.min, None)
+        self.assertEqual(part.thermal_resistance_junction_to_case_per_element.typ, 30)
+        self.assertEqual(part.thermal_resistance_junction_to_case_per_element.max, None)
+        self.assertEqual(part.thermal_resistance_junction_to_lead_per_element.min, None)
+        self.assertEqual(part.thermal_resistance_junction_to_lead_per_element.typ, 18)
+        self.assertEqual(part.thermal_resistance_junction_to_lead_per_element.max, None)
+        self.assertEqual(part.reverse_breakdown_voltage.min, 1000)
+        self.assertEqual(part.reverse_breakdown_voltage.typ, None)
+        self.assertEqual(part.reverse_breakdown_voltage.max, None)
+        self.assertEqual(part.reverse_breakdown_voltage.at_reverse_current_uA, 5)
+        self.assertEqual(part.forward_voltage_per_element.min, None)
+        self.assertEqual(part.forward_voltage_per_element.typ, Decimal('0.92'))
+        self.assertEqual(part.forward_voltage_per_element.max, Decimal('0.95'))
+        self.assertEqual(part.forward_voltage_per_element.at_forward_current, Decimal('0.5'))
+        self.assertEqual(part.forward_voltage_per_element.at_junction_temp, 25)
+        self.assertEqual(part.leakage_current_per_element.min, None)
+        self.assertEqual(part.leakage_current_per_element.typ, Decimal('0.00000008'))
+        self.assertEqual(part.leakage_current_per_element.max, Decimal('0.0000041'))
+        self.assertEqual(part.leakage_current_per_element.at_junction_temp, None)
+        self.assertEqual(part.leakage_current_per_element.at_ambient_temp, 25)
+        self.assertEqual(part.leakage_current_per_element.at_reverse_voltage, 1000)
+        self.assertEqual(part.total_capacitance_per_element.min, None)
+        self.assertEqual(part.total_capacitance_per_element.typ_in_farads(), Decimal('0.0000000000082'))
+        self.assertEqual(part.total_capacitance_per_element.max, None)
+        self.assertEqual(part.total_capacitance_per_element.at_frequency, 1000000)
+        self.assertEqual(part.total_capacitance_per_element.at_reverse_voltage, 4)
+
+        self.assertEqual(len(part.manufacturer_order_number_set.all()), 1)
+        manufacturer_order_number = part.manufacturer_order_number_set.all()[0]
+        self.assertEqual(manufacturer_order_number.manufacturer_order_number, 'HDS10M-13')
+        self.assertEqual(manufacturer_order_number.manufacturer.name, "Diodes Incorporated")
+        #self.assertEqual(manufacturer_order_number.packaging,)
+        self.assertEqual(manufacturer_order_number.part, part)
+        self.assertEqual(manufacturer_order_number.note, None)
+        self.assertEqual(manufacturer_order_number.description, None)

@@ -1,0 +1,125 @@
+[
+    {
+        "manufacturer": "TestDiodeManufacturer",
+        "partNumber": "TESTDIODE#",
+        "productionStatus": "",
+        "markingCode": "",
+        "partType": "Small Signal Diode",
+        "series": {
+            "name": "TestDiodeSeries",
+            "description": "Test Diode Series"
+        },
+        "description": "",
+        "productUrl": "",
+        "notes": "",
+        "tags": [],
+        "storageConditions": {
+            "temperature": "-55\u00b0C ~ +150\u00b0C",
+            "humidity": "",
+            "MSLevel": "Level 1 \u2192 J-STD-020"
+        },
+        "parameters": {
+            "Forward Voltage": {
+                "value": "max. 1.7V",
+                "conditions": {
+                    "I_F": "1A",
+                    "T_j": "25\u00b0C"
+                }
+            },
+            "Reverse Current": [
+                {
+                    "value": "max. 1uA",
+                    "conditions": {
+                        "V_R": "1000V",
+                        "T_J": "25\u00b0C"
+                    }
+                },
+                {
+                    "value": "max. 20uA",
+                    "conditions": {
+                        "V_R": "1000V",
+                        "T_J": "125\u00b0C"
+                    }
+                }
+            ],
+            "Junction Capacitance": {
+                "value": "10pF",
+                "conditions": {
+                    "V_R": "4V",
+                    "f": "1MHz"
+                }
+            },
+            "I_F": {
+                "value": "1A"
+            },
+            "I_FRM": {
+                "value": "10A"
+            },
+            "I_FSM": {
+                "value": "30A"
+            },
+            "Power Rating": {
+                "value": "1W",
+                "conditions": {
+                    "t": "10ms"
+                }
+            },
+            "V_BR": {
+                "value": "1000V"
+            },
+            "t_rr": {
+                "value": "35ns"
+            },
+            "V_RRM": {
+                "value": "600V",
+                "conditions": {
+                    "T_A": "25\u00b0C"
+                }
+            },
+            "V_R": {
+                "value": "1000V",
+                "conditions": {
+                    "T_A": "25\u00b0C"
+                }
+            }
+        },
+        "files": {
+            "datasheet": ""
+        },
+        "package": {
+            "name": ""
+        },
+        "symbol&footprint": {
+            "symbolName": "diode",
+            "pinmap": {},
+            "footprints": []
+        },
+        "orderNumbers": {
+            "TESTDIODEA": {
+                "Packaging Code": "13",
+                "Packaging Type": "Embossed Tape / Reel",
+                "Packaging Qty": "5000",
+                "Packaging Data": {
+                    "Reel Diameter": "",
+                    "Reel Width": "",
+                    "Tape Pin 1 Quadrant": "",
+                    "Tape W": "",
+                    "Tape E": "",
+                    "Tape F": "",
+                    "Tape SO": "",
+                    "Tape P0": "",
+                    "Tape P1": "",
+                    "Tape P2": "",
+                    "Tape D": "",
+                    "Tape D1": "",
+                    "Tape A0": "",
+                    "Tape A1": "",
+                    "Tape B0": "",
+                    "Tape B1": "",
+                    "Tape T": "",
+                    "Tape K": ""
+                }
+            }
+        }
+    }
+]

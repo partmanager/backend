@@ -1,0 +1,43 @@
+[
+    {
+        "manufacturer": "TestModuleManufacturer",
+        "partNumber": "TESTMOD#",
+        "productionStatus": "",
+        "markingCode": "",
+        "partType": "Module",
+        "series": {
+            "name": "",
+            "description": ""
+        },
+        "description": "ISM Transceiver 868MHz",
+        "productUrl": "",
+        "notes": "",
+        "tags": [],
+        "storageConditions": {
+            "temperature": "",
+            "humidity": "",
+            "MSLevel": ""
+        },
+        "parameters": {
+            "Module Type": "RF Transceiver",
+            "Frequency": {
+                "value": "868MHz"
+            }
+        },
+        "files": {},
+        "package": {},
+        "symbol&footprint": {
+            "symbolName": "",
+            "pinmap": {},
+            "footprints": []
+        },
+        "orderNumbers": {
+            "TESTMODA": {
+                "Packaging Code": "A",
+                "Packaging Type": "-",
+                "Packaging Qty": "1",
+                "Packaging Data": {}
+            }
+        }
+    }
+]

@@ -1,0 +1,138 @@
+[
+    {
+        "manufacturer": "TestBridgeRectifierManufacturer",
+        "partNumber": "TESTBRIDGERECTIFIER#",
+        "productionStatus": "",
+        "markingCode": "",
+        "partType": "Bridge Rectifier",
+        "series": {
+            "name": "",
+            "description": ""
+        },
+        "description": "Test bridge rectifier description",
+        "productUrl": "",
+        "notes": "",
+        "tags": [],
+        "storageConditions": {
+            "temperature": "-55\u00b0C ~ +150\u00b0C",
+            "humidity": "",
+            "MSLevel": "Level 1 \u2192 J-STD-020"
+        },
+        "parameters": {
+            "V_RRM Peak Repetitive Reverse Voltage": {
+                "value": "1000V",
+                "conditions": {
+                    "T_A": "25\u00b0C"
+                }
+            },
+            "V_RWM Working Peak Reverse Voltage": {
+                "value": "1000V",
+                "conditions": {
+                    "T_A": "25\u00b0C"
+                }
+            },
+            "V_R DC Blocking Voltage": {
+                "value": "1000V",
+                "conditions": {
+                    "T_A": "25\u00b0C"
+                }
+            },
+            "V_R(RMS) RMS Reverse Voltage": {
+                "value": "700V",
+                "conditions": {
+                    "T_A": "25\u00b0C"
+                }
+            },
+            "I_O Average Rectified Output Current": {
+                "value": "1A",
+                "conditions": {
+                    "T_C": "95\u00b0C"
+                }
+            },
+            "R_\u03b8JA Thermal Resistance, Junction to Ambient": {
+                "value": "40\u00b0C/W"
+            },
+            "R_\u03b8JC  Thermal Resistance, Junction to Case": {
+                "value": "30\u00b0C/W"
+            },
+            "R_\u03b8JL Thermal Resistance, Junction to Lead": {
+                "value": "18\u00b0C/W"
+            },
+            "V_(BR)R Reverse Breakdown Voltage": {
+                "value": "min. 1000V",
+                "conditions": {
+                    "I_R": "5uA",
+                    "T_A": "25\u00b0C"
+                }
+            },
+            "V_F Forward Voltage (per element)": {
+                "value": "0.92V +0.03V",
+                "conditions": {
+                    "I_F": "0.5A",
+                    "T_A": "25\u00b0C"
+                }
+            },
+            "I_R Leakage Current (per element)": [
+                {
+                    "value": "0.08uA +4.02uA",
+                    "conditions": {
+                        "V_R": "1000V",
+                        "T_A": "25\u00b0C"
+                    }
+                },
+                {
+                    "value": "20uA +80uA",
+                    "conditions": {
+                        "V_R": "1000V",
+                        "T_A": "125\u00b0C"
+                    }
+                }
+            ],
+            "C_T Total Capacitance (per element)": {
+                "value": "8.2pF",
+                "conditions": {
+                    "V_R": "4V",
+                    "f": "1MHz"
+                }
+            }
+        },
+        "files": {
+            "datasheet": ""
+        },
+        "package": {
+            "name": "HDS"
+        },
+        "symbol&footprint": {
+            "symbolName": "bridge_rectifier",
+            "pinmap": {},
+            "footprints": []
+        },
+        "orderNumbers": {
+            "TESTBRIDGERECTIFIERA": {
+                "Packaging Code": "13",
+                "Packaging Type": "Embossed Tape / Reel",
+                "Packaging Qty": "5000",
+                "Packaging Data": {
+                    "Reel Diameter": "",
+                    "Reel Width": "",
+                    "Tape Pin 1 Quadrant": "",
+                    "Tape W": "",
+                    "Tape E": "",
+                    "Tape F": "",
+                    "Tape SO": "",
+                    "Tape P0": "",
+                    "Tape P1": "",
+                    "Tape P2": "",
+                    "Tape D": "",
+                    "Tape D1": "",
+                    "Tape A0": "",
+                    "Tape A1": "",
+                    "Tape B0": "",
+                    "Tape B1": "",
+                    "Tape T": "",
+                    "Tape K": ""
+                }
+            }
+        }
+    }
+]

@@ -1,0 +1,50 @@
+[
+    {
+        "manufacturer": "TestLightPipeManufacturer",
+        "partNumber": "TESTLIGHTPIPE#",
+        "productionStatus": "",
+        "markingCode": "",
+        "partType": "Lightpipe",
+        "series": {
+            "name": "TestLightPipeSeries",
+            "description": "Test Light Pipe Series"
+        },
+        "description": "Light pipe test description",
+        "productUrl": "",
+        "notes": "",
+        "tags": [],
+        "storageConditions": {
+            "temperature": "",
+            "humidity": "",
+            "MSLevel": ""
+        },
+        "parameters": {
+            "Shape": "Round",
+            "Color": "Transparent",
+            "Lights Count": {
+                "value": "1"
+            },
+            "Length": {
+                "value": "6mm"
+            },
+            "Panel Cutout Diameter": {
+                "value": "3mm"
+            }
+        },
+        "files": {},
+        "package": {},
+        "symbol&footprint": {
+            "symbolName": "lightpipe_panelmount_1x",
+            "pinmap": {},
+            "footprints": []
+        },
+        "orderNumbers": {
+            "TESTLIGHTPIPEA": {
+                "Packaging Code": "A",
+                "Packaging Type": "Bag",
+                "Packaging Qty": "2000",
+                "Packaging Data": {}
+            }
+        }
+    }
+]

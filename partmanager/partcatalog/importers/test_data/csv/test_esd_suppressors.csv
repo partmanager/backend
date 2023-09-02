@@ -1,0 +1,2 @@
+Manufacturer,Production Status,Order Number,Part Number,Marking Code,Part Type,Symbol,Series,Series Description,Working Temp Range,Storage Temp Range,MSLevel,Notes,Product URL,Package Type,Directions,Rated Voltage,Clamping Voltage,Trigger Voltage,Capacitance,Attenuation,Leakage Current,ESD pulse withstand,Packaging Code,Packaging Type,Packaging Qty
+EATON,,PS04LTVA1,PS04LTVA1,,ESD Suppressor,,,,,,,,,,Bidirectional,5V +7V,25V,15V,0.05pF +0.1pF @ f=1MHz,0.2dB,max. 1nA,1000,,,

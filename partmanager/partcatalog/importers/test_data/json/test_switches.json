@@ -1,0 +1,88 @@
+[
+    {
+        "manufacturer": "TestSwitchManufacturer",
+        "partNumber": "TESTSWITCH#",
+        "productionStatus": "",
+        "markingCode": "A",
+        "partType": "Switch",
+        "series": {
+            "name": "TestSwitchSeries",
+            "description": "Test Switch Series"
+        },
+        "description": "",
+        "productUrl": "",
+        "notes": "",
+        "tags": [],
+        "storageConditions": {
+            "temperature": "5\u00b0C ~ 35\u00b0C",
+            "humidity": "",
+            "MSLevel": "Level 1"
+        },
+        "parameters": {
+            "Switch Type": "Tact Switch",
+            "Configuration": "SPST-NO",
+            "Position Count": {
+                "value": 1
+            },
+            "Switching Voltage": {
+                "value": "max. 500V"
+            },
+            "Switching Current": {
+                "value": "1A",
+                "conditions": {
+                    "T_A": "23\u00b0C"
+                }
+            },
+            "Contact Resistance": {
+                "value": "max. 10R",
+                "conditions": {
+                    "T_A": "25\u00b0C"
+                }
+            },
+            "Insulation Resistance": {
+                "value": "1000000R",
+                 "conditions": {
+                    "V": "100V",
+                    "T_A": "25\u00b0C"
+                }
+            },
+            "Operating Life": {
+                "value": 100000
+            }
+        },
+        "files": {},
+        "package": {},
+        "symbol&footprint": {
+            "symbolName": "switch",
+            "pinmap": {},
+            "footprints": []
+        },
+        "orderNumbers": {
+            "TESTSWITCHA": {
+                "Packaging Code": "A",
+                "Packaging Type": "Embossed Tape / Reel",
+                "Packaging Qty": "2000",
+                "Packaging Data": {
+                    "Reel Diameter": "",
+                    "Reel Width": "",
+                    "Tape Pin 1 Quadrant": "Q1",
+                    "Tape W": "12mm",
+                    "Tape E": "",
+                    "Tape F": "",
+                    "Tape SO": "",
+                    "Tape P0": "4.00mm",
+                    "Tape P1": "8.00mm",
+                    "Tape P2": "2.00mm",
+                    "Tape D": "",
+                    "Tape D1": "1.5mm",
+                    "Tape A0": "4.9mm",
+                    "Tape A1": "",
+                    "Tape B0": "3.65mm",
+                    "Tape B1": "",
+                    "Tape T": "0.40mm",
+                    "Tape K": "3.4mm"
+                }
+            }
+        }
+    }
+]

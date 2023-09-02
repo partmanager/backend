@@ -1,0 +1,107 @@
+[
+    {
+        "manufacturer": "TestCrystalOscillatorManufacturer",
+        "partNumber": "TESTCRYSTALOSCILLATOR#",
+        "productionStatus": "",
+        "markingCode": "",
+        "partType": "Crystal Oscillator",
+        "series": {
+            "name": "TestCrystalOscillatorSeries",
+            "description": "Test Crystal Oscillator Series"
+        },
+        "description": "",
+        "productUrl": "",
+        "notes": "",
+        "tags": [],
+        "storageConditions": {
+            "temperature": "-55\u00b0C ~ 125\u00b0C",
+            "humidity": "",
+            "MSLevel": "Level 1"
+        },
+        "parameters": {
+            "Supply Voltage": {
+                "value": "3.3V \u00b10.165V"
+            },
+            "Supply Current": {
+                "value": "2.5mA +4.5mA"
+            },
+            "Stand-by Current": {
+                "value": "max. 10uA"
+            },
+            "Frequency": {
+                "value": "8MHz"
+            },
+            "Frequency Stability Over Operating Temperature Range": {
+                "value": "\u00b1100ppm"
+            },
+            "Rise Time": {
+                "value": "2.5ns + 1.5ns"
+            },
+            "Fall Time": {
+                "value": "2.5ns + 1.5ns"
+            },
+            "Start-up Time": {
+                "value": "1ms +1ms"
+            },
+            "Output Load": {
+                "value": "max. 15pF"
+            },
+            "Peak to Peak Jitter": {
+                "value": "28ps"
+            },
+            "RMS Jitter": {
+                "value": "3.2ps +1.8ps"
+            },
+            "Ageing": {
+                "value": "\u00b13ppm/year",
+                "conditions": {
+                    "T_A": "25\u00b0C"
+                }
+            },
+            "Enable pin": {
+                "value": "yes"
+            },
+            "Tri-state Output": {
+                "value": "yes"
+            }
+        },
+        "files": {
+            "datasheet": ""
+        },
+        "package": {
+            "name": "Crystal_3.2x2.5x1.2"
+        },
+        "symbol&footprint": {
+            "symbolName": "oscillator_with_enable_4p",
+            "pinmap": {},
+            "footprints": []
+        },
+        "orderNumbers": {
+            "ASE-8.000MHZ-E-T": {
+                "Packaging Code": "T",
+                "Packaging Type": "Embossed Tape / Reel",
+                "Packaging Qty": "1000",
+                "Packaging Data": {
+                    "Reel Diameter": "178mm \u00b11mm",
+                    "Reel Width": "",
+                    "Tape Pin 1 Quadrant": "Q1",
+                    "Tape W": "8mm \u00b10.2mm",
+                    "Tape E": "1.75mm \u00b10.1mm",
+                    "Tape F": "3.5mm \u00b10.5mm",
+                    "Tape SO": "",
+                    "Tape P0": "4mm \u00b10.1mm",
+                    "Tape P1": "4mm \u00b10.1mm",
+                    "Tape P2": "2mm \u00b10.06mm",
+                    "Tape D": "1.5mm",
+                    "Tape D1": "1mm",
+                    "Tape A0": "2.9mm \u00b10.1mm",
+                    "Tape A1": "",
+                    "Tape B0": "3.6mm \u00b10.1mm",
+                    "Tape B1": "",
+                    "Tape T": "0.25mm \u00b10.05mm",
+                    "Tape K": "1.25mm \u00b10.1mm"
+                }
+            }
+        }
+    }
+]

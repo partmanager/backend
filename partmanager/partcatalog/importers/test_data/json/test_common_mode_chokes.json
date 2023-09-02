@@ -1,0 +1,73 @@
+[
+    {
+        "manufacturer": "TestCommonModeChokeManufacturer",
+        "partNumber": "TESTCOMMONMODECHOKE#",
+        "productionStatus": "",
+        "markingCode": "",
+        "partType": "Common Mode Choke",
+        "series": {
+            "name": "TestCommonModeChokeSeries",
+            "description": "Test Common Mode Choke Series"
+        },
+        "description": "",
+        "productUrl": "",
+        "notes": "",
+        "tags": [],
+        "storageConditions": {
+            "temperature": "-55\u2103 ~ 135\u2103",
+            "humidity": "",
+            "MSLevel": ""
+        },
+        "parameters": {
+            "Rated Current": {
+                "value": "max. 0.5A",
+                "conditions": {
+                    "T_A": "25\u2103"
+                }
+            },
+            "DC Resistance": {
+                "value": "max. 0.3m\u03a9"
+            },
+            "Impedance": {
+                "value": "1R",
+                "conditions": {
+                    "f": "100MHz"
+                }
+            }
+        },
+        "files": {},
+        "package": {},
+        "symbol&footprint": {
+            "symbolName": "common_mode",
+            "pinmap": {},
+            "footprints": []
+        },
+        "orderNumbers": {
+            "TESTCOMMONMODECHOKEA": {
+                "Packaging Code": "A",
+                "Packaging Type": "Embossed Tape / Reel",
+                "Packaging Qty": "1500",
+                "Packaging Data": {
+                    "Reel Diameter": "330mm",
+                    "Reel Width": "22.4mm",
+                    "Tape Pin 1 Quadrant": "Q2",
+                    "Tape W": "16mm",
+                    "Tape E": "2.525mm",
+                    "Tape F": "",
+                    "Tape SO": "",
+                    "Tape P0": "4mm",
+                    "Tape P1": "8mm",
+                    "Tape P2": "2mm",
+                    "Tape D": "1.55mm",
+                    "Tape D1": "",
+                    "Tape A0": "",
+                    "Tape A1": "",
+                    "Tape B0": "",
+                    "Tape B1": "",
+                    "Tape T": "",
+                    "Tape K": ""
+                }
+            }
+        }
+    }
+]

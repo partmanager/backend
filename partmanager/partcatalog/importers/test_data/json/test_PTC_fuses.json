@@ -1,0 +1,50 @@
+[
+    {
+        "manufacturer": "TestPTCFuseManufacturer",
+        "partNumber": "TESTPTCFUSE#",
+        "productionStatus": "",
+        "markingCode": "",
+        "partType": "PTC Fuse",
+        "series": {
+            "name": "TestPTCFuseSeries",
+            "description": "Test PTC Fuse Series"
+        },
+        "description": "",
+        "productUrl": "",
+        "notes": "",
+        "tags": [],
+        "storageConditions": {
+            "temperature": "",
+            "humidity": "",
+            "MSLevel": ""
+        },
+        "parameters": {
+            "Rated Voltage": {
+                "value": "max. 60V"
+            },
+            "Resistance": {
+                "value": "min. 3.6\u2126",
+                "conditions": {
+                    "T_A": "23\u00b0C"
+                }
+            }
+        },
+        "files": {},
+        "package": {
+            "name": "Chip 1210"
+        },
+        "symbol&footprint": {
+            "symbolName": "fuse_ptc",
+            "pinmap": {},
+            "footprints": []
+        },
+        "orderNumbers": {
+            "SM005-60": {
+                "Packaging Code": "",
+                "Packaging Type": "",
+                "Packaging Qty": "",
+                "Packaging Data": {}
+            }
+        }
+    }
+]

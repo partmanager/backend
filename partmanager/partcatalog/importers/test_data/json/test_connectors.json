@@ -1,0 +1,40 @@
+[
+    {
+        "manufacturer": "TestConnectorManufacturer",
+        "partNumber": "TESTCONNECTOR#",
+        "productionStatus": "",
+        "markingCode": "",
+        "partType": "Connector Bus",
+        "series": {
+            "name": "TestConnectorSeries",
+            "description": "Test Connector Series"
+        },
+        "description": "Test SIM Card Connector",
+        "productUrl": "",
+        "notes": "",
+        "tags": [],
+        "storageConditions": {
+            "temperature": "",
+            "humidity": "",
+            "MSLevel": ""
+        },
+        "parameters": {
+            "Bus Type": "SIM Card"
+        },
+        "files": {},
+        "package": {},
+        "symbol&footprint": {
+            "symbolName": "",
+            "pinmap": {},
+            "footprints": []
+        },
+        "orderNumbers": {
+            "TESTCONNECTORA": {
+                "Packaging Code": "A",
+                "Packaging Type": "",
+                "Packaging Qty": "1",
+                "Packaging Data": {}
+            }
+        }
+    }
+]

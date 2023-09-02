@@ -1,0 +1,57 @@
+[
+    {
+        "manufacturer": "TestESDSuppressorManufacturer",
+        "partNumber": "TESTESDSUPPRESSOR#",
+        "productionStatus": "",
+        "markingCode": "",
+        "partType": "ESD Suppressor",
+        "series": {
+            "name": "",
+            "description": ""
+        },
+        "description": "",
+        "productUrl": "",
+        "notes": "",
+        "tags": [],
+        "storageConditions": {
+            "temperature": "",
+            "humidity": "",
+            "MSLevel": ""
+        },
+        "parameters": {
+            "Clamping Voltage": {
+                "value": "25V"
+            },
+            "Trigger Voltage": {
+                "value": "15V"
+            },
+            "Capacitance": {
+                "value": "0.05pF +0.1pF",
+                "conditions": {
+                    "f": "1MHz"
+                }
+            },
+            "Attenuation": {
+                "value": "0.2dB"
+            },
+            "ESD pulse withstand": {
+                "value": "1000"
+            }
+        },
+        "files": {},
+        "package": {},
+        "symbol&footprint": {
+            "symbolName": "",
+            "pinmap": {},
+            "footprints": []
+        },
+        "orderNumbers": {
+            "TESTESDSUPPRESSORA": {
+                "Packaging Code": "A",
+                "Packaging Type": "",
+                "Packaging Qty": "",
+                "Packaging Data": {}
+            }
+        }
+    }
+]

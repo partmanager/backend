@@ -1,0 +1,63 @@
+from .json_importer_base import JsonImporterBase
+from .json_importers.balun_importer import BalunJsonImporter
+from .json_importers.battery_importer import BatteryJsonImporter
+from .json_importers.battery_holder_importer import BatteryHolderJsonImporter
+from .json_importers.bridge_rectifier_importer import BridgeRectifierJsonImporter
+from .json_importers.capacitor_importer import CapacitorJsonImporter
+from .json_importers.common_mode_choke_importer import CommonModeChokeJsonImporter
+from .json_importers.connector_importer import ConnectorJsonImporter
+from .json_importers.crystal_importer import CrystalJsonImporter
+from .json_importers.crystal_oscillator_importer import CrystalOscillatorJsonImporter
+from .json_importers.diode_importer import DiodeJsonImporter
+from .json_importers.diode_zener_importer import DiodeZenerJsonImporter
+from .json_importers.display_importer import DisplayJsonImporter
+from .json_importers.enclosure_importer import EnclosureJsonImporter
+from .json_importers.esd_suppressor_importer import ESDSuppressorJsonImporter
+from .json_importers.ferrite_bead_importer import FerriteBeadJsonImporter
+from .json_importers.fuse_importer import FuseJsonImporter
+from .json_importers.ic_importer import IntegratedCircuitJsonImporter
+from .json_importers.inductor_importer import InductorJsonImporter
+from .json_importers.led_importer import LEDJsonImporter
+from .json_importers.lightpipe_importer import LightpipeJsonImporter
+from .json_importers.module_importer import ModuleJsonImporter
+from .json_importers.ptc_fuse_importer import PTCFuseJsonImporter
+from .json_importers.relay_importer import RelayJsonImporter
+from .json_importers.resistor_importer import ResistorJsonImporter
+from .json_importers.resistor_array_importer import ResistorArrayJsonImporter
+from .json_importers.surge_arrester_importer import SurgeArresterJsonImporter
+from .json_importers.switch_importer import SwitchJsonImporter
+from .json_importers.transistor_mosfet_importer import TransistorMosfetJsonImporter
+from .json_importers.varistor_importer import VaristorJsonImporter
+
+
+json_importer = JsonImporterBase()
+json_importer.register_model_importer(BalunJsonImporter())
+json_importer.register_model_importer(BatteryJsonImporter())
+json_importer.register_model_importer(BatteryHolderJsonImporter())
+json_importer.register_model_importer(BridgeRectifierJsonImporter())
+json_importer.register_model_importer(CapacitorJsonImporter())
+json_importer.register_model_importer(CommonModeChokeJsonImporter())
+json_importer.register_model_importer(ConnectorJsonImporter())
+json_importer.register_model_importer(CrystalJsonImporter())
+json_importer.register_model_importer(CrystalOscillatorJsonImporter())
+json_importer.register_model_importer(DiodeJsonImporter())
+json_importer.register_model_importer(DiodeZenerJsonImporter())
+json_importer.register_model_importer(DisplayJsonImporter())
+json_importer.register_model_importer(EnclosureJsonImporter())
+json_importer.register_model_importer(ESDSuppressorJsonImporter())
+json_importer.register_model_importer(FerriteBeadJsonImporter())
+json_importer.register_model_importer(FuseJsonImporter())
+json_importer.register_model_importer(IntegratedCircuitJsonImporter())
+json_importer.register_model_importer(InductorJsonImporter())
+json_importer.register_model_importer(LEDJsonImporter())
+json_importer.register_model_importer(LightpipeJsonImporter())
+json_importer.register_model_importer(ModuleJsonImporter())
+json_importer.register_model_importer(PTCFuseJsonImporter())
+json_importer.register_model_importer(RelayJsonImporter())
+json_importer.register_model_importer(ResistorJsonImporter())
+json_importer.register_model_importer(ResistorArrayJsonImporter())
+json_importer.register_model_importer(SurgeArresterJsonImporter())
+json_importer.register_model_importer(SwitchJsonImporter())
+json_importer.register_model_importer(TransistorMosfetJsonImporter())
+json_importer.register_model_importer(VaristorJsonImporter())
+

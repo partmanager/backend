@@ -1,0 +1,58 @@
+[
+    {
+        "manufacturer": "TestEnclosureManufacturer",
+        "partNumber": "TESTENCLOSURE#",
+        "productionStatus": "",
+        "markingCode": "",
+        "partType": "Enclosure",
+        "series": {
+            "name": "TestEnclosureSeries",
+            "description": "Test Enclosure Series"
+        },
+        "description": "Enclosure ABS, wall mounting",
+        "productUrl": "",
+        "notes": "",
+        "tags": [],
+        "storageConditions": {
+            "temperature": "",
+            "humidity": "",
+            "MSLevel": ""
+        },
+        "parameters": {
+            "Material": "ABS",
+            "Color": "Gray",
+            "IP Rating": "IP30",
+            "Flame Rating": "UL94 HB",
+            "Length": {
+                "value": "40mm"
+            },
+            "Width": {
+                "value": "40mm"
+            },
+            "Height": {
+                "value": "20mm"
+            },
+            "PCB Length": {
+                "value": "max. 34mm"
+            },
+            "PCB Width": {
+                "value": "max. 34mm"
+            }
+        },
+        "files": {},
+        "package": {},
+        "symbol&footprint": {
+            "symbolName": "",
+            "pinmap": {},
+            "footprints": []
+        },
+        "orderNumbers": {
+            "TESTENCLOSUREA": {
+                "Packaging Code": "A",
+                "Packaging Type": "",
+                "Packaging Qty": "1",
+                "Packaging Data": {}
+            }
+        }
+    }
+]
