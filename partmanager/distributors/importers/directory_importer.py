@@ -9,7 +9,8 @@ logger = logging.getLogger('distributors')
 
 def import_distributor_manufacturer_translation(distributor, manufacturer_name_translation):
     for name_translation in manufacturer_name_translation:
-        logger.info(f"Creating Distributor manufacturer name conversion for {name_translation['distributor_manufacturer_name']} => {name_translation['manufacturer_name']}")
+        logger.info(
+            f"Creating Distributor manufacturer name conversion for {name_translation['distributor_manufacturer_name']} => {name_translation['manufacturer_name']}")
         manufacturer = get_manufacturer_by_name(name_translation['manufacturer_name'])
         if manufacturer:
             logger.debug("\t\tfound manufacturer")
@@ -27,36 +28,33 @@ def import_distributor_manufacturer_translation(distributor, manufacturer_name_t
 
 def import_distributor_order_number(distributor, distributor_order_numbers):
     for don in distributor_order_numbers:
-        distributor_order_number = DistributorOrderNumber.objects.filter(distributor=distributor,
-                                                                         distributor_order_number_text=don[
-                                                                             'distributor_order_number'],
-                                                                         manufacturer_order_number_text=don[
-                                                                             'manufacturer_order_number'])
-        if distributor_order_number:
-            print("Distributor order number exists, skipping...")
-        else:
-            distributor_order_number = DistributorOrderNumber(distributor=distributor,
-                                                              distributor_order_number_text=don[
-                                                                  'distributor_order_number'],
-                                                              manufacturer_order_number_text=don[
-                                                                  'manufacturer_order_number'],
-                                                              manufacturer_name_text=don['manufacturer_name'],
-                                                              part_url=don['part_url'])
+        distributor_order_number, created = DistributorOrderNumber.objects.get_or_create(
+            distributor=distributor,
+            distributor_order_number_text=don['distributor_order_number'],
+            manufacturer_order_number_text=don['manufacturer_order_number'],
+            defaults={
+                'manufacturer_name_text': don['manufacturer_name'],
+                'part_url': don['part_url']
+            })
+        if created:
             distributor_order_number.update_manufacturer_order_number()
             distributor_order_number.save()
+        else:
+            print("Distributor order number exists, skipping...")
 
 
 def import_distributor_from_dict(distributor_dict):
-    distributor = Distributor.objects.filter(name=distributor_dict['name'])
-    if distributor:
-        print("Distributor exist, skipping...")
-    else:
-        distributor = Distributor(name=distributor_dict['name'],
-                                  website_url=distributor_dict['website'],
-                                  connector_data=distributor_dict['connector_data'])
-        distributor.save()
+    distributor, created = Distributor.objects.get_or_create(
+        name=distributor_dict['name'],
+        defaults={
+            'website_url': distributor_dict['website'],
+            'connector_data': distributor_dict['connector_data'] if 'connector_data' in distributor_dict else None
+        })
+    if created:
         import_distributor_manufacturer_translation(distributor, distributor_dict['manufacturer_name_translation'])
         import_distributor_order_number(distributor, distributor_dict['distributor_order_numbers'])
+    else:
+        print("Distributor exist, skipping...")
 
 
 def __process_distributor_file(distributor_filename):
