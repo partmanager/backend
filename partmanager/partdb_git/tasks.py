@@ -10,8 +10,6 @@ from .update_partcatalog import update_manufacturers, update_distributors, updat
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('partdb_git')
 
-consoleHandler = logging.StreamHandler()
-
 
 @shared_task(bind=True)
 def update_all(self):

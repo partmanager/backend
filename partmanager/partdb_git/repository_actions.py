@@ -10,8 +10,6 @@ from .models import GitImportStatus
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('partdb_git')
 
-consoleHandler = logging.StreamHandler()
-
 
 class Progress(RemoteProgress):
     def update(self, op_code, cur_count, max_count=None, message=''):
