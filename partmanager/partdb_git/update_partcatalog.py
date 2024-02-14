@@ -6,9 +6,7 @@ from partcatalog.tasks import import_components
 
 # Configure the logger
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-consoleHandler = logging.StreamHandler()
+logger = logging.getLogger('partdb_git')
 
 
 def update_manufacturers(directory):
