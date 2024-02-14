@@ -69,7 +69,9 @@ INSTALLED_APPS = [
     'manufacturers.apps.ManufacturersConfig',
     'partcatalog.apps.PartcatalogConfig',
     'projects.apps.ProjectsConfig',
-    'packages.apps.PackagesConfig'
+    'packages.apps.PackagesConfig',
+    'partdb_git.apps.PartDBConfig',
+    'celery_progress'
 ]
 
 MIDDLEWARE = [
@@ -244,6 +246,13 @@ MEDIA_ROOT = '/var/media'
 MEDIA_URL = '/media/'
 
 DISTRIBUTORS_CREDENTIALS_FILE = '/etc/partmanager/distributors.json'
-PARTSDB_DIRECTORY = "/var/partsdb/"
+PARTSDB_CONFIG = {
+    "directory": "/var/partsdb/",
+    "repositories": {
+        "partsdb-official": {
+            "url": "https://github.com/partmanager/partsdb.git",
+            "branch": "main"
+        }
+    }
+}
 LOCAL_CURRENCY = 3
-

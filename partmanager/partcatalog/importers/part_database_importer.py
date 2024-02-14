@@ -212,3 +212,12 @@ def import_json_files(path, name, dry=True):
             json_importer.run(dry=dry)
         except KeyError as e:
             logger.error(f"Invalid file {file} {e}")
+
+
+def import_form_file(file, dry=True):
+    try:
+        logger.info(f"Loading {file}")
+        json_importer.parts_import(file)
+        json_importer.run(dry=dry)
+    except KeyError as e:
+        logger.error(f"Invalid file {file} {e}")
