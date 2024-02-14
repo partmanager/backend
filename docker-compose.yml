@@ -15,7 +15,7 @@ services:
     command: /bin/bash create_initial_migration.sh
     volumes:
       - ./partmanager:/code
-      - ../partsdb:/var/partsdb
+      - ./containers_data/partsdb:/var/partsdb
       - ./containers_data/static:/var/static
       - ./containers_data/media:/var/media
       - ./containers_data/var_log_shelftracker:/var/log/shelftracker

@@ -21,6 +21,7 @@ from inventory.importers.directory_importer import DirectoryImporter
 from projects.models import ProjectVersion
 from projects.importers.directory_importer import import_project
 from projects.exporters.directory_exporter import export as projects_export
+from partdb_git.tasks import update_all
 
 
 class ImportView(APIView):
@@ -45,6 +46,12 @@ class ImportView(APIView):
         import_project(workdir + '/projects')
 
         return Response(status=200)
+
+
+class UpdateGitView(APIView):
+    def post(self, request, format=None):
+        result = update_all.delay()
+        return Response({'task_id': result.task_id}, status=200)
 
 
 def export(request):
