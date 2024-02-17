@@ -118,6 +118,9 @@ class InventoryPosition(models.Model):
     archived = models.BooleanField(default=False)  # archived parts are excluded from query's and views by default
     flagged = models.BooleanField(default=False)
 
+    class Meta:
+        ordering = ['category', '-archived', 'part']
+
     def get_stock_value_display(self):
         stock_value = self.get_stock_value()
         if stock_value:
