@@ -5,6 +5,8 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.viewsets import ModelViewSet
+from rest_framework import filters
+from django_filters.rest_framework import DjangoFilterBackend
 
 from .tasks import update_inventory_mpn_assignments
 
@@ -23,6 +25,9 @@ class InventoryPositionViewSet(ModelViewSet):
     serializer_class = InventoryPositionSerializer
     pagination_class = StandardResultsSetPagination
 
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    search_fields = ['distributor_number', 'inventoryposition__part__manufacturer_order_number']
+    filterset_fields = ['category', 'archived', 'flagged']
 
 def api_inventory_list(request, category_pk):
     category = Category.objects.get(pk=category_pk)

@@ -6,6 +6,21 @@ from rest_framework import serializers
 from distributors.serializers import DistributorOrderNumberDetailSerializer, DistributorSerializer
 
 
+class InvoiceMinimalSerializer(serializers.ModelSerializer):
+    distributor = DistributorSerializer(read_only=True)
+
+    class Meta:
+        model = Invoice
+        fields = ['id',
+                  'number',
+                  'invoice_date',
+                  'distributor'
+                  ]
+        extra_kwargs = {
+            'id': {'read_only': True},
+        }
+
+
 class InvoiceSerializer(serializers.ModelSerializer):
     distributor = DistributorSerializer(read_only=True)
     price = serializers.SerializerMethodField()
@@ -49,8 +64,8 @@ class InvoiceCreateSerializer(serializers.ModelSerializer):
 class InvoiceItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = InvoiceItem
-        fields = ['id', 'invoice', 'position_in_invoice', 'ordered_quantity', 'price_value', 'price_currency',
-                  'unit_price_value']
+        fields = ['id', 'invoice', 'position_in_invoice', 'ordered_quantity', 'price_net', 'price_currency',
+                  'unit_price_net']
         extra_kwargs = {
             'id': {'read_only': True},
             'invoice': {'read_only': True}
@@ -58,12 +73,16 @@ class InvoiceItemSerializer(serializers.ModelSerializer):
 
 
 class InvoiceItemDetailSerializer(serializers.ModelSerializer):
+    invoice = InvoiceMinimalSerializer(read_only=True)
     unit_price = serializers.SerializerMethodField()
     extended_price = serializers.SerializerMethodField()
 
     class Meta:
         model = InvoiceItem
-        fields = '__all__'
+        fields = ['id', 'invoice', 'unit_price', 'extended_price', 'order_number', 'type',
+                  'position_in_invoice', 'distributor_number', 'ordered_quantity', 'shipped_quantity',
+                  'delivered_quantity', 'quantity_unit', 'bookkeeping', 'LOT', 'ECCN', 'COO', 'TARIC',
+                  'distributor_order_number']
         extra_kwargs = {
             'id': {'read_only': True},
             'invoice': {'read_only': True}
