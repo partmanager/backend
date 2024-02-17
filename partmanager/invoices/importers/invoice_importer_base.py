@@ -22,7 +22,7 @@ class InvoiceImporterBase:
 
     def create_invoice(self, distributor, invoice_dict, files_dir):
         invoice = Invoice(number=invoice_dict['invoice_number'],
-                          bookkeeping_type=invoice_dict['bookkeeping'],
+                          bookkeeping=invoice_dict['bookkeeping'],
                           distributor=distributor,
                           invoice_date=invoice_dict['invoice_date'],
                           order_date=invoice_dict['order_date'])
@@ -114,7 +114,7 @@ class InvoiceImporterBase:
                                    distributor_order_number=distributor_order_number,
                                    ordered_quantity=position['ordered_quantity'],
                                    shipped_quantity=position['shipped_quantity'],
-                                   price_value=decimal.Decimal(position['price']['net_value']),
+                                   price_net=decimal.Decimal(position['price']['net_value']),
                                    price_vat_tax=position['price']['vat_tax'],
                                    price_currency=Currency[position['price']['currency']])
         return invoice_item

@@ -1,6 +1,9 @@
 from celery import shared_task
 from .models import InvoiceItem
 from distributors.models import Distributor, DistributorOrderNumber
+from .importers.archive_importer import ArchiveInvoiceImporter
+from .importers.tme_csv_importer import TMECSVImporter
+from .importers.generic_csv_importer import GenericCSVImporter
 
 
 @shared_task
@@ -30,3 +33,17 @@ def update_invoice_item_don_assignments():
         print(distributor)
 #        distributor.request_order_numbers(request_don[key])
 
+
+@shared_task
+def import_invoice_from_file(importer, invoice_import_file, distributor_name, invoice_date):
+    print(importer)
+    print(invoice_import_file)
+    if importer == 'Archive importer':
+        importer = ArchiveInvoiceImporter()
+        result_invoice_model = importer.import_invoice(invoice_import_file)
+    elif importer == 'TME CSV file importer':
+        importer = TMECSVImporter()
+        result_invoice_model = importer.import_invoice(invoice_import_file)
+    elif importer == 'Generic CSV file importer':
+        importer = GenericCSVImporter()
+        result_invoice_model = importer.import_invoice(distributor_name, invoice_date, invoice_import_file)

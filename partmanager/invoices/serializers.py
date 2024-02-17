@@ -1,33 +1,49 @@
+import decimal
+
 from .models import Invoice, InvoiceItem
+from partmanager.choices import QuantityUnit
 from rest_framework import serializers
-from inventory.serializers_simple import InventoryPositionSerializer
-from distributors.serializers import DistributorOrderNumberDetailSerializer
+from distributors.serializers import DistributorOrderNumberDetailSerializer, DistributorSerializer
 
 
 class InvoiceSerializer(serializers.ModelSerializer):
+    distributor = DistributorSerializer(read_only=True)
+    price = serializers.SerializerMethodField()
+    local_price = serializers.SerializerMethodField()
+
     class Meta:
         model = Invoice
         fields = ['id',
                   'number',
-                  'bookkeeping_type',
+                  'bookkeeping',
                   'invoice_date',
                   'distributor',
                   'invoice_file',
+                  'payment_confirmation_file',
                   'item_count',
-                  'allitems_mapped',
-                  'net_price_value']
+                  'all_items_mapped',
+                  'price',
+                  'local_price']
+        extra_kwargs = {
+            'id': {'read_only': True},
+            'bookkeeping': {'read_only': True}
+        }
+
+    def get_price(self, obj):
+        return obj.price.to_dict()
+
+    def get_local_price(self, obj):
+        return obj.local_price.to_dict()
 
 
-class InvoiceNumberDistributorSerializer(serializers.ModelSerializer):
+class InvoiceCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Invoice
-        fields = ['id', 'number', 'distributor']
-
-
-class InvoiceDetailSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Invoice
-        fields = '__all__'
+        fields = ['number',
+                  'invoice_date',
+                  'distributor',
+                  'invoice_file',
+                  'payment_confirmation_file']
 
 
 class InvoiceItemSerializer(serializers.ModelSerializer):
@@ -42,11 +58,8 @@ class InvoiceItemSerializer(serializers.ModelSerializer):
 
 
 class InvoiceItemDetailSerializer(serializers.ModelSerializer):
-    invoice = serializers.SerializerMethodField()
     unit_price = serializers.SerializerMethodField()
     extended_price = serializers.SerializerMethodField()
-    distributor_order_number = serializers.SerializerMethodField()
-    inventory_positions = serializers.SerializerMethodField()
 
     class Meta:
         model = InvoiceItem
@@ -56,52 +69,78 @@ class InvoiceItemDetailSerializer(serializers.ModelSerializer):
             'invoice': {'read_only': True}
         }
 
-    def get_invoice(self, obj):
-        return {'id': obj.invoice.pk,
-                'number': f"{obj.invoice.distributor.name}: {obj.invoice.number}"}
-
     def get_unit_price(self, obj):
-        return {'price': obj.unit_price.value,
-                'currency': obj.price.currency}
+        return obj.unit_price.to_dict()
 
     def get_extended_price(self, obj):
-        return {'price': obj.price.value,
-                'currency': obj.price.currency}
-
-    def get_distributor_order_number(self, obj):
-        if obj.distributor_order_number:
-            response = {'don': obj.distributor_order_number.distributor_order_number_text,
-                        'manufacturer': obj.distributor_order_number.manufacturer_name_text,
-                        'mon': obj.distributor_order_number.manufacturer_order_number_text}
-            if obj.distributor_order_number.manufacturer_order_number:
-                manufacturer_order_number = obj.distributor_order_number.manufacturer_order_number
-                response['mapped_mon'] = {
-                    'manufacturer': manufacturer_order_number.manufacturer.name,
-                    'mon': manufacturer_order_number.manufacturer_order_number}
-            return response
-
-    def get_inventory_positions(self, obj):
-        response = []
-        for inventory_position in obj.inventoryposition_set.all():
-            inventory = {'storage_location': inventory_position.storage_location.location,
-                         'stock_quantity': '{} pcs'.format(inventory_position.stock),
-                         'stock_value': inventory_position.get_stock_value_display(),
-                         'condition': inventory_position.get_condition_display()}
-            response.append(inventory)
-        return response
+        return obj.price.to_dict()
 
 
 class InvoiceItemDetailWithStorageSerializer(serializers.ModelSerializer):
-    inventoryposition_set = InventoryPositionSerializer(many=True, read_only=True)
+    stock_data = serializers.SerializerMethodField()
     distributor_order_number = DistributorOrderNumberDetailSerializer(read_only=True)
+    unit_price = serializers.SerializerMethodField()
+    extended_price = serializers.SerializerMethodField()
+    quantity = serializers.SerializerMethodField()
+    type_display = serializers.SerializerMethodField()
+    bookkeeping_display = serializers.SerializerMethodField()
 
     class Meta:
         model = InvoiceItem
-        fields = '__all__'
-        extra_kwargs = {
-            'id': {'read_only': True},
-            'invoice': {'read_only': True}
-        }
+        fields = ['id',
+                  'order_number',
+                  'type',
+                  'type_display',
+                  'position_in_invoice',
+                  'distributor_number',
+                  'bookkeeping',
+                  'bookkeeping_display',
+                  'invoice',
+                  'quantity',
+                  'unit_price',
+                  'extended_price',
+                  'stock_data',
+                  'distributor_order_number',
+                  'LOT',
+                  'ECCN',
+                  'COO',
+                  'TARIC']
+        # extra_kwargs = {
+        #     'id': {'read_only': True},
+        #     'invoice': {'read_only': True}
+        # }
+
+    def get_unit_price(self, obj):
+        return obj.unit_price.to_dict()
+
+    def get_extended_price(self, obj):
+        return obj.price.to_dict()
+
+    def get_quantity(self, obj):
+        return {'ordered': obj.ordered_quantity,
+                'shipped': obj.shipped_quantity,
+                'delivered': obj.delivered_quantity,
+                'unit': obj.quantity_unit,
+                'unit_display': QuantityUnit(obj.quantity_unit).name}
+
+    def get_type_display(self, obj):
+        return obj.get_type_display()
+
+    def get_bookkeeping_display(self, obj):
+        return obj.get_bookkeeping_display()
+
+    def get_stock_data(self, obj):
+        response = {'storage_location': [],
+                    'quantity': 0,
+                    'value': decimal.Decimal(),
+                    'value_currency': None
+                    }
+        for inventory_position in obj.inventoryposition_set.all():
+            response['storage_location'].append(inventory_position.storage_location.location)
+            response['quantity'] += inventory_position.stock
+            response['value'] += inventory_position.get_stock_value()['net']
+            response['value_currency'] = inventory_position.get_stock_value()['currency_display']
+        return response
 
 
 class InvoiceItemCreateSerializer(serializers.ModelSerializer):
@@ -120,11 +159,11 @@ class InvoiceWithItemsSerializer(serializers.ModelSerializer):
         model = Invoice
         fields = ['id',
                   'number',
-                  'bookkeeping_type',
+                  'bookkeeping',
                   'invoice_date',
                   'distributor',
                   'invoice_file',
                   'item_count',
-                  'allitems_mapped',
-                  'net_price_value',
+                  'all_items_mapped',
+                  'price_net',
                   'invoiceitem_set']

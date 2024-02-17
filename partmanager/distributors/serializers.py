@@ -5,7 +5,7 @@ from rest_framework import serializers
 class DistributorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Distributor
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'website_url']
 
 
 class DistributorDetailSerializer(serializers.ModelSerializer):

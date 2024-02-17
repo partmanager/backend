@@ -18,7 +18,7 @@ class ProjectVersion(models.Model):
 
     def to_dict(self):
         project_dict = {'name': self.project.name,
-                        'varsion': self.name,
+                        'version': self.name,
                         'boms': []}
         for bom in self.bom_set.all():
             project_dict['boms'].append(bom.to_dict())

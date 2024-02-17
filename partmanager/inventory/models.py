@@ -119,11 +119,18 @@ class InventoryPosition(models.Model):
     flagged = models.BooleanField(default=False)
 
     def get_stock_value_display(self):
+        stock_value = self.get_stock_value()
+        if stock_value:
+            return "{:.2f} {}".format(stock_value['net'], stock_value['currency_display'])
+        return "Backend Error"
+
+
+    def get_stock_value(self):
         try:
-            return "{:.2f} {}".format(self.invoice.unit_price.value * self.stock,
-                                      self.invoice.get_unit_price_currency_display())
+            return {'net': self.invoice.unit_price.net * self.stock,
+                    'currency_display': self.invoice.get_unit_price_currency_display()}
         except TypeError as exception:
-            return "Error"
+            return None
 
     def get_reserved_quantity(self):
         count = 0

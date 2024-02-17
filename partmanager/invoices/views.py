@@ -1,15 +1,15 @@
-from django.http import JsonResponse
 from .models import Invoice, InvoiceItem
-from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
+from rest_framework import status
+from rest_framework import filters
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.parsers import FileUploadParser, MultiPartParser, FormParser
-from rest_framework import filters
-from .importers.archive_importer import ArchiveInvoiceImporter
-from .importers.tme_csv_importer import TMECSVImporter
-from .importers.generic_csv_importer import GenericCSVImporter
-from .serializers import InvoiceSerializer, InvoiceDetailSerializer, InvoiceItemSerializer, InvoiceItemDetailSerializer, InvoiceItemCreateSerializer, InvoiceWithItemsSerializer
-from .tasks import update_invoice_item_don_assignments
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.response import Response
+from django_filters.rest_framework import DjangoFilterBackend
+
+from .serializers import InvoiceSerializer, InvoiceItemSerializer, InvoiceItemDetailSerializer, InvoiceItemCreateSerializer, InvoiceItemDetailWithStorageSerializer, InvoiceCreateSerializer
+from .tasks import update_invoice_item_don_assignments, import_invoice_from_file
 
 
 class StandardResultsSetPagination(PageNumberPagination):
@@ -20,23 +20,19 @@ class StandardResultsSetPagination(PageNumberPagination):
 
 
 class InvoiceViewSet(ModelViewSet):
+    """
+    Used by frontend to display invoice list
+    """
     pagination_class = StandardResultsSetPagination
-    serializer_class = InvoiceSerializer
-    filter_backends = [filters.SearchFilter]
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ['number', 'distributor__name']
+    filterset_fields = ['distributor', 'bookkeeping']
     queryset = Invoice.objects.all()
 
     def get_serializer_class(self):
-        if self.action in ['create', 'retrieve', 'update']:
-            return InvoiceDetailSerializer
+        if self.action in ['create', 'update']:
+            return InvoiceCreateSerializer
         return InvoiceSerializer
-
-
-class InvoiceWithItemsViewSet(ModelViewSet):
-    queryset = Invoice.objects.all()
-
-    def get_serializer_class(self):
-        return InvoiceWithItemsSerializer
 
 
 class InvoiceItemViewSet(ModelViewSet):
@@ -54,45 +50,44 @@ class InvoiceItemViewSet(ModelViewSet):
         return InvoiceItemDetailSerializer
 
 
-def api_invoice_detail(request, pk):
-    #if request.is_ajax():
-        invoice = Invoice.objects.get(pk=pk)
-        invoice_items = invoice.invoiceitem_set.all()
-        items = []
-        for invoice_item in invoice_items:
-            items.extend(invoice_item.to_view_ajax_response())
-        response = {"invoice": invoice.to_view_ajax_response(),
-                    "items": items
-                    }
-        return JsonResponse(response, safe=False)
+class InvoiceItemWithStorageViewSet(ModelViewSet):
+    """
+    Used by frontend to display invoice items
+    """
+    serializer_class = InvoiceItemSerializer
+    queryset = InvoiceItem.objects.all()
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    search_fields = ['distributor_number', 'inventoryposition__part__manufacturer_order_number']
+    filterset_fields = ['invoice']
+
+    def get_serializer_class(self):
+        if self.action in ['retrieve', 'update']:
+            return InvoiceItemDetailWithStorageSerializer
+        elif self.action == 'create':
+            return InvoiceItemCreateSerializer
+        return InvoiceItemDetailWithStorageSerializer
 
 
 class InvoiceImportView(APIView):
     parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request, format=None):
+        if 'file' not in request.FILES:
+            return Response({'error': 'No file provided'}, status=status.HTTP_400_BAD_REQUEST)
+
         importer = request.data['importer']
         invoice_import_file = request.FILES['file']
-        print(importer)
-        print(invoice_import_file)
-        if importer == 'Archive importer':
-            importer = ArchiveInvoiceImporter()
-            result_invoice_model = importer.import_invoice(invoice_import_file)
-        elif importer == 'TME CSV file importer':
-            importer = TMECSVImporter()
-            result_invoice_model = importer.import_invoice(invoice_import_file)
-        elif importer == 'Generic CSV file importer':
-            importer = GenericCSVImporter()
-            distributor_name = request.cleaned_data['distributor']
-            invoice_date = request.cleaned_data['invoice_date']
-            result_invoice_model = importer.import_invoice(distributor_name, invoice_date, invoice_import_file)
+        distributor_name = request.cleaned_data['distributor']
+        invoice_date = request.cleaned_data['invoice_date']
 
-        if result_invoice_model is not None:
-            return JsonResponse({'status': 'success'})
-        else:
-            return JsonResponse({'status': 'Error'})
+        if importer not in ['Archive importer', 'TME CSV file importer', 'Generic CSV file importer']:
+            return Response({'error': 'Incorrect importer'}, status=status.HTTP_400_BAD_REQUEST)
+
+        result = import_invoice_from_file.delay(importer, invoice_import_file, distributor_name, invoice_date)
+        return Response({'task_id': result.task_id})
 
 
 def update(request):
-    update_invoice_item_don_assignments.delay()
-    return JsonResponse({"status": "OK"})
+    result = update_invoice_item_don_assignments.delay()
+    return Response({'task_id': result.task_id})

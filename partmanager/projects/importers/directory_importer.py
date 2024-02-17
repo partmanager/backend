@@ -14,8 +14,9 @@ def create_project(project_dict):
     project, created = Project.objects.get_or_create(name=project_dict['name'])
     if created:
         logger.debug("\t project already exists")
-    logger.info(f"Creating project version: {project_dict['varsion']}")
-    project_version, created = ProjectVersion.objects.get_or_create(name=project_dict['varsion'],
+    version = project_dict['version'] if 'version' in project_dict else project_dict['varsion']
+    logger.info(f"Creating project version: {version}")
+    project_version, created = ProjectVersion.objects.get_or_create(name=version,
                                                                     project=project)
     #project_version.save()
     return project_version

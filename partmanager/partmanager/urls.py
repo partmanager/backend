@@ -26,8 +26,8 @@ from .views import export, ImportView
 from distributors.views import DistributorViewSet, DistributorOrderNumberViewSet, DistributorManufacturerViewSet, api_stock_and_price
 from inventory.views import InventoryPositionViewSet
 from inventory.api import StorageLocationWithItemsViewSet
-from invoices.views import InvoiceViewSet, InvoiceWithItemsViewSet
-from invoices.views import InvoiceItemViewSet
+from invoices.views import InvoiceViewSet, InvoiceImportView
+from invoices.views import InvoiceItemViewSet, InvoiceItemWithStorageViewSet
 from manufacturers.views_api import ManufacturerViewSet
 from inventory.api import CategoryViewSet, StorageLocationViewSet, InventoryReservationViewSet
 from projects.views_api import AssemblyViewSet, BOMViewSet, BOMItemViewSet, ProjectViewSet, ProjectVersionViewSet, BOMImportView
@@ -42,8 +42,8 @@ router.register(r'api/inventory', InventoryPositionViewSet, basename='InventoryP
 router.register(r'api/inventory-category', CategoryViewSet, basename='CategoryViewSet')
 router.register(r'api/inventory-reservation', InventoryReservationViewSet, basename='InventoryReservationViewSet')
 router.register(r'api/invoice', InvoiceViewSet, basename='Invoice')
-router.register(r'api/invoice-with-items', InvoiceWithItemsViewSet, basename='InvoiceWithItemsViewSet')
 router.register(r'api/invoiceItem', InvoiceItemViewSet, basename='InvoiceItem')
+router.register(r'api/invoiceItemWithStorage', InvoiceItemWithStorageViewSet, basename='InvoiceItem')
 router.register(r'api/manufacturer', ManufacturerViewSet, basename='ManufacturerViewSet')
 router.register(r'api/storage_location', StorageLocationViewSet, basename='StorageLocationViewSet')
 router.register(r'api/storage_location_items', StorageLocationWithItemsViewSet, basename='StorageLocationWithItemsViewSet')
@@ -67,6 +67,7 @@ urlpatterns = [
     path('distributors/', include('distributors.urls')),
     path('inventory/', include('inventory.urls')),
     path('invoices/', include('invoices.urls')),
+    path('api/invoiceImport', InvoiceImportView.as_view()),
     path('parts/', include('partcatalog.urls')),
     path('projects/', include('projects.urls')),
     path('admin/', admin.site.urls),

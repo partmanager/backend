@@ -1,4 +1,3 @@
-import json
 from django.http import JsonResponse
 from .models import InvoiceItem
 
@@ -25,18 +24,3 @@ def invoice_items_options_list(request):
         })
     response = {"rows": rows}
     return JsonResponse(response, safe=False)
-
-
-def invoice_item_update(request):
-    # if request.is_ajax():
-    data = json.loads(request.body.decode("utf-8"))
-    if data and 'id' in data:
-        invoice_item = InvoiceItem.objects.get(pk=data['id'])
-        assert invoice_item.invoice.pk == data['invoice_pk']
-        if 'item_type' in data and data['item_type'] in ['p', 'v', 's']:
-            invoice_item.type = data['item_type']
-            invoice_item.save()
-        return JsonResponse({'status': 'OK',
-                             'message': 'Successfully updated {} invoice item at position {}.'.format(invoice_item.order_number,
-                                                                                                      invoice_item.position_in_invoice),
-                             'id': invoice_item.pk})
