@@ -1,0 +1,9 @@
+rm distributors/migrations/*
+rm inventory/migrations/*
+rm invoices/migrations/*
+rm manufacturers/migrations/*
+rm packages/migrations/*
+rm partcatalog/migrations/*
+rm partdb_git/migrations/*
+rm projects/migrations/*
+rm symbolandfootprint/migrations/*
