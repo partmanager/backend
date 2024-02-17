@@ -2,7 +2,8 @@ from rest_framework import serializers
 
 from .models import Category, StorageLocation, InventoryPosition, InventoryReservation, InventoryPositionHistory
 from .serializers_simple import StorageLocationSerializer
-from invoices.serializers import InvoiceItemSerializer
+from invoices.serializers import InvoiceItemSerializer, InvoiceItemDetailSerializer
+from manufacturers.serializers import ManufacturerSerializer
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -17,13 +18,39 @@ class StorageLocationDetailSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class InventoryPositionMinimalSerializer(serializers.ModelSerializer):
+    storage_location = StorageLocationSerializer(read_only=True)
+    #invoice = InvoiceItemSerializer(read_only=True)
+
+    class Meta:
+        model = InventoryPosition
+        fields = ['id']
+
+
 class InventoryPositionSerializer(serializers.ModelSerializer):
     storage_location = StorageLocationSerializer(read_only=True)
-    invoice = InvoiceItemSerializer(read_only=True)
+    invoice = InvoiceItemDetailSerializer(read_only=True)
+    manufacturer = ManufacturerSerializer(read_only=True)
+    reserved_quantity = serializers.SerializerMethodField()
+    condition_display = serializers.SerializerMethodField()
+    status_display = serializers.SerializerMethodField()
+    stock_unit_display = serializers.SerializerMethodField()
 
     class Meta:
         model = InventoryPosition
         fields = '__all__'
+
+    def get_reserved_quantity(self, obj):
+        return obj.get_reserved_quantity()
+
+    def get_condition_display(self, obj):
+        return obj.get_condition_display()
+
+    def get_status_display(self, obj):
+        return obj.get_status_display()
+
+    def get_stock_unit_display(self, obj):
+        return obj.get_stock_unit_display()
 
 
 class StorageLocationWithItemsSerializer(serializers.ModelSerializer):
