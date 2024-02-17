@@ -21,6 +21,7 @@ from inventory.importers.directory_importer import DirectoryImporter
 from projects.models import ProjectVersion
 from projects.importers.directory_importer import import_project
 from projects.exporters.directory_exporter import export as projects_export
+from .tasks import import_data
 
 
 class ImportView(APIView):
@@ -34,17 +35,9 @@ class ImportView(APIView):
         archive_filename = workdir + '/' + import_file.name
         with open(archive_filename, 'wb') as file:
             file.write(import_file.read())
-        shutil.unpack_archive(archive_filename, extract_dir=workdir)
+        result = import_data.delay(archive_filename, workdir)
 
-        import_manufacturers(workdir + '/manufacturers')
-        import_distributor(workdir + '/distributors')
-        importer = DirectoryInvoiceImporter()
-        importer.dry = False
-        importer.import_invoice(workdir + '/invoices')
-        DirectoryImporter().import_inventory(workdir + '/inventory')
-        import_project(workdir + '/projects')
-
-        return Response(status=200)
+        return Response({'task_id': result.task_id})
 
 
 def export(request):
