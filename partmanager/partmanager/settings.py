@@ -185,6 +185,10 @@ LOGGING = {
             "class": "logging.FileHandler",
             "filename": "/var/log/shelftracker/debug-partcatalog.log",
         },
+        "partdb-file": {
+            "class": "logging.FileHandler",
+            "filename": "/var/log/shelftracker/debug-partdb.log",
+        },
     },
 
     "root": {
@@ -215,6 +219,11 @@ LOGGING = {
         "invoices": {
             "level": "DEBUG",
             "handlers": ["file", "invoices-file"],
+            "propagate": False,
+        },
+        "partdb_git": {
+            "level": "DEBUG",
+            "handlers": ["file", "partdb-file"],
             "propagate": False,
         },
     },

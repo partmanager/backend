@@ -21,4 +21,5 @@ def update_distributors(directory):
 
 def update_partcatalog(modified_files, progress_recorder):
     logger.info(f"Importing components")
+    logger.debug(f"Modified files: {modified_files}")
     import_components(modified_files, progress_recorder)

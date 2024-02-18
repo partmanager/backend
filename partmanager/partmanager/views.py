@@ -38,8 +38,9 @@ class ImportView(APIView):
             file.write(import_file.read())
         result = import_data.delay(archive_filename, workdir)
 
-	return Response({'task_id': result.task_id})
-        
+        return Response({'task_id': result.task_id})
+
+
 class UpdateGitView(APIView):
     def post(self, request, format=None):
         result = update_all.delay()

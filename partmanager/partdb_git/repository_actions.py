@@ -24,7 +24,7 @@ def update_or_clone_repo(repo_url, local_path, ssh_key=None):
         # If the repository exists, pull the latest changes
         repo.remote().fetch()
         switch_to_local_branch(repo)
-        repo.git.rebase('local')
+        repo.git.merge('main')
         logger.info("Repository updated successfully.")
     except NoSuchPathError:
         # If the repository doesn't exist locally, clone it
@@ -58,16 +58,16 @@ def set_last_import_commit(repository_name, commit):
 
 
 def generate_modified_component_list(directory, repo, commit):
-    logger.info(f"Preparing modified files list")
+    logger.info(f"Preparing modified files list, commit diff: {commit}")
     if commit:
         try:
             modified_files = repo.git.diff(commit, name_only=True).splitlines()
         except git.exc.GitCommandError:
             logger.warning(f"Error while checking for modified files in repository. Updating all files.")
-            modified_files = list(Path(directory + "/parts/").rglob('*.json'))
+            modified_files = list(Path(directory + "/components/").rglob('*.json'))
     else:
         logger.info(f"No commit provided. Loading all files from repository")
-        modified_files = list(Path(directory + "/parts/").rglob('*.json'))
+        modified_files = list(Path(directory + "/components/").rglob('*.json'))
     return modified_files
 
 
