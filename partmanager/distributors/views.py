@@ -45,13 +45,9 @@ class DistributorOrderNumberViewSet(ModelViewSet):
 class DistributorManufacturerViewSet(ModelViewSet):
     serializer_class = DistributorManufacturerSerializer
     queryset = DistributorManufacturer.objects.all()
-
-    def get_queryset(self):
-        queryset = DistributorManufacturer.objects.all()
-        distributor_pk = self.request.query_params.get('distributor')
-        if distributor_pk is not None:
-            queryset = queryset.filter(distributor=distributor_pk)
-        return queryset
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    search_fields = ['manufacturer__name']
+    filterset_fields = ['distributor']
 
     def get_serializer_class(self):
         if self.action in ['retrieve', 'update']:

@@ -247,6 +247,7 @@ class DistributorManufacturer(models.Model):
     manufacturer_name_text = models.CharField(max_length=200)
 
     class Meta:
+        unique_together = ["distributor", "manufacturer_name_text"]
         ordering = ['distributor', 'manufacturer_name_text']
 
     def __str__(self):
