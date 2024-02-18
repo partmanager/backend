@@ -33,10 +33,10 @@ def import_distributor_order_number(distributor, distributor_order_numbers):
         try:
             distributor_order_number, created = DistributorOrderNumber.objects.get_or_create(
                 distributor=distributor,
-                distributor_order_number_text=don['distributor_order_number'],
-                manufacturer_order_number_text=don['manufacturer_order_number'],
+                don=don['distributor_order_number'],
+                mon=don['manufacturer_order_number'],
                 defaults={
-                    'manufacturer_name_text': don['manufacturer_name'],
+                    'manufacturer_name': don['manufacturer_name'],
                     'part_url': don['part_url']
                 })
             if created:

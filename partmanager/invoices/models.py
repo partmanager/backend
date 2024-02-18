@@ -117,12 +117,10 @@ class Invoice(models.Model):
 
 class InvoiceItem(models.Model):
     invoice = models.ForeignKey('Invoice', on_delete=models.CASCADE)
+    position_in_invoice = models.IntegerField()
     order_number = models.CharField(max_length=250, null=True, blank=True)
     type = models.IntegerField(choices=MerchandiseType.choices, default=MerchandiseType.PART)
-    position_in_invoice = models.IntegerField()
-    distributor_number = models.CharField(max_length=250, null=True, blank=True)
-    distributor_order_number = models.ForeignKey('distributors.DistributorOrderNumber', on_delete=models.PROTECT,
-                                                 null=True, blank=True)
+    distributor_order_number = models.ForeignKey('distributors.DistributorOrderNumber', on_delete=models.PROTECT)
     ordered_quantity = models.IntegerField(null=True, blank=True)
     shipped_quantity = models.IntegerField(null=True, blank=True)
     delivered_quantity = models.IntegerField(null=True, blank=True)

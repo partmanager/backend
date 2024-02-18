@@ -162,13 +162,21 @@ class DistributorOrderNumber(models.Model):
         - service by 'service' field, service is in example shipping
     """
     distributor = models.ForeignKey('Distributor', on_delete=models.CASCADE)
-    distributor_order_number_text = models.CharField(max_length=200, unique=True)
-    type = models.IntegerField(choices=MerchandiseType.choices, default=MerchandiseType.PART)
-    manufacturer_order_number_text = models.CharField(max_length=200, null=True, blank=True)
-    manufacturer_name_text = models.CharField(max_length=200, null=True, blank=True)
-    manufacturer_order_number = models.ForeignKey('partcatalog.ManufacturerOrderNumber', on_delete=models.PROTECT,
-                                                  null=True, blank=True)
+    don = models.CharField(max_length=200, verbose_name="Distributor specific order number")
+    mon = models.CharField(max_length=200,
+                           null=True,
+                           blank=True,
+                           verbose_name="Distributor specific manufacturer order number")
+    manufacturer_name = models.CharField(max_length=200,
+                                         null=True,
+                                         blank=True,
+                                         verbose_name="Distributor specific manufacturer name")
+    manufacturer_order_number = models.ForeignKey('partcatalog.ManufacturerOrderNumber',
+                                                  on_delete=models.PROTECT,
+                                                  null=True,
+                                                  blank=True)
     part_url = models.URLField(max_length=500, null=True, blank=True)
+    type = models.IntegerField(choices=MerchandiseType.choices, default=MerchandiseType.PART)
 
     stock = models.FloatField(null=True, blank=True)
     stock_unit = models.IntegerField(choices=QuantityUnit.choices, default=QuantityUnit.PCS)
@@ -176,7 +184,8 @@ class DistributorOrderNumber(models.Model):
     price_levels = models.JSONField(null=True, blank=True)
 
     class Meta:
-        ordering = ['distributor', 'manufacturer_name_text', 'distributor_order_number_text']
+        unique_together = ["distributor", "don"]
+        ordering = ['distributor', 'manufacturer_name', 'don', 'mon']
 
     def get_stock_and_price(self):
         '''
@@ -194,7 +203,7 @@ class DistributorOrderNumber(models.Model):
                 'distributor': {'name': self.distributor.name,
                                 'url': self.distributor.website_url,
                                 'id': self.distributor.pk},
-                'distributorOrderNumber': {'don': self.distributor_order_number_text,
+                'distributorOrderNumber': {'don': self.don,
                                            'url': self.part_url},
                 'manufacturerOrderNumber': str(
                     self.manufacturer_order_number) if self.manufacturer_order_number else '',
@@ -215,12 +224,12 @@ class DistributorOrderNumber(models.Model):
     def update_manufacturer_order_number(self):
         if self.manufacturer_order_number is None:
             manufacturer = get_manufacturer_by_name(
-                self.distributor.convert_manufacturer_name(self.manufacturer_name_text))
-            order_number = self.manufacturer_order_number_text if self.manufacturer_order_number_text else self.distributor_order_number_text
+                self.distributor.convert_manufacturer_name(self.manufacturer_name))
+            order_number = self.mon if self.mon else self.don
             mon = ManufacturerOrderNumber.objects.filter(
                 manufacturer_order_number__iexact=order_number, manufacturer=manufacturer)
-            print("Trying to assingn part to DON:", self.distributor_order_number_text, "MON:",
-                  self.manufacturer_order_number_text, "Found Manufacturer:", manufacturer, "Found MON:", mon)
+            print("Trying to assign part to DON:", self.don, "MON:",
+                  self.mon, "Found Manufacturer:", manufacturer, "Found MON:", mon)
             if len(mon) == 1:
                 self.manufacturer_order_number = mon[0]
                 return mon[0]
@@ -229,14 +238,13 @@ class DistributorOrderNumber(models.Model):
 
     def __str__(self):
         part_or_service = self.manufacturer_order_number.manufacturer_order_number if self.manufacturer_order_number else self.service.name if self.service else ''
-        return "{}, {}, {} -> {}{}".format(self.distributor.name, self.manufacturer_name_text,
-                                           self.distributor_order_number_text, self.manufacturer_order_number_text,
-                                           " --> " + part_or_service)
+        return "{}, {}, {} -> {}{}".format(self.distributor.name, self.manufacturer_name,
+                                           self.don, self.mon, " --> " + part_or_service)
 
     def to_dict(self):
-        don_dict = {'distributor_order_number': self.distributor_order_number_text,
-                    'manufacturer_order_number': self.manufacturer_order_number_text,
-                    'manufacturer_name': self.manufacturer_name_text,
+        don_dict = {'distributor_order_number': self.don,
+                    'manufacturer_order_number': self.mon,
+                    'manufacturer_name': self.manufacturer_name,
                     'part_url': self.part_url}
         return don_dict
 

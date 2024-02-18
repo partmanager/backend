@@ -7,5 +7,5 @@ class DistributorOrderNumberFilter(filters.FilterSet):
 
     class Meta:
         model = DistributorOrderNumber
-        fields = ['distributor', 'manufacturer_name_text']
+        fields = ['distributor', 'manufacturer_name']
 

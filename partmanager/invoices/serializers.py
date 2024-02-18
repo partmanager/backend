@@ -80,7 +80,7 @@ class InvoiceItemDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = InvoiceItem
         fields = ['id', 'invoice', 'unit_price', 'extended_price', 'order_number', 'type',
-                  'position_in_invoice', 'distributor_number', 'ordered_quantity', 'shipped_quantity',
+                  'position_in_invoice', 'ordered_quantity', 'shipped_quantity',
                   'delivered_quantity', 'quantity_unit', 'bookkeeping', 'LOT', 'ECCN', 'COO', 'TARIC',
                   'distributor_order_number']
         extra_kwargs = {
@@ -96,6 +96,7 @@ class InvoiceItemDetailSerializer(serializers.ModelSerializer):
 
 
 class InvoiceItemDetailWithStorageSerializer(serializers.ModelSerializer):
+    invoice = InvoiceMinimalSerializer(read_only=True)
     stock_data = serializers.SerializerMethodField()
     distributor_order_number = DistributorOrderNumberDetailSerializer(read_only=True)
     unit_price = serializers.SerializerMethodField()
@@ -111,7 +112,6 @@ class InvoiceItemDetailWithStorageSerializer(serializers.ModelSerializer):
                   'type',
                   'type_display',
                   'position_in_invoice',
-                  'distributor_number',
                   'bookkeeping',
                   'bookkeeping_display',
                   'invoice',
@@ -157,8 +157,9 @@ class InvoiceItemDetailWithStorageSerializer(serializers.ModelSerializer):
         for inventory_position in obj.inventoryposition_set.all():
             response['storage_location'].append(inventory_position.storage_location.location)
             response['quantity'] += inventory_position.stock
-            response['value'] += inventory_position.get_stock_value()['net']
-            response['value_currency'] = inventory_position.get_stock_value()['currency_display']
+            if inventory_position.get_stock_value():
+                response['value'] += inventory_position.get_stock_value()['net']
+                response['value_currency'] = inventory_position.get_stock_value()['currency_display']
         return response
 
 

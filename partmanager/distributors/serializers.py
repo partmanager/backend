@@ -19,7 +19,7 @@ class DistributorOrderNumberSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DistributorOrderNumber
-        fields = ['id', 'distributor_order_number_text', 'manufacturer_order_number_text', 'manufacturer_name_text', 'manufacturer_order_number_mon']
+        fields = ['id', 'don', 'mon', 'manufacturer_name', 'manufacturer_order_number_mon']
 
     def get_manufacturer_order_number_mon(self, obj):
         if obj.manufacturer_order_number is not None:

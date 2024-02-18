@@ -2,11 +2,10 @@ import decimal
 import logging
 
 from invoices.models import Invoice, InvoiceItem
-from distributors.models import Distributor
+from distributors.models import Distributor, DistributorOrderNumber
 from django.db import IntegrityError
 from django.core.files import File
 from partmanager.choices import Currency
-
 
 logger = logging.getLogger('invoices')
 
@@ -14,6 +13,7 @@ logger = logging.getLogger('invoices')
 class InvoiceImporterBase:
     def __init__(self):
         self.dry = False
+        self.DON_to_update = []
 
     def update_or_create_items(self, distributor, invoice_items):
         self.request_missing_distributor_order_numbers(distributor, invoice_items)
@@ -60,61 +60,57 @@ class InvoiceImporterBase:
     def import_invoice_from_dict(self, invoice_dict, files_dir):
         distributor = Distributor.get_by_name(invoice_dict['distributor'])
         if distributor:
-            self.request_missing_distributor_order_numbers(distributor, invoice_dict['items'])
+            #self.request_missing_distributor_order_numbers(distributor, invoice_dict['items'])
             db_invoice = self.get_or_create_invoice(distributor, invoice_dict, files_dir)
             for position in invoice_dict['items']:
                 invoice_item = self.create_invoice_item(distributor, db_invoice, position)
-                try:
-                    if not self.dry:
-                        invoice_item.save()
-                except IntegrityError as e:
-                    logger.error(e)
+                # try:
+                #     if not self.dry:
+                #         invoice_item.save()
+                # except IntegrityError as e:
+                #     logger.error(e)
         else:
             logger.error(f"Unable to find distributor: {invoice_dict['distributor']}, Skipping")
 
     def update_or_create_invoice_item(self, distributor, invoice_model, invoice_item_dict):
-        new_invoice_item = self.create_invoice_item(distributor, invoice_model, invoice_item_dict)
-        if new_invoice_item:
-            invoice_item = self.get_invoice_item(invoice_model, invoice_item_dict)
-            if invoice_item:
-                return self._update_invoice_item(invoice_item, new_invoice_item)
-            else:
-                if not self.dry:
-                    new_invoice_item.save()
-                    return new_invoice_item
+        invoice_item, created = self.create_invoice_item(distributor, invoice_model, invoice_item_dict)
+        if not created:
+            return self._update_invoice_item(invoice_item, invoice_item_dict)
+        return invoice_item
 
-    def get_invoice_item(self, invoice_model, invoice_item_dict):
-        try:
-            invoice_item = InvoiceItem.objects.get(invoice=invoice_model,
-                                                   position_in_invoice=int(invoice_item_dict['position']))
-            return invoice_item
-        except InvoiceItem.DoesNotExist:
-            return None
-
-    def _update_invoice_item(self, current_invoice_item, new_invoice_item):
+    def _update_invoice_item(self, current_invoice_item, invoice_item_dict):
         updated = False
         for field in ['order_number', 'distributor_order_number']:
             current_attr = getattr(current_invoice_item, field)
-            new_attr = getattr(new_invoice_item, field)
-            if current_attr != new_attr and new_attr is not None and current_attr is None:
-                updated = True
-                setattr(current_invoice_item, field, new_attr)
-        if updated:
-            current_invoice_item.save()
+            #new_attr = getattr(new_invoice_item, field)
+            #if current_attr != new_attr and new_attr is not None and current_attr is None:
+            #    updated = True
+            #    setattr(current_invoice_item, field, new_attr)
+        #if updated:
+        #    current_invoice_item.save()
         return current_invoice_item
 
     def create_invoice_item(self, distributor, invoice_model, invoice_item_dict):
         position = invoice_item_dict
         logger.debug('creating invoice item: %s', position)
-        distributor_order_number = distributor.get_order_number(position['distributor_number'])
-        invoice_item = InvoiceItem(invoice=invoice_model,
-                                   order_number=position['order_number'] if 'order_number' in position else None,
-                                   position_in_invoice=int(position['position']),
-                                   distributor_number=position['distributor_number'],
-                                   distributor_order_number=distributor_order_number,
-                                   ordered_quantity=position['ordered_quantity'],
-                                   shipped_quantity=position['shipped_quantity'],
-                                   price_net=decimal.Decimal(position['price']['net_value']),
-                                   price_vat_tax=position['price']['vat_tax'],
-                                   price_currency=Currency[position['price']['currency']])
-        return invoice_item
+        distributor_order_number, created = DistributorOrderNumber.objects.get_or_create(
+            distributor=distributor,
+            don=position['distributor_number']
+        )
+
+        if created:
+            self.DON_to_update.append(distributor_order_number)
+
+        invoice_item, created = InvoiceItem.objects.get_or_create(
+            invoice=invoice_model,
+            position_in_invoice=int(position['position']),
+            defaults={
+                "order_number": position['order_number'] if 'order_number' in position else None,
+                "distributor_order_number": distributor_order_number,
+                "ordered_quantity": position['ordered_quantity'],
+                "shipped_quantity": position['shipped_quantity'],
+                "price_net": decimal.Decimal(position['price']['net_value']),
+                "price_vat_tax": position['price']['vat_tax'],
+                "price_currency": Currency[position['price']['currency']]
+            })
+        return invoice_item, created

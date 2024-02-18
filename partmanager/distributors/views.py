@@ -32,7 +32,7 @@ class DistributorOrderNumberViewSet(ModelViewSet):
     queryset = DistributorOrderNumber.objects.all()
     serializer_class = DistributorOrderNumberSerializer
     pagination_class = StandardResultsSetPagination
-    search_fields = ['distributor_order_number_text', 'manufacturer_order_number_text']
+    search_fields = ['don', 'mon']
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_class = DistributorOrderNumberFilter
 
