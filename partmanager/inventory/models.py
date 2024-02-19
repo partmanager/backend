@@ -115,6 +115,11 @@ class InventoryPosition(models.Model):
     condition = models.CharField(max_length=1, choices=CONDITION_STATUS, default='n')
     status = models.CharField(max_length=1, choices=INVENTORY_STATUS, default='b')
     category = models.ForeignKey('inventory.Category', on_delete=models.PROTECT)
+    LOT = models.CharField(max_length=20, null=True, blank=True, verbose_name="Lot number")
+    ECCN = models.CharField(max_length=20, null=True, blank=True, verbose_name="Export Control Classification Number")
+    COO = models.CharField(max_length=20, null=True, blank=True, verbose_name="Country of origin")
+    TARIC = models.CharField(max_length=20, null=True, blank=True,
+                             verbose_name="Integrated Tariff of the European Community")
     archived = models.BooleanField(default=False)  # archived parts are excluded from query's and views by default
     flagged = models.BooleanField(default=False)
 
