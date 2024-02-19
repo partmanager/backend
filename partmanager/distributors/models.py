@@ -182,6 +182,7 @@ class DistributorOrderNumber(models.Model):
     stock_unit = models.IntegerField(choices=QuantityUnit.choices, default=QuantityUnit.PCS)
     update_time = models.DateTimeField(null=True, blank=True)
     price_levels = models.JSONField(null=True, blank=True)
+    # distributorstock_set reverse key with stock history
 
     class Meta:
         unique_together = ["distributor", "don"]
@@ -199,6 +200,7 @@ class DistributorOrderNumber(models.Model):
                  'prices': {'quantity': <float/decimal/int>, 'unitPrice': <float/decimal>}
                  }
         '''
+        distributor_stock = self.distributorstock_set.first()
         return {'id': self.pk,
                 'distributor': {'name': self.distributor.name,
                                 'url': self.distributor.website_url,
@@ -207,10 +209,10 @@ class DistributorOrderNumber(models.Model):
                                            'url': self.part_url},
                 'manufacturerOrderNumber': str(
                     self.manufacturer_order_number) if self.manufacturer_order_number else '',
-                'updateTime': self.update_time,
+                'updateTime': distributor_stock.update_time,
                 'status': '',
-                'stockCount': {'quantity': self.stock, 'unit': 'pcs'},
-                'prices': self.price_levels}
+                'stockCount': {'quantity': distributor_stock.stock, 'unit': 'pcs'},
+                'prices': distributor_stock.price_levels}
 
     def update_stock_and_price(self, stock_and_price):
         processed_price_list = []
@@ -265,3 +267,15 @@ class DistributorManufacturer(models.Model):
         don_manufacturer_dict = {'distributor_manufacturer_name': self.manufacturer_name_text,
                                  'manufacturer_name': self.manufacturer.name}
         return don_manufacturer_dict
+
+
+class DistributorStock(models.Model):
+    don = models.ForeignKey('DistributorOrderNumber', on_delete=models.CASCADE)
+    stock = models.FloatField(null=True, blank=True)
+    stock_unit = models.IntegerField(choices=QuantityUnit.choices, default=QuantityUnit.PCS)
+    update_time = models.DateTimeField(null=True, blank=True)
+    price_levels = models.JSONField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ["don", "update_time"]
+        ordering = ['don', '-update_time']
