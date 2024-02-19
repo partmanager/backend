@@ -10,6 +10,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from .serializers import InvoiceSerializer, InvoiceItemSerializer, InvoiceItemDetailSerializer, InvoiceItemCreateSerializer, InvoiceItemDetailWithStorageSerializer, InvoiceCreateSerializer
 from .tasks import update_invoice_item_don_assignments, import_invoice_from_file
+from .filters import InvoiceItemFilter
 
 
 class StandardResultsSetPagination(PageNumberPagination):
@@ -59,7 +60,7 @@ class InvoiceItemWithStorageViewSet(ModelViewSet):
     pagination_class = StandardResultsSetPagination
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ['distributor_number', 'inventoryposition__part__manufacturer_order_number']
-    filterset_fields = ['invoice']
+    filterset_class = InvoiceItemFilter
 
     def get_serializer_class(self):
         if self.action in ['retrieve', 'update']:
