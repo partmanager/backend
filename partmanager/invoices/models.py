@@ -19,13 +19,11 @@ class Invoice(models.Model):
     number = models.CharField(max_length=250)
     bookkeeping = models.CharField(max_length=1, choices=BOOKKEEPING_TYPE, default='p')  # calculated field
     invoice_date = models.DateField()
-    order_date = models.DateField(null=True, blank=True)  # todo remove
     distributor = models.ForeignKey('distributors.Distributor', on_delete=models.PROTECT)
     invoice_file = models.FileField(upload_to='invoices', null=True, blank=True)
     payment_confirmation_file = models.FileField(upload_to='invoices', null=True, blank=True)
     price = NetGrossPrice()  # calculated field
     local_price = NetGrossPrice()  # calculated field, Price converted to local currency
-
     # invoiceitem_set -> reverse key from InvoiceItem class
 
     class Meta:
@@ -144,7 +142,6 @@ class InvoiceItem(models.Model):
     COO = models.CharField(max_length=20, null=True, blank=True, verbose_name="Country of origin")
     TARIC = models.CharField(max_length=20, null=True, blank=True,
                              verbose_name="Integrated Tariff of the European Community")
-
     # inventoryposition_set -> reverse key
 
     class Meta:
@@ -171,6 +168,7 @@ class InvoiceItem(models.Model):
             self.unit_price.net = None
 
         super(InvoiceItem, self).save(*args, **kwargs)
+        self.invoice.save()
 
     def get_price_per_unit_display(self):
         return self.unit_price.get_display()
