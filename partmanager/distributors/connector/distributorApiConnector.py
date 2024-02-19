@@ -16,6 +16,7 @@ def get_distributor_api_connector(distributor_name: str):
 
 
 def load_settings():
+    pass
     try:
         with open(file=settings.DISTRIBUTORS_CREDENTIALS_FILE) as f:
             distributors_api_config = json.load(f)
@@ -26,8 +27,3 @@ def load_settings():
                                                       distributors_api_config['Mouser']['app_secret'])
     except FileNotFoundError as e:
         logger.warning(f"Unable to open distributors credential file: {e}")
-
-
-load_settings()
-
-
