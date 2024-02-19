@@ -16,9 +16,11 @@ class Manufacturer(models.Model):
     class Meta:
         ordering = ['name', 'full_name']
 
+    @property
     def part_count(self):
         return len(self.part_set.all())
 
+    @property
     def order_number_count(self):
         return len(self.manufacturerordernumber_set.all())
 

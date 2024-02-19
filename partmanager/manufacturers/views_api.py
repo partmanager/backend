@@ -16,15 +16,15 @@ class ManufacturerViewSet(ModelViewSet):
         return ManufacturerSerializer
 
 
-def detail(request, pk):
-    # if request.is_ajax():
-    manufacturer = get_object_or_404(Manufacturer, pk=pk)
-    return JsonResponse({'id': manufacturer.pk,
-                         'name': manufacturer.name, 'full_name': manufacturer.full_name,
-                         'address': manufacturer.address, 'website': manufacturer.website,
-                         'email': manufacturer.email,
-                         'phone': manufacturer.phone, 'comment': manufacturer.comment,
-                         'partCount': manufacturer.part_count(),
-                         'orderNumberCount': manufacturer.order_number_count(),
-                         'seriesData': manufacturer.series()})
+# def detail(request, pk):
+#     # if request.is_ajax():
+#     manufacturer = get_object_or_404(Manufacturer, pk=pk)
+#     return JsonResponse({'id': manufacturer.pk,
+#                          'name': manufacturer.name, 'full_name': manufacturer.full_name,
+#                          'address': manufacturer.address, 'website': manufacturer.website,
+#                          'email': manufacturer.email,
+#                          'phone': manufacturer.phone, 'comment': manufacturer.comment,
+#                          'partCount': manufacturer.part_count(),
+#                          'orderNumberCount': manufacturer.order_number_count(),
+#                          'seriesData': manufacturer.series()})
 

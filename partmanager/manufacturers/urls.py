@@ -4,5 +4,5 @@ from . import views_api as api
 
 app_name = 'manufacturers'
 urlpatterns = [
-    path('detail/<int:pk>', api.detail, name='manufacturer-detail'),
+    # path('detail/<int:pk>', api.detail, name='manufacturer-detail'),
 ]
