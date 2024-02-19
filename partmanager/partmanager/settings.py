@@ -245,4 +245,5 @@ MEDIA_URL = '/media/'
 
 DISTRIBUTORS_CREDENTIALS_FILE = '/etc/partmanager/distributors.json'
 PARTSDB_DIRECTORY = "/var/partsdb/"
+LOCAL_CURRENCY = 3
 

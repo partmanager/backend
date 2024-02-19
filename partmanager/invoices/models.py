@@ -4,6 +4,7 @@ from django.db import models
 from django.db.models import Q
 from partmanager.choices import MerchandiseType, QuantityUnit
 from partmanager.common_fields import Price, NetGrossPrice, PriceWithTax
+from django.conf import settings
 
 BOOKKEEPING_TYPE = (
     ('k', 'Track this invoice in bookkeeping'),
@@ -23,7 +24,7 @@ class Invoice(models.Model):
     invoice_file = models.FileField(upload_to='invoices', null=True, blank=True)
     payment_confirmation_file = models.FileField(upload_to='invoices', null=True, blank=True)
     price = NetGrossPrice()  # calculated field
-    local_price = NetGrossPrice()  # # calculated field, Price converted to local currency
+    local_price = NetGrossPrice()  # calculated field, Price converted to local currency
 
     # invoiceitem_set -> reverse key from InvoiceItem class
 
@@ -99,15 +100,24 @@ class Invoice(models.Model):
             bookkeeping = 'p'
             net_price = decimal.Decimal('0')
             gross_price = decimal.Decimal('0')
+            local_net_price = decimal.Decimal('0')
+            local_gross_price = decimal.Decimal('0')
             for item in self.invoiceitem_set.all():
-                net_price += item.price.value
-                gross_price += item.price.value * decimal.Decimal(item.price.tax) / decimal.Decimal(100)
+                net_price += item.price.net
+                local_net_price += item.local_price.net
+                if item.price.gross:
+                    gross_price += item.price.gross
+                if item.local_price.gross:
+                    local_gross_price += item.local_price.gross
                 if item.bookkeeping != 'p':
                     bookkeeping = 'k'
 
             self.price.net = net_price
             self.price.gross = gross_price
-            self.price.currency = self.invoiceitem_set.first().currency
+            self.price.currency = self.invoiceitem_set.first().price.currency
+            self.local_price.net = local_net_price
+            self.local_price.gross = local_gross_price
+            self.local_price.currency = self.invoiceitem_set.first().local_price.currency
             self.bookkeeping = bookkeeping
 
     def save(self, *args, **kwargs):
@@ -125,8 +135,9 @@ class InvoiceItem(models.Model):
     shipped_quantity = models.IntegerField(null=True, blank=True)
     delivered_quantity = models.IntegerField(null=True, blank=True)
     quantity_unit = models.IntegerField(choices=QuantityUnit.choices, default=QuantityUnit.PCS)
-    price = PriceWithTax()
-    unit_price = Price()  # calculated field
+    price = PriceWithTax()  # price in invoice currency
+    local_price = PriceWithTax()  # calculated field, price converted to local currency
+    unit_price = Price()  # calculated field, price converted to local currency
     bookkeeping = models.CharField(max_length=1, choices=BOOKKEEPING_TYPE, default='p')
     LOT = models.CharField(max_length=20, null=True, blank=True, verbose_name="Lot number")
     ECCN = models.CharField(max_length=20, null=True, blank=True, verbose_name="Export Control Classification Number")
@@ -141,13 +152,21 @@ class InvoiceItem(models.Model):
         ordering = ['invoice', 'position_in_invoice']
 
     def save(self, *args, **kwargs):
-        self.unit_price.currency = self.price.currency
+        if self.price.currency == settings.LOCAL_CURRENCY:
+            self.local_price = self.price
+        else:
+            convertion_ratio = 4
+            self.local_price.net = self.price.net / convertion_ratio
+            self.local_price.gross = self.price.gross / convertion_ratio
+            self.local_price.currency = settings.LOCAL_CURRENCY
+
+        self.unit_price.currency = self.local_price.currency
         if self.delivered_quantity is not None and self.shipped_quantity is not None:
-            self.unit_price.net = self.price.net / min(self.delivered_quantity, self.shipped_quantity)
+            self.unit_price.net = self.local_price.net / min(self.delivered_quantity, self.shipped_quantity)
         elif self.shipped_quantity:
-            self.unit_price.net = self.price.net / self.shipped_quantity
+            self.unit_price.net = self.local_price.net / self.shipped_quantity
         elif self.delivered_quantity:
-            self.unit_price.net = self.price.net / self.delivered_quantity
+            self.unit_price.net = self.local_price.net / self.delivered_quantity
         else:
             self.unit_price.net = None
 

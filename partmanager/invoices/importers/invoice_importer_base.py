@@ -69,6 +69,7 @@ class InvoiceImporterBase:
                 #         invoice_item.save()
                 # except IntegrityError as e:
                 #     logger.error(e)
+            db_invoice.save()
         else:
             logger.error(f"Unable to find distributor: {invoice_dict['distributor']}, Skipping")
 
@@ -101,6 +102,13 @@ class InvoiceImporterBase:
         if created:
             self.DON_to_update.append(distributor_order_number)
 
+        net_price = decimal.Decimal(position['price']['net_value'])
+        tax = position['price']['vat_tax']
+        gross_price = None
+        if 'gross_value' in position['price']:
+            gross_price = decimal.Decimal(position['price']['gross_value'])
+        elif tax:
+            gross_price = net_price * decimal.Decimal(tax) / 100
         invoice_item, created = InvoiceItem.objects.get_or_create(
             invoice=invoice_model,
             position_in_invoice=int(position['position']),
@@ -109,8 +117,9 @@ class InvoiceImporterBase:
                 "distributor_order_number": distributor_order_number,
                 "ordered_quantity": position['ordered_quantity'],
                 "shipped_quantity": position['shipped_quantity'],
-                "price_net": decimal.Decimal(position['price']['net_value']),
-                "price_vat_tax": position['price']['vat_tax'],
+                "price_net": net_price,
+                "price_gross": gross_price,
+                "price_vat_tax": tax,
                 "price_currency": Currency[position['price']['currency']]
             })
         return invoice_item, created

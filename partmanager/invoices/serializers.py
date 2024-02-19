@@ -101,6 +101,7 @@ class InvoiceItemDetailWithStorageSerializer(serializers.ModelSerializer):
     distributor_order_number = DistributorOrderNumberDetailSerializer(read_only=True)
     unit_price = serializers.SerializerMethodField()
     extended_price = serializers.SerializerMethodField()
+    local_price = serializers.SerializerMethodField()
     quantity = serializers.SerializerMethodField()
     type_display = serializers.SerializerMethodField()
     bookkeeping_display = serializers.SerializerMethodField()
@@ -118,6 +119,7 @@ class InvoiceItemDetailWithStorageSerializer(serializers.ModelSerializer):
                   'quantity',
                   'unit_price',
                   'extended_price',
+                  'local_price',
                   'stock_data',
                   'distributor_order_number',
                   'LOT',
@@ -134,6 +136,9 @@ class InvoiceItemDetailWithStorageSerializer(serializers.ModelSerializer):
 
     def get_extended_price(self, obj):
         return obj.price.to_dict()
+
+    def get_local_price(self, obj):
+        return obj.local_price.to_dict()
 
     def get_quantity(self, obj):
         return {'ordered': obj.ordered_quantity,
