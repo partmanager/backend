@@ -3,7 +3,7 @@ import decimal
 from .models import Invoice, InvoiceItem
 from partmanager.choices import QuantityUnit
 from rest_framework import serializers
-from distributors.serializers import DistributorOrderNumberDetailSerializer, DistributorSerializer
+from distributors.serializers import DistributorOrderNumberDetailSerializer, DistributorSerializer, DistributorOrderNumberSerializer
 
 
 class InvoiceMinimalSerializer(serializers.ModelSerializer):
@@ -98,7 +98,7 @@ class InvoiceItemDetailSerializer(serializers.ModelSerializer):
 class InvoiceItemDetailWithStorageSerializer(serializers.ModelSerializer):
     invoice = InvoiceMinimalSerializer(read_only=True)
     stock_data = serializers.SerializerMethodField()
-    distributor_order_number = DistributorOrderNumberDetailSerializer(read_only=True)
+    distributor_order_number = DistributorOrderNumberSerializer(read_only=True)
     unit_price = serializers.SerializerMethodField()
     extended_price = serializers.SerializerMethodField()
     local_price = serializers.SerializerMethodField()

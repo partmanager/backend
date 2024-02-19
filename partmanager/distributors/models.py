@@ -10,6 +10,7 @@ class Distributor(models.Model):
     name = models.CharField(max_length=100, unique=True)
     website_url = models.URLField(max_length=200, null=True, blank=True)
     connector_data = models.JSONField(null=True, blank=True)
+
     # distributorordernumber_set -> reverse key form DistributorOrderNumber model
     # distributormanufacturer_set -> reverse key form DistributorManufacturer model
 
@@ -104,11 +105,13 @@ class Distributor(models.Model):
         don_set = []
         for don in distributor_order_number_model_set:
             assert don.distributor == self
-            don_set.append(don.distributor_order_number_text)
+            don_set.append(don.don)
         if don_set:
             distributor_connector = self.__get_distributor_connector()
-            stock_and_price = distributor_connector.get_stock_and_prices(don_set)
-            return self.update_stock_and_price(stock_and_price)
+            print("Distributor connector:", distributor_connector)
+            if distributor_connector:
+                stock_and_price = distributor_connector.get_stock_and_prices(don_set)
+                return self.update_stock_and_price(stock_and_price)
 
     def get_stock_and_price(self, distributor_order_number_model_set):
         '''
@@ -133,7 +136,7 @@ class Distributor(models.Model):
         for sap in stock_and_price:
             print("---------------------")
             print(sap)
-            don = self.distributorordernumber_set.get(distributor_order_number_text=sap['distributorOrderNumber'])
+            don = self.distributorordernumber_set.get(don=sap['distributorOrderNumber'])
             don.update_stock_and_price(sap)
             don.save()
             result.append(don.get_stock_and_price())
@@ -177,11 +180,6 @@ class DistributorOrderNumber(models.Model):
                                                   blank=True)
     part_url = models.URLField(max_length=500, null=True, blank=True)
     type = models.IntegerField(choices=MerchandiseType.choices, default=MerchandiseType.PART)
-
-    stock = models.FloatField(null=True, blank=True)
-    stock_unit = models.IntegerField(choices=QuantityUnit.choices, default=QuantityUnit.PCS)
-    update_time = models.DateTimeField(null=True, blank=True)
-    price_levels = models.JSONField(null=True, blank=True)
     # distributorstock_set reverse key with stock history
 
     class Meta:
@@ -209,19 +207,21 @@ class DistributorOrderNumber(models.Model):
                                            'url': self.part_url},
                 'manufacturerOrderNumber': str(
                     self.manufacturer_order_number) if self.manufacturer_order_number else '',
-                'updateTime': distributor_stock.update_time,
+                'updateTime': distributor_stock.update_time if distributor_stock else None,
                 'status': '',
-                'stockCount': {'quantity': distributor_stock.stock, 'unit': 'pcs'},
-                'prices': distributor_stock.price_levels}
+                'stockCount': {'quantity': distributor_stock.stock if distributor_stock else None, 'unit': 'pcs'},
+                'prices': distributor_stock.price_levels if distributor_stock else None}
 
     def update_stock_and_price(self, stock_and_price):
         processed_price_list = []
         for price in stock_and_price['priceList']:
             price['price'] = float(price['price'])
             processed_price_list.append(price)
-        self.update_time = now()
-        self.stock = stock_and_price['stockCount']
-        self.price_levels = processed_price_list
+        stock = DistributorStock(don=self,
+                                 update_time=now(),
+                                 stock=stock_and_price['stockCount'],
+                                 price_levels=processed_price_list)
+        stock.save()
 
     def update_manufacturer_order_number(self):
         if self.manufacturer_order_number is None:
