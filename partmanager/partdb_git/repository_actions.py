@@ -61,7 +61,8 @@ def generate_modified_component_list(directory, repo, commit):
     logger.info(f"Preparing modified files list, commit diff: {commit}")
     if commit:
         try:
-            modified_files = repo.git.diff(commit, name_only=True).splitlines()
+            tmp_modified_files = repo.git.diff(commit, name_only=True).splitlines()
+            modified_files = [f'{directory}/{i}' for i in tmp_modified_files]
         except git.exc.GitCommandError:
             logger.warning(f"Error while checking for modified files in repository. Updating all files.")
             modified_files = list(Path(directory + "/components/").rglob('*.json'))
