@@ -14,14 +14,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
 from django.views.generic import RedirectView
 from django.conf.urls.static import static
 from django.conf.urls import url
 from django.conf import settings
 from rest_framework.routers import DefaultRouter
 
-from .views import export, ImportView
+from .views import export, ImportView, UpdateGitView
 
 from distributors.views import DistributorViewSet, DistributorOrderNumberViewSet, DistributorManufacturerViewSet, api_stock_and_price
 from inventory.views import InventoryPositionViewSet
@@ -74,7 +74,9 @@ urlpatterns = [
     path('', RedirectView.as_view(url='inventory/', permanent=True)),
     path('import', ImportView.as_view(), name='import'),
     path('export', export),
+    path('updategit', UpdateGitView.as_view(), name='updategit'),
     url(r'^', include(router.urls)),
+    re_path(r'^celery-progress/', include('celery_progress.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

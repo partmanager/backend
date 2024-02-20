@@ -69,7 +69,9 @@ INSTALLED_APPS = [
     'manufacturers.apps.ManufacturersConfig',
     'partcatalog.apps.PartcatalogConfig',
     'projects.apps.ProjectsConfig',
-    'packages.apps.PackagesConfig'
+    'packages.apps.PackagesConfig',
+    'partdb_git.apps.PartDBConfig',
+    'celery_progress'
 ]
 
 MIDDLEWARE = [
@@ -183,6 +185,10 @@ LOGGING = {
             "class": "logging.FileHandler",
             "filename": "/var/log/shelftracker/debug-partcatalog.log",
         },
+        "partdb-file": {
+            "class": "logging.FileHandler",
+            "filename": "/var/log/shelftracker/debug-partdb.log",
+        },
     },
 
     "root": {
@@ -215,6 +221,11 @@ LOGGING = {
             "handlers": ["file", "invoices-file"],
             "propagate": False,
         },
+        "partdb_git": {
+            "level": "DEBUG",
+            "handlers": ["file", "partdb-file"],
+            "propagate": False,
+        },
     },
 }
 
@@ -244,6 +255,13 @@ MEDIA_ROOT = '/var/media'
 MEDIA_URL = '/media/'
 
 DISTRIBUTORS_CREDENTIALS_FILE = '/etc/partmanager/distributors.json'
-PARTSDB_DIRECTORY = "/var/partsdb/"
+PARTSDB_CONFIG = {
+    "directory": "/var/partsdb/",
+    "repositories": {
+        "partsdb-official": {
+            "url": "https://github.com/partmanager/partsdb.git",
+            "branch": "main"
+        }
+    }
+}
 LOCAL_CURRENCY = 3
-

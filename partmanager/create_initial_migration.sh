@@ -5,6 +5,7 @@ python3 manage.py makemigrations manufacturers
 python3 manage.py makemigrations packages
 python3 manage.py makemigrations symbolandfootprint
 python3 manage.py makemigrations partcatalog
+python3 manage.py makemigrations partdb_git
 python3 manage.py makemigrations distributors
 python3 manage.py makemigrations invoices
 python3 manage.py makemigrations inventory
