@@ -16,8 +16,8 @@ def update_manufacturer_order_number():
     for don in don_to_update:
         logger.info(f'Updating {don}')
 
-        manufacturer_name_converted = don.distributor.convert_manufacturer_name(don.manufacturer_name_text)
-        logger.debug(f"\tDistributor manufacturer name: {don.manufacturer_name_text}, converted manufacturer name: {manufacturer_name_converted}")
+        manufacturer_name_converted = don.distributor.convert_manufacturer_name(don.manufacturer_name)
+        logger.debug(f"\tDistributor manufacturer name: {don.manufacturer_name}, converted manufacturer name: {manufacturer_name_converted}")
         if last_manufacturer_name != manufacturer_name_converted:
             new_manufacturer = get_manufacturer_by_name(manufacturer_name_converted)
             if new_manufacturer:
@@ -31,7 +31,7 @@ def update_manufacturer_order_number():
         if manufacturer_obj is not None:
             logger.debug(f"\tManufacturer: {manufacturer_obj}")
 
-            order_number = don.manufacturer_order_number_text if don.manufacturer_order_number_text else don.distributor_order_number_text
+            order_number = don.mon if don.mon else don.don
             logger.debug(f"\tsearching for MON with order number: {order_number}")
             try:
                 mon = ManufacturerOrderNumber.objects.get(

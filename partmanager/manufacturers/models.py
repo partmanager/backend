@@ -47,12 +47,18 @@ class Manufacturer(models.Model):
 
 def get_manufacturer_by_name(manufacturer_name):
     if manufacturer_name is not None:
-        manufacturer = Manufacturer.objects.filter(Q(name__iexact=manufacturer_name) | Q(full_name__iexact=manufacturer_name))
-        if manufacturer:
-            if len(manufacturer) == 1:
-                return manufacturer[0]
-            else:
-                raise RuntimeError("Multiple manufacturers with the same name found: " + str(manufacturer_name), manufacturer)
+        try:
+            manufacturer = Manufacturer.objects.get(name=manufacturer_name)
+            return manufacturer
+        except Manufacturer.DoesNotExist:
+            return None
+
+        #manufacturer = Manufacturer.objects.filter(Q(name__iexact=manufacturer_name) | Q(full_name__iexact=manufacturer_name))
+        #if manufacturer:
+        #    if len(manufacturer) == 1:
+        #        return manufacturer[0]
+        #    else:
+        #        raise RuntimeError("Multiple manufacturers with the same name found: " + str(manufacturer_name), manufacturer)
 
 
 def get_or_create_manufacturer_by_name(manufacturer_name):

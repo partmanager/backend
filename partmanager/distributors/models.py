@@ -36,7 +36,8 @@ class Distributor(models.Model):
     def convert_manufacturer_name(self, distributor_manufacturer_name):
         if distributor_manufacturer_name is not None:
             try:
-                return self.distributormanufacturer_set.get(manufacturer_name_text=distributor_manufacturer_name)
+                obj = self.distributormanufacturer_set.get(manufacturer_name_text=distributor_manufacturer_name)
+                return obj.manufacturer.name
             except DistributorManufacturer.DoesNotExist:
                 return distributor_manufacturer_name
 
@@ -239,7 +240,7 @@ class DistributorOrderNumber(models.Model):
                 print("Distributor order number, found more than one MON:", mon)
 
     def __str__(self):
-        part_or_service = self.manufacturer_order_number.manufacturer_order_number if self.manufacturer_order_number else self.service.name if self.service else ''
+        part_or_service = self.manufacturer_order_number.manufacturer_order_number if self.manufacturer_order_number else "" #self.service.name if self.service else ''
         return "{}, {}, {} -> {}{}".format(self.distributor.name, self.manufacturer_name,
                                            self.don, self.mon, " --> " + part_or_service)
 
@@ -254,7 +255,7 @@ class DistributorOrderNumber(models.Model):
 class DistributorManufacturer(models.Model):
     distributor = models.ForeignKey('Distributor', on_delete=models.CASCADE)
     manufacturer = models.ForeignKey('manufacturers.Manufacturer', on_delete=models.PROTECT)
-    manufacturer_name_text = models.CharField(max_length=200)
+    manufacturer_name_text = models.CharField(max_length=200, verbose_name="Distributor specific manufacturer name.")
 
     class Meta:
         unique_together = ["distributor", "manufacturer_name_text"]
