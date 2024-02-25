@@ -48,10 +48,18 @@ class Manufacturer(models.Model):
 def get_manufacturer_by_name(manufacturer_name):
     if manufacturer_name is not None:
         try:
-            manufacturer = Manufacturer.objects.get(name=manufacturer_name)
+            manufacturer = Manufacturer.objects.get(name__iexact=manufacturer_name)
             return manufacturer
         except Manufacturer.DoesNotExist:
-            return None
+            try:
+                manufacturer = Manufacturer.objects.get(full_name__iexact=manufacturer_name)
+                return manufacturer
+            except Manufacturer.DoesNotExist:
+                return None
+        except Manufacturer.MultipleObjectsReturned as e:
+            found = Manufacturer.objects.filter(name__iexact=manufacturer_name)
+            print(e, found)
+            return found[0]
 
         #manufacturer = Manufacturer.objects.filter(Q(name__iexact=manufacturer_name) | Q(full_name__iexact=manufacturer_name))
         #if manufacturer:
