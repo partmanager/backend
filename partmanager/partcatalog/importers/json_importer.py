@@ -27,6 +27,7 @@ from .json_importers.resistor_array_importer import ResistorArrayJsonImporter
 from .json_importers.surge_arrester_importer import SurgeArresterJsonImporter
 from .json_importers.switch_importer import SwitchJsonImporter
 from .json_importers.transistor_mosfet_importer import TransistorMosfetJsonImporter
+from .json_importers.tvs_importer import TVSJsonImporter
 from .json_importers.varistor_importer import VaristorJsonImporter
 
 
@@ -59,5 +60,6 @@ json_importer.register_model_importer(ResistorArrayJsonImporter())
 json_importer.register_model_importer(SurgeArresterJsonImporter())
 json_importer.register_model_importer(SwitchJsonImporter())
 json_importer.register_model_importer(TransistorMosfetJsonImporter())
+json_importer.register_model_importer(TVSJsonImporter())
 json_importer.register_model_importer(VaristorJsonImporter())
 

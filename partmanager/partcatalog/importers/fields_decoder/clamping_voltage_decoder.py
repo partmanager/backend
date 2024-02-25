@@ -12,7 +12,10 @@ def clamping_voltage_decoder(json_data):
         #value['typ']
         voltage.max = value['max']
         if 'conditions' in json_data:
-            voltage.at_peak_current = __current_decode(json_data['conditions']['I'])
+            if "I" in json_data['conditions']:
+                voltage.at_peak_current = __current_decode(json_data['conditions']['I'])
+            elif "I_PP" in json_data['conditions']:
+                voltage.at_peak_current = __current_decode(json_data['conditions']['I_PP'])
         else:
             voltage.at_peak_current = None
         return voltage
