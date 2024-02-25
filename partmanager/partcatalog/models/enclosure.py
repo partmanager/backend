@@ -7,10 +7,11 @@ class Enclosure(Part):
     class Material(models.IntegerChoices):
         UNKNOWN = 0
         ABS = 1
+        ALUMINIUM = 2
 
         @staticmethod
         def from_string(type_str):
-            values = {"ABS": 1}
+            values = {"ABS": 1, "Aluminium": 2, "Aluminum": 2}
             return values[type_str]
 
     class Color(models.IntegerChoices):
@@ -26,11 +27,12 @@ class Enclosure(Part):
     class IPRating(models.IntegerChoices):
         UNKNOWN = 0
         IP30 = 1
+        IP54 = 54
 
         @staticmethod
         def from_string(type_str):
             if len(type_str):
-                values = {"IP30": 1}
+                values = {"IP30": 1, "IP54": 54}
                 return values[type_str]
             else:
                 return 0

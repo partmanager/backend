@@ -10,7 +10,7 @@ from .fields.power import Power
 from .fields.time import Time
 from .fields.voltage import Voltage
 from .fields.current import Current
-
+from .fields.max_current import MaxCurrentAtTemp
 
 class Diode(Part):
     part_type_subset = ['D', 'DS']
@@ -73,14 +73,14 @@ class TVS(Part):
     )
     part_type_subset = ['TVS']
     configuration = models.CharField(max_length=1, choices=CONFIGURATION_TYPE)
-    reverse_standoff_voltage_in_volts = models.DecimalField(max_digits=6, decimal_places=2)  # Vrwm
+    reverse_standoff_voltage = Voltage()  # Vrwm
     breakdown_voltage = BreakdownVoltage()
     test_current_in_mA = models.IntegerField(null=True, blank=True)  # It todo remove
-    clamping_voltage = ClampingVoltage()
-    clamping_voltage2 = ClampingVoltage()
-    peak_pulse_current_max_in_amper = models.DecimalField(max_digits=6, decimal_places=2)  # Ipp
+    clamping_voltage_1 = ClampingVoltage()
+    clamping_voltage_2 = ClampingVoltage()
+    peak_pulse_current_max = MaxCurrentAtTemp()  # Ipp
     reverse_leakage_current_max_in_uA = models.IntegerField(null=True, blank=True)  # Ir @ Vrwm
-    power_rating_in_wats = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    power_rating = Power()
 
     custom_fields = {'Configuration': 'configuration', 'Power Rating': 'power_rating_in_wats'}
     fields = {**Part.fields_begin, **custom_fields, **Part.fields_end}
@@ -91,5 +91,4 @@ class TVS(Part):
         return configuration[configuration_str]
 
     def generate_description(self):
-        return "TVS, {} {}".format(self.get_configuration_display(),
-                                   decimal_voltage_to_str(self.reverse_standoff_voltage_in_volts))
+        return f"TVS, {self.get_configuration_display()}, {self.reverse_standoff_voltage}"

@@ -5,19 +5,21 @@ class BatteryType(models.IntegerChoices):
     CR2030 = 1
     CR2032 = 2
     R6 = 3
+    CR14250 = 4
 
     @staticmethod
     def from_string(type_str):
-        values = {'CR2030': 1, "CR2032": 2, 'R6': 3, 'AA, R6': 3}
+        values = {'CR2030': 1, "CR2032": 2, 'R6': 3, 'AA, R6': 3, 'CR14250': 4}
         return values[type_str]
 
 
 class BatteryClassification(models.IntegerChoices):
     ALKALINE = 1
+    LITHIUM = 2
 
     @staticmethod
     def from_string(type_str):
-        values = {'Alkaline': 1}
+        values = {'Alkaline': 1, 'Lithium': 2}
         return values[type_str]
 
 
