@@ -43,25 +43,35 @@ class ModelImporter:
     def create_part(self, manufacturer, part_number, json_data):
         logger.info(f"Creating {part_number}")
         package = self.get_package(json_data['package'])
-        parameters = self.decode_parameters(json_data['parameters'])
         common_parameters = self.decode_common_part_parameters(json_data)
+        #logger.debug(f"Decoded common part parameters: {common_parameters}")
+        parameters = self.decode_parameters(json_data['parameters'])
+        #logger.debug(f"Decoded part specific parameters: {parameters}")
         symbol = self.decode_symbol_and_footprint(json_data)
-        part = self.model_class(manufacturer_part_number=part_number,
-                                manufacturer=manufacturer,
-                                storage_conditions=self.decode_storage_conditions(json_data['storageConditions']),
-                                **common_parameters,
-                                package=package,
-                                **parameters,
-                                symbol=symbol)
+        #logger.debug(f"Decoded symbol and footprint: {symbol}")
+        try:
+            part = self.model_class(manufacturer_part_number=part_number,
+                                    manufacturer=manufacturer,
+                                    storage_conditions=self.decode_storage_conditions(json_data['storageConditions']),
+                                    **common_parameters,
+                                    package=package,
+                                    **parameters,
+                                    symbol=symbol)
+        except AttributeError as e:
+            logger.error(f"{repr(e)}, {json_data}")
+            return None
         if self.generate_description == GenerateDescriptionPolicy.AlwaysGenerateDescription:
             part.description = part.generate_description()
+            logger.info(f"Generated description {part.description}")
         elif self.generate_description == GenerateDescriptionPolicy.GenerateDescriptionIfMissing:
             if 'description' in json_data and len(json_data['description']) > 0:
-                part.description = json_data['description']
+                part.description = json_data['description'] if 'description' in json_data else None
             else:
                 part.description = part.generate_description()
+                logger.info(f"Generated description {part.description}")
         elif self.generate_description == GenerateDescriptionPolicy.AlwaysUseFileDescription:
-            part.description = json_data['description']
+            part.description = json_data['description'] if 'description' in json_data else None
+        logger.info(f"Created {part_number}")
         return part
 
     def decode_storage_conditions(self, json_data):
@@ -77,7 +87,7 @@ class ModelImporter:
             common_parameters['device_marking_code'] = json_data['markingCode']
         if 'series' in json_data:
             common_parameters['series'] = json_data['series']['name']
-            common_parameters['series_description'] = json_data['series']['description']
+            common_parameters['series_description'] = json_data['series']['description'] if 'description' in json_data['series'] else None
         if 'productUrl' in json_data and json_data['productUrl'] is not None and len(json_data['productUrl']):
             common_parameters['product_url'] = json_data['productUrl']
         if 'notes' in json_data and json_data['notes'] is not None and len(json_data['notes']):
@@ -111,6 +121,7 @@ class ModelImporter:
         decoded = {}
         for parameter in self.parameters:
             try:
+                #logger.debug(f"Decoding parameter {parameter}")
                 parameter_decoder = self.parameters[parameter]['decoder']
                 json_field = self.parameters[parameter]['json_field']
                 max_values_count = self.parameters[parameter]['max_values_count'] if 'max_values_count' in self.parameters[parameter] else None
@@ -118,9 +129,13 @@ class ModelImporter:
                     if max_values_count:
                         if isinstance(json_data[json_field], list):
                             for index in range(min(max_values_count, len(json_data[json_field]))):
-                                decoded['{}_{}'.format(parameter, index + 1)] = parameter_decoder(json_data[json_field][index])
+                                decoded_param = parameter_decoder(json_data[json_field][index])
+                                if decoded_param:
+                                    decoded['{}_{}'.format(parameter, index + 1)] = decoded_param
                         else:
-                            decoded['{}_1'.format(parameter)] = parameter_decoder(json_data[json_field])
+                            decoded_param = parameter_decoder(json_data[json_field])
+                            if decoded_param:
+                                decoded['{}_1'.format(parameter)] = parameter_decoder(json_data[json_field])
                     else:
                         if isinstance(json_data[json_field], list):
                             logger.error("*********** Error, parameter is list but part model can't support it")
@@ -178,10 +193,10 @@ class JsonImporterBase:
                         for f in file:
                             part.files.add(f)
                         self.__save(part)
-                    self.logger.debug('%s %s', part.manufacturer_part_number, "\tAdd")
+                    self.logger.info(f"{part.manufacturer_part_number} added")
             else:
                 self.update_part(part, imported_part, part_importer)
-                self.logger.debug('%s %s', part.manufacturer_part_number, "\tSkip")
+                self.logger.info(f"{part.manufacturer_part_number} updated")
 
             self.add_manufacturer_order_numbers(manufacturer, part, json_data['orderNumbers'])
         else:
@@ -207,23 +222,6 @@ class JsonImporterBase:
                 present.generate_description()
             self.logger.info(f"************************** Saving updated part: {present}")
             present.save()
-
-
-    # def create_part(self, manufacturer, part_number, json_data):
-    #     model_importer = self.model_decoders[json_data['partType']]
-    #     if model_importer:
-    #         package = self.get_package(json_data['package'])
-    #         parameters = json_data['parameters']
-    #         common_parameters = self.decode_common_part_parameters(json_data)
-    #         part = model_importer.model_class(manufacturer_part_number=part_number,
-    #                                           manufacturer=manufacturer,
-    #                                           **common_parameters,
-    #                                           package=package)
-    #         if model_importer.generate_description:
-    #             part.description = part.generate_description()
-    #         else:
-    #             part.description = json_data['description']
-    #         return part
 
     def add_manufacturer_order_numbers(self, manufacturer, part, order_numbers):
         for order_number in order_numbers:
@@ -279,11 +277,11 @@ class JsonImporterBase:
                 #print(filename)
                 file = File(url=url, name=filename, file_type=filetype)
                 self.__save(file)
-                if not self.skip_file_download:
-                    try:
-                        create_file_version_from_url(file_model=file, filename=filename, version='unknown', url=url)
-                    except requests.exceptions.ReadTimeout:
-                        self.logger.error('File download timeout, %s', url)
+                #if not self.skip_file_download:
+                #    try:
+                #        create_file_version_from_url(file_model=file, filename=filename, version='unknown', url=url)
+                #    except requests.exceptions.ReadTimeout:
+                #        self.logger.error('File download timeout, %s', url)
                 # file_version = FileVersion(file=url, file_container=file, version='')
                 # file_version.save()
                 files.append(file)

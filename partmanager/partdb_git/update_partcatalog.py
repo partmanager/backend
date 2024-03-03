@@ -10,13 +10,19 @@ logger = logging.getLogger('partdb_git')
 
 
 def update_manufacturers(directory):
-    logger.info(f"Updating manufacturers data")
-    import_manufacturers(directory + "/manufacturers")
+    try:
+        logger.info(f"Updating manufacturers data")
+        import_manufacturers(directory + "/manufacturers")
+    except FileNotFoundError:
+        logger.warning(f"Manufacturers data file not found")
 
 
 def update_distributors(directory):
-    logger.info(f"Updating distributors data")
-    import_distributor(directory + "/distributors")
+    try:
+        logger.info(f"Updating distributors data")
+        import_distributor(directory + "/distributors")
+    except FileNotFoundError:
+        logger.warning(f"Distributors data file not found")
 
 
 def update_partcatalog(modified_files, progress_recorder):

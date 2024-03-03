@@ -12,5 +12,9 @@ django-celery-results
 celery>=5.3
 celery-progress
 gitpython
+pandas
+openpyxl
+lxml
+odfpy
 
 

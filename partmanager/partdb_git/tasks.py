@@ -20,7 +20,13 @@ def update_all(self):
     for repository in repos:
         repo_dict = repos[repository]
         url = repo_dict["url"]
-        repo = update_or_clone_repo(url, destination + repository)
+        branch = repo_dict['branch']
+        ssh_key = None
+        repo = update_or_clone_repo(url,
+                                    branch,
+                                    destination + repository,
+                                    ssh_key=ssh_key,
+                                    credintials=repo_dict['credentials'])
         if repo:
             progress_recorder.set_progress(1, 4, description='Updating manufacturers data')
             update_manufacturers(destination + repository)

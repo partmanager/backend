@@ -23,6 +23,7 @@ class TVSJsonImporter(ModelImporter):
                            'power_rating': {'decoder': power_decoder, 'json_field': 'Power Rating'},
                            }
         self.parameters_todo.add('I_RM')
+        self.parameters_todo.add('I_R')
         self.parameters_todo.add('Cd')
         self.parameters_todo.add('V_ESD MIL-STD-883')
         self.parameters_todo.add('V_ESD IEC 61000-4-2')

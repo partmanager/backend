@@ -16,22 +16,29 @@ class Progress(RemoteProgress):
         print(self._cur_line)
 
 
-def update_or_clone_repo(repo_url, local_path, ssh_key=None):
+def update_or_clone_repo(repo_url, branch, local_path, ssh_key=None, credintials=None):
     logger.info(f"Updating repository {repo_url}, in directory {local_path}")
     try:
         # Attempt to open the repository
         repo = git.Repo(local_path)
         # If the repository exists, pull the latest changes
-        repo.remote().fetch()
+        repo.git.checkout(branch)
+        repo.remote().pull()
         switch_to_local_branch(repo)
-        repo.git.merge('main')
+        #repo.index.remove(['components/.gitignore'], working_tree=True)
+        repo.git.merge(branch)
         logger.info("Repository updated successfully.")
     except NoSuchPathError:
         # If the repository doesn't exist locally, clone it
         if ssh_key:
             git.Repo.clone_from(repo_url, local_path, progress=Progress(), env={"GIT_SSH_COMMAND": f"ssh -i {ssh_key}"})
         else:
-            repo = git.Repo.clone_from(repo_url, local_path, progress=Progress())
+            if credintials:
+                repo = git.Repo.clone_from(f"https://{credintials['user']}:{credintials['password']}@{repo_url}",
+                                           local_path,
+                                           progress=Progress())
+            else:
+                repo = git.Repo.clone_from(repo_url, local_path, progress=Progress())
         logger.info("Repository cloned successfully.")
     except Exception as e:
         logger.error("An error occurred:", repr(e))
@@ -62,7 +69,7 @@ def generate_modified_component_list(directory, repo, commit):
     if commit:
         try:
             tmp_modified_files = repo.git.diff(commit, name_only=True).splitlines()
-            modified_files = [f'{directory}/{i}' for i in tmp_modified_files]
+            modified_files = [f'{directory}/{i}' for i in tmp_modified_files if i.endswith('.json')]
         except git.exc.GitCommandError:
             logger.warning(f"Error while checking for modified files in repository. Updating all files.")
             modified_files = list(Path(directory + "/components/").rglob('*.json'))
@@ -75,7 +82,7 @@ def generate_modified_component_list(directory, repo, commit):
 def commit_to_local_branch(partsdb_repo):
     try:
         switch_to_local_branch(partsdb_repo)
-        partsdb_repo.git.add(update=True)
+        partsdb_repo.git.add(all=True)
         commit = partsdb_repo.index.commit("Committing all modified files")
         return commit.hexsha
     except git.exc.GitCommandError as e:
