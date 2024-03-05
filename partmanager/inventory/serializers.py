@@ -7,10 +7,14 @@ from manufacturers.serializers import ManufacturerSerializer
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    subcategories_id_set = serializers.SerializerMethodField()
+
     class Meta:
         model = Category
         fields = '__all__'
 
+    def get_subcategories_id_set(self, obj):
+        return obj.get_id_set()
 
 class StorageLocationDetailSerializer(serializers.ModelSerializer):
     class Meta:
@@ -35,13 +39,15 @@ class InventoryPositionSerializer(serializers.ModelSerializer):
     condition_display = serializers.SerializerMethodField()
     status_display = serializers.SerializerMethodField()
     stock_unit_display = serializers.SerializerMethodField()
+    alternative_locations = serializers.SerializerMethodField()
+    distributors = serializers.SerializerMethodField()
 
     class Meta:
         model = InventoryPosition
         fields = '__all__'
 
     def get_reserved_quantity(self, obj):
-        return obj.get_reserved_quantity()
+        return obj.get_reserved_quantity() + 10
 
     def get_condition_display(self, obj):
         return obj.get_condition_display()
@@ -51,6 +57,35 @@ class InventoryPositionSerializer(serializers.ModelSerializer):
 
     def get_stock_unit_display(self, obj):
         return obj.get_stock_unit_display()
+
+    def get_distributors(self, obj):
+        if obj.part and obj.part.distributorordernumber_set:
+            return obj.part.part.distributor_pk_set()
+
+    def get_alternative_locations(self, obj):
+        def add_invoice_info(self, dictionary, invoice):
+            dictionary['invoice_id'] = invoice.pk
+            dictionary['distributor_id'] = invoice.invoice.distributor.pk
+            #dictionary['price'] = invoice.get_price_per_unit_display()  # todo remove
+            #dictionary['stock_value'] = self.get_stock_value_display()  # todo remove
+            dictionary['distributor'] = invoice.get_distributor_display()  # todo remove
+            #dictionary['invoice_number'] = invoice.get_invoice_number_display()  # todo remove
+            dictionary['shipped_quantity'] = invoice.shipped_quantity  # todo remove
+
+        if obj.part:
+            other_positions = []
+            for position in obj.part.inventoryposition_set.all():
+                if position != obj:
+                    position_dict = {'storage_location': position.storage_location.location,
+                                     'stock': position.stock,
+                                     'condition': position.get_condition_display()}
+                    if position.invoice:
+                        #add_invoice_info(position, position_dict, position.invoice)
+                        serializer = InvoiceItemDetailSerializer(position.invoice)
+                        position_dict['invoice_item'] = serializer.data
+
+                    other_positions.append(position_dict)
+            return other_positions
 
 
 class StorageLocationWithItemsSerializer(serializers.ModelSerializer):
@@ -82,6 +117,7 @@ class InventoryPositionDetailSerializer(serializers.ModelSerializer):
     distributorordernumber_set = serializers.SerializerMethodField()
     distributors = serializers.SerializerMethodField()
     alternative_locations = serializers.SerializerMethodField()
+
 
     class Meta:
         model = InventoryPosition

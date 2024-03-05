@@ -8,7 +8,7 @@ urlpatterns = [
     path('', RedirectView.as_view(url='parts/1', permanent=True), name='index'),
     path('history/<int:pk>', views.inventory_position_history_list_view, name='parts-history'),
 
-    path('api/list/<int:category_pk>', views.api_inventory_list, name='api-inventory-list'),
+    # path('api/list/<int:category_pk>', views.api_inventory_list, name='api-inventory-list'),
     path('api/category_list', views.api_category_list, name='api-category-list'),
     path('api/category_flat_list', api.flat_category_list, name='api-category-flat-list'),
     path('api/storage_location_list', api.storage_location_list, name='api-storage-location-list'),
