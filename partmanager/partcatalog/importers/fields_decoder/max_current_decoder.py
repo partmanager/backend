@@ -19,15 +19,16 @@ def max_current_at_temp_decoder(json_data):
 
 
 def max_current_at_temp_at_freq_decoder(json_data):
-    value = parameter_str_to_dict(json_data['value'], __current_decode)
-    if value:
-        assert value['min'] is None and value['typ'] is None, value
-        current = MaxCurrentAtTempAtFreq()
-        current.max = value['max']
-        if 'conditions' in json_data:
-            current.at_temp = __si_temperature_decode(json_data['conditions']['T_A']) if 'T_A' in json_data['conditions'] else None
-            current.at_freq = __frequency_decode(json_data['conditions']['f']) if 'f' in json_data['conditions'] else None
-        else:
-            current.at_temp = None
-            current.at_freq = None
-        return current
+    if json_data and json_data['value']:
+        value = parameter_str_to_dict(json_data['value'], __current_decode)
+        if value:
+            assert value['min'] is None and value['typ'] is None, value
+            current = MaxCurrentAtTempAtFreq()
+            current.max = value['max']
+            if 'conditions' in json_data:
+                current.at_temp = __si_temperature_decode(json_data['conditions']['T_A']) if 'T_A' in json_data['conditions'] else None
+                current.at_freq = __frequency_decode(json_data['conditions']['f']) if 'f' in json_data['conditions'] else None
+            else:
+                current.at_temp = None
+                current.at_freq = None
+            return current

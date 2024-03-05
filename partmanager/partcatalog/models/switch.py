@@ -12,12 +12,14 @@ class Switch(Part):
         DIP = 1
         TACT_SWITCH = 2
         ENCODING_SWITCH = 3
+        ENCODER = 4
 
         @staticmethod
         def from_string(type_str):
             values = {"DIP Switch": 1,
                       "Tact Switch": 2,
-                      "Encoding Switch": 3}
+                      "Encoding Switch": 3,
+                      "Encoder": 4}
             return values[type_str]
 
     class ConfigurationChoices(models.IntegerChoices):

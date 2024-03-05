@@ -74,7 +74,7 @@ class TVS(Part):
     part_type_subset = ['TVS']
     configuration = models.CharField(max_length=1, choices=CONFIGURATION_TYPE)
     reverse_standoff_voltage = Voltage()  # Vrwm
-    breakdown_voltage = BreakdownVoltage()
+    breakdown_voltage = BreakdownVoltage()  # Vbr
     test_current_in_mA = models.IntegerField(null=True, blank=True)  # It todo remove
     clamping_voltage_1 = ClampingVoltage()
     clamping_voltage_2 = ClampingVoltage()

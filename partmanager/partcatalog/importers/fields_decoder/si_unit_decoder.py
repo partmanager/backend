@@ -50,12 +50,13 @@ def voltage_decode(voltage_str):
 
 
 class SiUnitDecoderBase:
-    def __init__(self, unit):
+    def __init__(self, unit, extra_suffix=None):
         self.prefix = {'f': Decimal('0.000000000000001'),
                        'p': Decimal('0.000000000001'),
                        'n': Decimal('0.000000001'),
                        'u': Decimal('0.000001'),
                        'μ': Decimal('0.000001'),
+                       '\u00b5': Decimal('0.000001'),
                        'm': Decimal('0.001'),
                        'k': Decimal(1000),
                        'M': Decimal(1000000),
@@ -64,16 +65,19 @@ class SiUnitDecoderBase:
                        '':  Decimal(1)}
         self.sufix_mul = {}
         self.__generate_sufix_dict(unit)
+        if extra_suffix:
+            self.sufix_mul.update(extra_suffix)
 
     def decode(self, value_str):
+        original_string = value_str
         for sufix in self.sufix_mul:
-            if sufix in value_str:
+            if value_str.endswith(sufix):
                 value_str = value_str.replace(sufix, '')
                 try:
                     value = Decimal(value_str) * self.sufix_mul[sufix]
                     return value
                 except:
-                    print("SI unit decoder, Unable to convert", value_str)
+                    print(f"SI unit decoder. Unable to convert value: {value_str}, found suffix: {sufix}, original string: {original_string}, available suffixes: {self.sufix_mul}")
                     raise
 
     def __generate_sufix_dict(self, unit):
@@ -97,7 +101,7 @@ class SiVoltageDecoder(SiUnitDecoderBase):
 
 
 __si_current_decoder = SiUnitDecoderBase('A')
-__si_capacitance_decoder = SiUnitDecoderBase('F')
+__si_capacitance_decoder = SiUnitDecoderBase('F', extra_suffix={'㎌': Decimal('0.000001')})
 __si_capacity_decoder = SiUnitDecoderBase('Ah')
 __si_luminous_intensity = SiUnitDecoderBase('cd')
 __si_distance_decoder = SiUnitDecoderBase('m')

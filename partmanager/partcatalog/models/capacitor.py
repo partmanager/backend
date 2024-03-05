@@ -81,14 +81,22 @@ class Capacitor(Part):
         return part_type_to_short_name[self.part_type]
 
     def generate_description(self):
-        description = "{} {}, {}, {}, {}".format(self.get_part_type_short_display(),
-                                                 self.capacitance,
-                                                 self.voltage,
-                                                 self.dielectric_type,
-                                                 self.working_temperature_range)
-        if self.package:
-            description += ' ' + self.package.name
-        return description
+        try:
+            description = "{} {}, {}, {}, {}".format(self.get_part_type_short_display(),
+                                                     self.capacitance,
+                                                     self.voltage,
+                                                     self.dielectric_type,
+                                                     self.working_temperature_range)
+            if self.package:
+                description += ' ' + self.package.name
+            return description
+        except TypeError as e:
+            print(self.manufacturer_part_number)
+            print(self.get_part_type_short_display())
+            print(self.capacitance)
+            print(self.voltage)
+            print(self.dielectric_type)
+            print(self.working_temperature_range)
 
     class Meta:
         ordering = ['capacitance_typ', 'voltage_max', 'capacitance_relative_tolerance']

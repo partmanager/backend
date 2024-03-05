@@ -14,23 +14,27 @@ def parameter_str_to_dict(parameter_str, value_decoder):
             values_str = parameter_str.split('~')
             return {'min': value_decoder(values_str[0]), 'typ': None, 'max': value_decoder(values_str[1])}
         elif '±' in parameter_str:
-            value_str, tolerance_str = parameter_str.split('±')
-            value_str = value_str.strip()
-            tolerance_str = tolerance_str.strip()
-            #print(parameter_str, "value:", value_str, "tolerance:", tolerance_str)
-            if len(value_str) > 0:
-                value = value_decoder(value_str)
-                assert value is not None, parameter_str
-                if '%' in tolerance_str:
-                    min_max = percent_str_to_decimal(tolerance_str) / Decimal(100)
-                    return {'min': value - value * min_max, 'typ': value, 'max': value + value * min_max, 'tolerance_type': 'relative', 'relative_tolerance': min_max}
-                elif 'ppm' in tolerance_str:
-                    min_max = ppm_str_to_decimal(tolerance_str) / Decimal(1000000)
-                    return {'min': value - value * min_max, 'typ': value, 'max': value + value * min_max,
-                            'tolerance_type': 'relative', 'relative_tolerance': min_max}
-                else:
-                    min_max = value_decoder(tolerance_str)
-                    return {'min': value - min_max, 'typ': value, 'max': value + min_max, 'tolerance_type': 'absolute'}
+            try:
+                value_str, tolerance_str = parameter_str.split('±')
+                value_str = value_str.strip()
+                tolerance_str = tolerance_str.strip()
+                #print(parameter_str, "value:", value_str, "tolerance:", tolerance_str)
+                if len(value_str) > 0:
+                    value = value_decoder(value_str)
+                    assert value is not None, f"value should be not None but it is {value}, decoded from {value_str}, parameter_str: {parameter_str}"
+                    if '%' in tolerance_str:
+                        min_max = percent_str_to_decimal(tolerance_str) / Decimal(100)
+                        return {'min': value - value * min_max, 'typ': value, 'max': value + value * min_max, 'tolerance_type': 'relative', 'relative_tolerance': min_max}
+                    elif 'ppm' in tolerance_str:
+                        min_max = ppm_str_to_decimal(tolerance_str) / Decimal(1000000)
+                        return {'min': value - value * min_max, 'typ': value, 'max': value + value * min_max,
+                                'tolerance_type': 'relative', 'relative_tolerance': min_max}
+                    else:
+                            min_max = value_decoder(tolerance_str)
+                            return {'min': value - min_max, 'typ': value, 'max': value + min_max, 'tolerance_type': 'absolute'}
+            except:
+                print(parameter_str)
+                raise
             else:
                 min_max = value_decoder(tolerance_str)
                 return {'min': min_max * -1, 'typ': None, 'max': min_max}
@@ -69,12 +73,17 @@ def parameter_str_to_dict(parameter_str, value_decoder):
             #         value_dict = {'min': typ_value + tolerance_value, 'typ': typ_value, 'max': None}
             #     return value_dict
             elif '+' in parameter_str:
-                typ_and_max_str = parameter_str.split('+')
-                typ_value = value_decoder(typ_and_max_str[0])
-                max_value = typ_value + value_decoder(typ_and_max_str[1])
-                value_dict = {'min': None, 'typ': typ_value, 'max': max_value}
-    #            print(value_dict)
-                return value_dict
+                try:
+                    typ_and_max_str = parameter_str.split('+')
+                    typ_value = value_decoder(typ_and_max_str[0].strip())
+                    max_value = typ_value + value_decoder(typ_and_max_str[1].strip())
+                    value_dict = {'min': None, 'typ': typ_value, 'max': max_value}
+        #            print(value_dict)
+                    return value_dict
+                except TypeError as e:
+                    print(parameter_str)
+                    print(typ_and_max_str)
+                    raise
             elif '-' in parameter_str:
                 typ_and_max_str = parameter_str.split('-')
                 typ_value = value_decoder(typ_and_max_str[0])
