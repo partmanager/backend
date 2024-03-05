@@ -16,5 +16,6 @@ pandas
 openpyxl
 lxml
 odfpy
+chardet
 
 
