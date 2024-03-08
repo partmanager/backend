@@ -39,6 +39,8 @@ class DistributorOrderNumberViewSet(ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'retrieve':
             return DistributorOrderNumberDetailSerializer
+        elif self.action == 'create':
+            return DistributorOrderNumberDetailSerializer
         return DistributorOrderNumberSerializer
 
 

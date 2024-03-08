@@ -49,12 +49,12 @@ def flat_category_list(request):
     return JsonResponse({'categories': category})
 
 
-def storage_location_folders_list(request):
-    locations = StorageLocationFolder.objects.all()
-    rows = []
-    for location in locations:
-        rows.append({'name': location.name, 'id': location.pk})
-    return JsonResponse({'rows': rows})
+# def storage_location_folders_list(request):
+#     locations = StorageLocationFolder.objects.all()
+#     rows = []
+#     for location in locations:
+#         rows.append({'name': location.name, 'id': location.pk})
+#     return JsonResponse({'rows': rows})
 
 
 def storage_location_flat_list(request):

@@ -24,7 +24,7 @@ from rest_framework.routers import DefaultRouter
 from .views import export, ImportView, UpdateGitView
 
 from distributors.views import DistributorViewSet, DistributorOrderNumberViewSet, DistributorManufacturerViewSet, api_stock_and_price
-from inventory.views import InventoryPositionViewSet
+from inventory.views import InventoryPositionViewSet, StrageLocationFolderViewSet
 from inventory.api import StorageLocationWithItemsViewSet
 from invoices.views import InvoiceViewSet, InvoiceImportView
 from invoices.views import InvoiceItemViewSet, InvoiceItemWithStorageViewSet
@@ -47,6 +47,7 @@ router.register(r'api/invoiceItemWithStorage', InvoiceItemWithStorageViewSet, ba
 router.register(r'api/manufacturer', ManufacturerViewSet, basename='ManufacturerViewSet')
 router.register(r'api/storage_location', StorageLocationViewSet, basename='StorageLocationViewSet')
 router.register(r'api/storage_location_items', StorageLocationWithItemsViewSet, basename='StorageLocationWithItemsViewSet')
+router.register(r'api/storage_location_folder', StrageLocationFolderViewSet, basename='StorageLocationFolderViewSet')
 router.register(r'api/project', ProjectViewSet, basename='ProjectViewSet')
 router.register(r'api/project-version', ProjectVersionViewSet, basename='ProjectVersionViewSet')
 router.register(r'api/bom', BOMViewSet, basename='BOMViewSet')
