@@ -1,7 +1,7 @@
 import json
 from django.http import JsonResponse
 from .models.part import Part
-from .tasks import import_components
+
 
 menu = {'id': 500,
         'label': 'Root',
@@ -123,10 +123,3 @@ def get_part_detail(request):
         }
         print(response)
         return JsonResponse({'data': response})
-
-
-def start_import(request):
-    import_components.delay()
-    response = {"total": True
-                }
-    return JsonResponse(response, safe=False)
