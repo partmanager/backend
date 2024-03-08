@@ -12,7 +12,7 @@ class Price(CompositeField):
             return f"{Currency(self.currency).name}"
 
         def to_dict(self):
-            dictionary = {'net': str(self.net),
+            dictionary = {'net': str(self.net) if self.net else None,
                           'currency': self.currency,
                           'currency_display': self.get_currency_display()}
             return dictionary
@@ -32,8 +32,8 @@ class PriceWithTax(CompositeField):
             return f"{Currency(self.currency).name}"
 
         def to_dict(self):
-            dictionary = {'net': str(self.net),
-                          'gross': str(self.gross),
+            dictionary = {'net': str(self.net) if self.net else None,
+                          'gross': str(self.gross) if self.gross else None,
                           'vat_tax': self.vat_tax,
                           'currency': self.currency,
                           'currency_display': self.get_currency_display()
@@ -48,8 +48,8 @@ class NetGrossPrice(CompositeField):
 
     class Proxy(CompositeField.Proxy):
         def to_dict(self):
-            dictionary = {'net': str(self.net),
-                          'gross': str(self.gross),
+            dictionary = {'net': str(self.net) if self.net else None,
+                          'gross': str(self.gross) if self.net else None,
                           'currency': self.currency,
                           'currency_display': self.get_currency_display()}
             return dictionary

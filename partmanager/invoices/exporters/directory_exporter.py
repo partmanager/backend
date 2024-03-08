@@ -1,3 +1,4 @@
+import json
 import time
 import os
 import shutil
@@ -5,7 +6,7 @@ import shutil
 
 def create_invoice_file(invoice, filename):
     with open(filename, 'w') as invoice_file:
-        invoice_file.write(invoice.to_json())
+        json.dump(invoice.to_dict(), invoice_file)
 
 
 def copy_invoice_files(invoice, destination):

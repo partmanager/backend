@@ -68,7 +68,7 @@ def import_distributor_from_dict(distributor_dict):
 
 
 def process_distributor_file(distributor_filename):
-    logger.info("Importing distributor", distributor_filename)
+    logger.info(f"Importing distributor: {distributor_filename}")
     with open(distributor_filename, 'r') as distributor_file:
         distributor = json.load(distributor_file)
         import_distributor_from_dict(distributor)

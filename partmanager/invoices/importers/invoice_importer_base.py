@@ -24,8 +24,7 @@ class InvoiceImporterBase:
         invoice = Invoice(number=invoice_dict['invoice_number'],
                           bookkeeping=invoice_dict['bookkeeping'],
                           distributor=distributor,
-                          invoice_date=invoice_dict['invoice_date'],
-                          order_date=invoice_dict['order_date'])
+                          invoice_date=invoice_dict['invoice_date'])
         if not self.dry:
             invoice.save()
             logger.info('New invoice was created: %s', invoice.number)
@@ -102,12 +101,12 @@ class InvoiceImporterBase:
         if created:
             self.DON_to_update.append(distributor_order_number)
 
-        net_price = decimal.Decimal(position['price']['net_value'])
+        net_price = decimal.Decimal(position['price']['net']) if position['price']['net'] else None
         tax = position['price']['vat_tax']
         gross_price = None
-        if 'gross_value' in position['price']:
-            gross_price = decimal.Decimal(position['price']['gross_value'])
-        elif tax:
+        if 'gross' in position['price'] and position['price']['gross']:
+            gross_price = decimal.Decimal(position['price']['gross'])
+        elif tax and net_price:
             gross_price = net_price * decimal.Decimal(tax) / 100
         invoice_item, created = InvoiceItem.objects.get_or_create(
             invoice=invoice_model,
@@ -120,6 +119,6 @@ class InvoiceImporterBase:
                 "price_net": net_price,
                 "price_gross": gross_price,
                 "price_vat_tax": tax,
-                "price_currency": Currency[position['price']['currency']]
+                "price_currency": Currency[position['price']['currency_display']]
             })
         return invoice_item, created

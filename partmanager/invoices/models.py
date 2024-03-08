@@ -82,8 +82,6 @@ class Invoice(models.Model):
                       'invoice_number': self.number,
                       'bookkeeping': self.bookkeeping,
                       'invoice_date': self.invoice_date.isoformat(),
-                      'order_number': self.order_number,
-                      'order_date': self.order_date.isoformat() if self.order_date else None,
                       'file': None,
                       'items': []}
         if self.invoice_file:
@@ -192,7 +190,7 @@ class InvoiceItem(models.Model):
                       'ordered_quantity': self.ordered_quantity,
                       'shipped_quantity': self.shipped_quantity,
                       'quantity_unit': self.quantity_unit,
-                      'distributor_number': self.distributor_number,
+                      'distributor_number': self.distributor_order_number.don,
                       'price': self.price.to_dict(),
                       'bookkeeping': self.bookkeeping,
                       'LOT': self.LOT,
