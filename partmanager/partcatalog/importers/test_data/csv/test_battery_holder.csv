@@ -1,2 +1,0 @@
-Manufacturer,Order Number,Part Number,Marking Code,Part Type,Production Status,Series,Series Description,Description,Working Temp Range,Storage Temp Range,MSLevel,Battery Type,Battery Count,Symbol,Package Type,Packaging Code,Packaging Type,Packaging Qty,Notes,Product URL
-Connfly,DS1092-02-B6P,DS1092-02-B6P,,Battery Holder,,,,"Battery holder CR2032, PCB mount",-40°C ~ 105°C,,,CR2032,1,battery_holder_1xCR2032,,,,,,

@@ -1,2 +1,0 @@
-Manufacturer,Order Number,Part Number,Part Type,Package Type,Production Status,Series,Series Description,Marking Code,Working Temp Range,Storage Temp Range,MSLevel,Symbol,Packaging Type,Packaging Qty,Notes,Product URL,Elements Count,Resistance,TCR,Power Rating Per Resistor,Power Rating Package,Working Voltage,Overload Voltage,Packaging Code
-Bourns,CAT16-220J4LF,CAT16-220J4LF,Resistor Array,Chip Array 1206,,CAT16,Chip Resistor Arrays,,-55°C ~ +125°C,,,,,,,,4,22R ±5% ,±200 PPM/°C,max. 5W @ TA=70°C,max. 0.250W,max. 50V,max. 100V,
