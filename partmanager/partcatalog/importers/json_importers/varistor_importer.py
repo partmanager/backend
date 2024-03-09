@@ -18,5 +18,9 @@ class VaristorJsonImporter(ModelImporter):
                            'rated_dc_voltage': {'decoder': voltage_decoder,
                                        'json_field': 'DC Voltage'},
                            'clamping_voltage': {'decoder': clamping_voltage_decoder, 'json_field': 'Clamping Voltage'},
-                           'power_rating': {'decoder': power_decode, 'json_field': 'Power Rating'}
+                           'power_rating': {'decoder': decode_power, 'json_field': 'Power Rating'}
                            }
+
+
+def decode_power(val_as_dict):
+    return power_decode(val_as_dict["value"])

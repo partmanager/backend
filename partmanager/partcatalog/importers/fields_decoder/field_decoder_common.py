@@ -86,8 +86,8 @@ def parameter_str_to_dict(parameter_str, value_decoder):
                     raise
             elif '-' in parameter_str:
                 typ_and_max_str = parameter_str.split('-')
-                typ_value = value_decoder(typ_and_max_str[0])
-                min_value = typ_value - value_decoder(typ_and_max_str[1])
+                typ_value = value_decoder(typ_and_max_str[0].strip())
+                min_value = typ_value - value_decoder(typ_and_max_str[1].strip())
                 value_dict = {'min': min_value, 'typ': typ_value, 'max': None}
     #            print(value_dict)
                 return value_dict
