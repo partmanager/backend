@@ -7,5 +7,5 @@ admin.site.register(DistributorManufacturer)
 
 @admin.register(DistributorOrderNumber)
 class DistributorOrderNumberAdmin(admin.ModelAdmin):
-    fields = ('distributor', 'distributor_order_number_text', 'manufacturer_order_number_text', 'manufacturer_name_text', 'service')
-    search_fields = ['distributor__name', 'distributor_order_number_text', 'service__name']
+    fields = ('distributor', 'don', 'mon', 'manufacturer_name', 'service')
+    search_fields = ['distributor__name', 'don', 'service__name']

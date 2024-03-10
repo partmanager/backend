@@ -1,3 +1,6 @@
+import os
+import tempfile
+
 from .models import Invoice, InvoiceItem
 from rest_framework import status
 from rest_framework import filters
@@ -79,13 +82,19 @@ class InvoiceImportView(APIView):
 
         importer = request.data['importer']
         invoice_import_file = request.FILES['file']
-        distributor_name = request.cleaned_data['distributor']
-        invoice_date = request.cleaned_data['invoice_date']
+        distributor_name = request.data['distributor']
+        invoice_date = request.data['invoice_date']
 
         if importer not in ['Archive importer', 'TME CSV file importer', 'Generic CSV file importer']:
             return Response({'error': 'Incorrect importer'}, status=status.HTTP_400_BAD_REQUEST)
 
-        result = import_invoice_from_file.delay(importer, invoice_import_file, distributor_name, invoice_date)
+        fd, tmp_invoice_import_file = tempfile.mkstemp()
+        with open(tmp_invoice_import_file, 'wb') as f:
+            content = invoice_import_file.read()
+            f.write(content)
+        os.close(fd)
+
+        result = import_invoice_from_file.delay(importer, tmp_invoice_import_file, distributor_name, invoice_date)
         return Response({'task_id': result.task_id})
 
 

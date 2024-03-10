@@ -22,7 +22,6 @@ class InvoiceImporterBase:
 
     def create_invoice(self, distributor, invoice_dict, files_dir):
         invoice = Invoice(number=invoice_dict['invoice_number'],
-                          bookkeeping=invoice_dict['bookkeeping'],
                           distributor=distributor,
                           invoice_date=invoice_dict['invoice_date'])
         if not self.dry:

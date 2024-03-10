@@ -1,3 +1,5 @@
+import os
+
 from celery import shared_task
 from .models import InvoiceItem
 from distributors.models import Distributor, DistributorOrderNumber
@@ -19,7 +21,7 @@ def update_invoice_item_don_assignments():
             if ii.distributor_number not in skip:
                 print(f"Updating {ii}, {ii.distributor_number}")
                 don = DistributorOrderNumber.objects.get(distributor=ii.invoice.distributor,
-                                                         distributor_order_number_text=ii.distributor_number)
+                                                         don=ii.distributor_number)
                 ii.distributor_order_number = don
                 ii.save()
         except DistributorOrderNumber.DoesNotExist as e:
@@ -47,3 +49,4 @@ def import_invoice_from_file(importer, invoice_import_file, distributor_name, in
     elif importer == 'Generic CSV file importer':
         importer = GenericCSVImporter()
         result_invoice_model = importer.import_invoice(distributor_name, invoice_date, invoice_import_file)
+    os.remove(invoice_import_file)

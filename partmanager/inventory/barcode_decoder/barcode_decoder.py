@@ -26,11 +26,11 @@ def find_don(data):
         if 'text' in data['distributor_order_number']:
             don = DistributorOrderNumber.objects.get(
                 distributor__name=data['distributor']['name'],
-                distributor_order_number_text=data['distributor_order_number']['text'])
+                don=data['distributor_order_number']['text'])
         elif data['manufacturer_order_number']:
             don = DistributorOrderNumber.objects.get(
                 distributor__name=data['distributor']['name'],
-                manufacturer_order_number_text=data['manufacturer_order_number'])
+                don=data['manufacturer_order_number'])
         else:
             don = None
         return don

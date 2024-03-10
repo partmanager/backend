@@ -11,10 +11,10 @@ class TMECSVImporter(InvoiceImporterBase):
         if self.distributor is None:
             self.distributor = Distributor.get_by_name('TME')
 
-        with filename.open() as file:
+        with open(filename, 'r') as file:
             file_content = ''
             for line in file:
-                file_content = file_content + line.decode()
+                file_content = file_content + line
 
             reader = csv.DictReader(file_content.splitlines(), delimiter=';')
             self._process_rows(reader)
@@ -46,9 +46,9 @@ class TMECSVImporter(InvoiceImporterBase):
                                      'ordered_quantity': ordered_quantity,
                                      'shipped_quantity': ordered_quantity,
                                      "unit": row["Jednostka"],
-                                     'price': {'net_value': net_price,
+                                     'price': {'net': net_price,
                                                'vat_tax': '23',
-                                               'currency': row['Waluta']},
+                                               'currency_display': row['Waluta']},
                                      'invoice_model': invoice_model}
             elif 'Invoice number' in row:
                 invoice_item_dict = {'order_number': row['Order number'],
@@ -57,9 +57,9 @@ class TMECSVImporter(InvoiceImporterBase):
                                      'ordered_quantity': ordered_quantity,
                                      'shipped_quantity': ordered_quantity,
                                      "unit": row["Unit"],
-                                     'price': {'net_value': net_price,
+                                     'price': {'net': net_price,
                                                'vat_tax': '23',
-                                               'currency': row['Currency']},
+                                               'currency_display': row['Currency']},
                                      'invoice_model': invoice_model}
             else:
                 raise
@@ -69,16 +69,12 @@ class TMECSVImporter(InvoiceImporterBase):
     def get_or_create_invoice_from_row(self, csv_row):
         if 'Numer faktury' in csv_row:
             invoice_dict = {'invoice_number': csv_row['Numer faktury'],
-                            'invoice_date': csv_row['Data wystawienia'],
-                            'order_number': None,
-                            'order_date': None,
-                            'bookkeeping': 'p'}
+                            'invoice_date': csv_row['Data wystawienia']
+                            }
         elif 'Invoice number' in csv_row:
             invoice_dict = {'invoice_number': csv_row['Invoice number'],
-                            'invoice_date': csv_row['Date of issue'],
-                            'order_number': None,
-                            'order_date': None,
-                            'bookkeeping': 'p'}
+                            'invoice_date': csv_row['Date of issue']
+                            }
         else:
             raise
         return self.get_or_create_invoice(self.distributor, invoice_dict, None)

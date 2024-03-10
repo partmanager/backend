@@ -52,10 +52,10 @@ class Invoice(models.Model):
             invoice_items = self.invoiceitem_set.filter(position_in_invoice=position)
         elif distributor_order_number_text:
             invoice_items = self.invoiceitem_set.filter(
-                distributor_order_number__distributor_order_number_text=distributor_order_number_text)
+                distributor_order_number__don=distributor_order_number_text)
         elif manufacturer_order_number:
             invoice_items = self.invoiceitem_set.filter(
-                distributor_order_number__manufacturer_order_number=manufacturer_order_number)
+                distributor_order_number__mon=manufacturer_order_number)
             print("Searching invoice:", self.get_invoice_number_display(), " by MON:", manufacturer_order_number,
                   "Found:", invoice_items)
         if len(invoice_items) == 1:

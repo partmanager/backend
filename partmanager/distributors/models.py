@@ -43,7 +43,7 @@ class Distributor(models.Model):
 
     def get_order_number(self, distributor_order_number):
         try:
-            return self.distributorordernumber_set.get(distributor_order_number_text=distributor_order_number)
+            return self.distributorordernumber_set.get(don=distributor_order_number)
         except DistributorOrderNumber.DoesNotExist:
             return None
 
@@ -72,9 +72,9 @@ class Distributor(models.Model):
                                     manufacturer_order_number=component['Manufacturer Part Number'],
                                     manufacturer=manufacturer)
                                 don = DistributorOrderNumber(distributor=self,
-                                                             distributor_order_number_text=distributor_order_number,
-                                                             manufacturer_name_text=component['Manufacturer'],
-                                                             manufacturer_order_number_text=component[
+                                                             don=distributor_order_number,
+                                                             manufacturer_name=component['Manufacturer'],
+                                                             mon=component[
                                                                  'Manufacturer Part Number'],
                                                              manufacturer_order_number=mon[0] if len(
                                                                  mon) == 1 else None,
@@ -98,8 +98,7 @@ class Distributor(models.Model):
                     'part_url': component['DistributorComponentWebPage']
                 }
                 DistributorOrderNumber.objects.update_or_create(distributor=self,
-                                                                distributor_order_number_text=component[
-                                                                    'Distributor Order Number'],
+                                                                don=component['Distributor Order Number'],
                                                                 defaults=defaults)
 
     def request_stock_and_price(self, distributor_order_number_model_set):

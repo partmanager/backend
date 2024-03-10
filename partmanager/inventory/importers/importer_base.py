@@ -12,7 +12,7 @@ class InventoryImporterBase:
             if invoice:
                 if len(invoice) == 1:
                     return invoice[0].get_item(manufacturer_order_number=manufacturer_order_number,
-                                               distributor_order_number_text=invoice_data["Symbol"],
+                                               don=invoice_data["Symbol"],
                                                position=invoice_data["Position"])
 
     def create_or_update_inventory_position(self, position_dict):
