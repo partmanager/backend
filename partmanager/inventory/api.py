@@ -273,7 +273,7 @@ def add_item_barcode_search(request):
             don = item['distributor_order_number']['don']
             if don:
                 new_item_candidate['distributor_id'] = don.distributor.pk
-                new_item_candidate['don'] = don.distributor_order_number_text
+                new_item_candidate['don'] = don.don
                 if don.manufacturer_order_number:
                     manufacturer_order_number = don.manufacturer_order_number
                     new_item_candidate['manufacturer_id'] = manufacturer_order_number.manufacturer.pk

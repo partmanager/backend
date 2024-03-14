@@ -178,11 +178,7 @@ class InvoiceItem(models.Model):
         return self.invoice.get_invoice_number_display()
 
     def __str__(self):
-        if self.distributor_order_number:
-            return "{}, {}, {}".format(self.invoice.distributor.name, self.invoice.number, self.distributor_number)
-        else:
-            return "{}, {}, {} Missing DON".format(self.invoice.distributor.name, self.invoice.number,
-                                                   self.distributor_number)
+        return "{}, {}, {}".format(self.invoice.distributor.name, self.invoice.number, self.distributor_order_number)
 
     def to_dict(self):
         dictionary = {'order_number': self.order_number,
