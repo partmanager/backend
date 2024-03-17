@@ -2,6 +2,8 @@ from .models import InventoryPosition, Category, StorageLocation, StorageLocatio
 from django.db.models import Sum
 from django.http import JsonResponse
 from invoices.models import InvoiceItem
+from invoices.serializers import InvoiceItemDetailSerializer
+from manufacturers.serializers import ManufacturerSerializer
 from manufacturers.models import Manufacturer
 from partcatalog.models.manufacturer_order_number import ManufacturerOrderNumber
 from partcatalog.utils import get_part
@@ -147,113 +149,6 @@ def assign_missing_mon(request):
     return JsonResponse({'missing_part': len(inventory_items), 'found': found_count})
 
 
-def add_item(request):
-    '''
-
-    :param request:
-         request body contain json data:
-         {
-            'mon': optional, contain ManufacturerOrderNumber pk
-            'name': optional, string
-            'description': optional, string
-            'note': optional, note as string
-            'manufacturer': optional, contain Manufacturer pk
-            'storage_location' -> required field, contain storage_location pk
-            'invoice' -> optional, contain invoice item pk
-            'quantity': {'value': required field, contain initial stock quantity
-                         'unit': required field, contain unit type according to QuantityUnit
-                         }
-            'condition': required field,
-            'status': required field
-            'category': required field, contain category pk
-         }
-    :return:
-    '''
-    if request.method == 'POST':
-        data = json.loads(request.body.decode("utf-8"))
-        if data:
-            mon = ManufacturerOrderNumber.objects.get(pk=data['mon']) if 'mon' in data and data['mon'] else None
-            if mon is None:
-                description = data['description'] if 'description' in data else None
-            else:
-                description = mon.part.description
-            inventory_position = InventoryPosition(
-                name=data['name'] if mon is None else mon.manufacturer_order_number,
-                description=description,
-                note=data['note'] if 'note' in data else None,
-                manufacturer=Manufacturer.objects.get(pk=data['manufacturer']) if 'manufacturer' in data else None,
-                part=mon,
-                storage_location=StorageLocation.objects.get(pk=data['storage_location']),
-                invoice=InvoiceItem.objects.get(pk=data['invoice']) if 'invoice' in data and data['invoice'] else None,
-                stock=data['quantity']['value'],
-                stock_unit=data['quantity']['unit'],
-                condition=data['condition'],
-                status=data['status'],
-                category=Category.objects.get(pk=data['category']),
-                archived=False
-            )
-            inventory_position.save_with_history(user_id=None, comment=None)
-            return JsonResponse({'status': "OK", 'message': 'Added item to inventory: {}'.format(inventory_position)})
-
-
-def update_item(request):
-    '''
-
-    :param request:
-         request body contain json data:
-         {
-            'id': required, InventoryPosition id for edit
-            'mon': optional, contain ManufacturerOrderNumber pk
-            'name': optional, string
-            'description': optional, string
-            'note': optional, note as string
-            'manufacturer': optional, contain Manufacturer pk
-            'storage_location' -> required field, contain storage_location pk
-            'invoice' -> optional, contain invoice item pk
-            'quantity': {'value': required field, contain initial stock quantity
-                         'unit': required field, contain unit type according to QuantityUnit
-                         }
-            'condition': required field,
-            'status': required field
-            'category': required field, contain category pk
-         }
-    :return:
-    '''
-    if request.method == 'POST':
-        data = json.loads(request.body.decode("utf-8"))
-        if data:
-            inventory_position = InventoryPosition.objects.get(pk=data['id'])
-            if 'manufacturer' in data:
-                inventory_position.manufacturer = Manufacturer.objects.get(pk=data['manufacturer'])
-            if 'mon' in data and data['mon']:
-                mon = ManufacturerOrderNumber.objects.get(pk=data['mon'])
-                inventory_position.part = mon
-                inventory_position.name = mon.manufacturer_order_number
-                inventory_position.description = mon.part.description
-                if inventory_position.manufacturer is None:
-                    inventory_position.manufacturer = mon.part.manufacturer
-                elif inventory_position.manufacturer != mon.part.manufacturer:
-                    print("Error*******")
-            else:
-                inventory_position.part = None
-                inventory_position.name = data['name']
-                inventory_position.description = data['description']
-
-            inventory_position.note = data['note'] if 'note' in data else None
-            inventory_position.storage_location = StorageLocation.objects.get(pk=data['storage_location'])
-            if 'invoice' in data and data['invoice'] is not None:
-                inventory_position.invoice = InvoiceItem.objects.get(pk=data['invoice'])
-            inventory_position.stock = data['quantity']['value']
-            inventory_position.stock_unit = data['quantity']['unit']
-            inventory_position.condition = data['condition']
-            print("Condition", data['condition'])
-            inventory_position.status = data['status']
-            inventory_position.category = Category.objects.get(pk=data['category'])
-
-            inventory_position.save_with_history(user_id=None, comment=None)
-            return JsonResponse({'status': "OK", 'message': 'Updated item in inventory: {}'.format(inventory_position)})
-
-
 def add_item_barcode_search(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode("utf-8"))
@@ -266,20 +161,18 @@ def add_item_barcode_search(request):
             item = item[0]
 
             new_item_candidate = {'stock': item['quantity'],
-                                  'stock_unit_id': 1,
-                                  'condition_id': 'n',
-                                  'inventory_status_id': 'b',
-                                  'part': {'name': item['manufacturer_order_number']}}
+                                  'stock_unit': 1,
+                                  'condition': 'n',
+                                  'status': 'b',
+                                  'name': item['manufacturer_order_number']}
             don = item['distributor_order_number']['don']
             if don:
                 new_item_candidate['distributor_id'] = don.distributor.pk
                 new_item_candidate['don'] = don.don
-                if don.manufacturer_order_number:
-                    manufacturer_order_number = don.manufacturer_order_number
-                    new_item_candidate['manufacturer_id'] = manufacturer_order_number.manufacturer.pk
-                    new_item_candidate['part']['name'] = manufacturer_order_number.manufacturer_order_number
-                    new_item_candidate['part']['description'] = manufacturer_order_number.part.description
-                    new_item_candidate['part']['mon_id'] = manufacturer_order_number.pk
+                if don.mon:
+                    manufacturer = ManufacturerSerializer(don.mon, read_only=True)
+                    new_item_candidate['manufacturer'] = manufacturer.data
+                    manufacturer_order_number = don.mon
                     part_type = manufacturer_order_number.part.part_type
                     default_categories = Category.objects.filter(default_part_types__contains=[part_type])
                     if len(default_categories) > 0:
@@ -287,7 +180,9 @@ def add_item_barcode_search(request):
                         new_item_candidate['category_id'] = default_categories[0].pk
 
             if item['invoice']:
-                new_item_candidate['invoice_id'] = item['invoice'].pk
+                invoice = InvoiceItemDetailSerializer(item['invoice'], read_only=True)
+                new_item_candidate['invoice'] = invoice.data
+
             return JsonResponse(new_item_candidate)
 
 

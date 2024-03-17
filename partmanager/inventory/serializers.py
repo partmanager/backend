@@ -31,6 +31,12 @@ class InventoryPositionMinimalSerializer(serializers.ModelSerializer):
         fields = ['id']
 
 
+class InventoryPositionCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InventoryPosition
+        fields = '__all__'
+
+
 class InventoryPositionSerializer(serializers.ModelSerializer):
     storage_location = StorageLocationSerializer(read_only=True)
     invoice = InvoiceItemDetailSerializer(read_only=True)

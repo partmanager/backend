@@ -43,8 +43,9 @@ class InvoiceItemViewSet(ModelViewSet):
     serializer_class = InvoiceItemSerializer
     queryset = InvoiceItem.objects.all()
     pagination_class = StandardResultsSetPagination
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['distributor_number', 'inventoryposition__part__manufacturer_order_number']
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    search_fields = ['distributor_order_number__don', 'inventoryposition__part__manufacturer_order_number']
+    filterset_fields = ['invoice__distributor', 'bookkeeping']
 
     def get_serializer_class(self):
         if self.action in ['retrieve', 'update']:

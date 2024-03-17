@@ -10,7 +10,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from .serializers_simple import StorageLocationFolderSerializer
 from .tasks import update_inventory_mpn_assignments
-from .serializers import InventoryPositionSerializer, InventoryPositionHistorySerializer
+from .serializers import InventoryPositionSerializer, InventoryPositionHistorySerializer, InventoryPositionCreateSerializer
 
 
 class StandardResultsSetPagination(PageNumberPagination):
@@ -28,6 +28,11 @@ class InventoryPositionViewSet(ModelViewSet):
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ['name', 'description', 'part__manufacturer_order_number', 'storage_location__location']
     filterset_fields = {'category': ['in'], 'archived': ['exact'], 'flagged': ['exact']}
+
+    def get_serializer_class(self):
+        if self.action in ['create', 'update', 'partial_update']:
+            return InventoryPositionCreateSerializer
+        return InventoryPositionSerializer
 
 
 class StrageLocationFolderViewSet(ModelViewSet):
