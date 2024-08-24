@@ -4,6 +4,7 @@ from django.core.exceptions import FieldDoesNotExist  # NOQA
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from .files import File
+from .fields.operating_conditions import OperatingConditions
 from .fields.storage_conditions import StorageConditions
 from .to_string_conversions import decimal_ppm_to_str, decimal_celsius_to_str
 from symbolandfootprint.models import Footprint
@@ -151,6 +152,7 @@ class Part(PolymorphicModel):
     )
 
     part_type = models.CharField(max_length=3, choices=PART_TYPE, default='UNK')
+    generated = models.BooleanField(default=False)
     manufacturer_part_number = models.CharField(max_length=200)
     manufacturer = models.ForeignKey('manufacturers.Manufacturer', on_delete=models.PROTECT)
     series = models.CharField(max_length=100, null=True, blank=True)
@@ -165,10 +167,11 @@ class Part(PolymorphicModel):
     notes = models.TextField(max_length=200, null=True, blank=True)
     comment = models.TextField(max_length=2000, null=True, blank=True)
     product_url = models.URLField(null=True, blank=True)
-    working_temperature_min = models.IntegerField(null=True, blank=True)
-    working_temperature_max = models.IntegerField(null=True, blank=True)
-    storage_temperature_min = models.IntegerField(null=True, blank=True)
-    storage_temperature_max = models.IntegerField(null=True, blank=True)
+    #working_temperature_min = models.IntegerField(null=True, blank=True)
+    #working_temperature_max = models.IntegerField(null=True, blank=True)
+    #storage_temperature_min = models.IntegerField(null=True, blank=True)
+    #storage_temperature_max = models.IntegerField(null=True, blank=True)
+    operating_conditions = OperatingConditions()
     storage_conditions = StorageConditions()
     symbol = models.ForeignKey('symbolandfootprint.Symbol', on_delete=models.PROTECT, blank=True, null=True)
     #footprints = models.ManyToManyField(Footprint)
@@ -189,24 +192,23 @@ class Part(PolymorphicModel):
             ["manufacturer", "manufacturer_part_number"],
         ]
 
-    @property
-    def working_temperature_range(self):
-        if self.working_temperature_min and self.working_temperature_max:
+    def operating_temperature_range(self):
+        if self.operating_conditions.temperature_min and self.operating_conditions.temperature_max:
             return "{}..{}\u2103".format(self.working_temperature_min, self.working_temperature_max)
-        elif self.working_temperature_max:
-            return "max: {}\u2103".format(self.working_temperature_max)
-        elif self.working_temperature_min:
-            return "min: {}\u2103".format(self.working_temperature_min)
+        elif self.operating_conditions.temperature_max:
+            return "max: {}\u2103".format(self.operating_conditions.temperature_max)
+        elif self.operating_conditions.temperature_min:
+            return "min: {}\u2103".format(self.operating_conditions.temperature_min)
         else:
             return ''
 
     @property
     def storage_temperature_range(self): # todo delete
-        if self.storage_temperature_min and self.storage_temperature_max:
-            return "{}..{}\u2103".format(self.storage_temperature_min, self.storage_temperature_max)
-        elif self.storage_temperature_max:
+        if self.storage_conditions.temperature_min and self.storage_conditions.temperature_max:
+            return "{}..{}\u2103".format(self.storage_conditions.temperature_min, self.storage_conditions.temperature_max)
+        elif self.storage_conditions.temperature_max:
             return "{max: {}\u2103".format(self.storage_temperature_max)
-        elif self.storage_temperature_min:
+        elif self.storage_conditions.temperature_min:
             return "{min: {}\u2103".format(self.storage_temperature_min)
         else:
             return ''

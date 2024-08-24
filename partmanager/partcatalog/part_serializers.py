@@ -31,13 +31,14 @@ from rest_polymorphic.serializers import PolymorphicSerializer
 
 
 common_fields = ['id', 'manufacturer_part_number', 'manufacturer_order_number_set', 'product_url', 'production_status',
-                 'working_temperature_range', 'storage_conditions', 'package', 'manufacturer', 'description', 'notes',
+                 'operating_conditions', 'storage_conditions', 'package', 'manufacturer', 'description', 'notes',
                  'comment', 'distributors', 'files']
 
 
 class PartBaseSerializer(serializers.ModelSerializer):
     manufacturer = ManufacturerSerializer()
     storage_conditions = serializers.SerializerMethodField()
+    operating_conditions = serializers.SerializerMethodField()
     package = serializers.SerializerMethodField()
     files = FileSerializer(many=True, read_only=True)
     manufacturer_order_number_set = ManufacturerOrderNumberWithLocationsSerializer(many=True, read_only=True)
@@ -47,6 +48,9 @@ class PartBaseSerializer(serializers.ModelSerializer):
         model = Part
         fields = common_fields
 
+    def get_operating_conditions(self, obj):
+        return obj.operating_conditions.to_dict()
+
     def get_storage_conditions(self, obj):
         return obj.storage_conditions.to_ajax()
 
@@ -55,6 +59,7 @@ class PartBaseSerializer(serializers.ModelSerializer):
 
     def get_distributors(self, obj):
         return obj.distributor_pk_set()
+
 
 class BalunSerializer(PartBaseSerializer):
     unbalanced_port_impedance = serializers.SerializerMethodField()

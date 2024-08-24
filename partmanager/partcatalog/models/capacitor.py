@@ -86,7 +86,7 @@ class Capacitor(Part):
                                                      self.capacitance,
                                                      self.voltage,
                                                      self.dielectric_type,
-                                                     self.working_temperature_range)
+                                                     self.operating_temperature_range())
             if self.package:
                 description += ' ' + self.package.name
             return description
@@ -96,7 +96,7 @@ class Capacitor(Part):
             print(self.capacitance)
             print(self.voltage)
             print(self.dielectric_type)
-            print(self.working_temperature_range)
+            print(self.operating_temperature_range())
 
     class Meta:
         ordering = ['capacitance_typ', 'voltage_max', 'capacitance_relative_tolerance']

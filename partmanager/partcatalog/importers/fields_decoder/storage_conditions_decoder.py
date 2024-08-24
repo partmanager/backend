@@ -6,8 +6,12 @@ from .humidity_decoder import relative_humidity_decode as __relative_humidity_de
 
 
 def storage_conditions_decoder(json_data):
-    temperature = parameter_str_to_dict(json_data['temperature'], __temperature_decode)
-    humidity = parameter_str_to_dict(json_data['humidity'], __relative_humidity_decode)
+    temperature = None
+    humidity = None
+    if 'temperature' in json_data:
+        temperature = parameter_str_to_dict(json_data['temperature'], __temperature_decode)
+    if 'humidity' in json_data:
+        humidity = parameter_str_to_dict(json_data['humidity'], __relative_humidity_decode)
 
     storage_conditions = StorageConditions()
     if temperature:
@@ -24,5 +28,5 @@ def storage_conditions_decoder(json_data):
     else:
         storage_conditions.humidity_min = None
         storage_conditions.humidity_max = None
-    storage_conditions.msl_level = MSLevel.from_string(json_data['MSLevel']) if json_data['MSLevel'] else None
+    storage_conditions.msl_level = MSLevel.from_string(json_data['MSLevel']) if 'MSLevel' in json_data else None
     return storage_conditions

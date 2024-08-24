@@ -108,7 +108,7 @@ class InventoryPosition(models.Model):
     manufacturer = models.ForeignKey('manufacturers.Manufacturer', on_delete=models.PROTECT, null=True,
                                      blank=True)  # used when part is null
     part = models.ForeignKey('partcatalog.ManufacturerOrderNumber', on_delete=models.PROTECT, null=True, blank=True)
-    storage_location = models.ForeignKey('StorageLocation', on_delete=models.PROTECT, null=True)
+    storage_location = models.ForeignKey('StorageLocation', on_delete=models.PROTECT)
     invoice = models.ForeignKey('invoices.InvoiceItem', on_delete=models.SET_NULL, null=True, blank=True)
     stock = models.IntegerField(help_text='Current stock')
     stock_unit = models.IntegerField(choices=QuantityUnit.choices, default=QuantityUnit.PCS)

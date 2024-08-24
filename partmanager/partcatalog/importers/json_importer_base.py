@@ -7,9 +7,11 @@ from .common import decode_common_part_parameters, decode_files, add_manufacture
 from .parameter_decoder import celsius_str_to_decimal, voltage_str_to_decimal
 from partcatalog.models.part import Part
 from partcatalog.models.manufacturer_order_number import ManufacturerOrderNumber
+from partcatalog.models.packaging import Packaging
 from partcatalog.models.files import FileVersion, File, create_file_version_from_url
 from symbolandfootprint.models import get_or_create_symbol
 from .fields_decoder.storage_conditions_decoder import storage_conditions_decoder
+from .fields_decoder.operating_conditions_decoder import operating_conditions_decoder
 from urllib.parse import urlparse
 from enum import Enum
 import os
@@ -52,6 +54,7 @@ class ModelImporter:
         try:
             part = self.model_class(manufacturer_part_number=part_number,
                                     manufacturer=manufacturer,
+                                    operating_conditions=self.decode_operating_conditions(json_data),
                                     storage_conditions=self.decode_storage_conditions(json_data['storageConditions']),
                                     **common_parameters,
                                     package=package,
@@ -77,6 +80,9 @@ class ModelImporter:
     def decode_storage_conditions(self, json_data):
         return storage_conditions_decoder(json_data)
 
+    def decode_operating_conditions(self, json_data):
+        return operating_conditions_decoder(json_data['operatingConditions'] if 'operatingConditions' in json_data else {})
+
     def decode_common_part_parameters(self, json_data):
         common_parameters = {
             'part_type': Part.part_type_from_str(json_data['partType'])
@@ -85,9 +91,10 @@ class ModelImporter:
             common_parameters['production_status'] = str_to_production_status(json_data['productionStatus'])
         if 'markingCode' in json_data and json_data['markingCode'] is not None and len(json_data['markingCode']):
             common_parameters['device_marking_code'] = json_data['markingCode']
-        if 'series' in json_data:
+        if 'series' in json_data and 'name' in json_data['series']:
             common_parameters['series'] = json_data['series']['name']
-            common_parameters['series_description'] = json_data['series']['description'] if 'description' in json_data['series'] else None
+            common_parameters['series_description'] = json_data['series']['description'] if 'description' in json_data[
+                'series'] else None
         if 'productUrl' in json_data and json_data['productUrl'] is not None and len(json_data['productUrl']):
             common_parameters['product_url'] = json_data['productUrl']
         if 'notes' in json_data and json_data['notes'] is not None and len(json_data['notes']):
@@ -97,8 +104,9 @@ class ModelImporter:
     def decode_symbol_and_footprint(self, json_data):
         if 'symbol&footprint' in json_data:
             symbol_footprint = json_data['symbol&footprint']
-            symbol_name = symbol_footprint['symbolName']
-            return get_or_create_symbol(symbol_name)
+            if 'symbolName' in symbol_footprint:
+                symbol_name = symbol_footprint['symbolName']
+                return get_or_create_symbol(symbol_name)
 
     def get_package(self, package_json):
         return None
@@ -124,7 +132,9 @@ class ModelImporter:
                 #logger.debug(f"Decoding parameter {parameter}")
                 parameter_decoder = self.parameters[parameter]['decoder']
                 json_field = self.parameters[parameter]['json_field']
-                max_values_count = self.parameters[parameter]['max_values_count'] if 'max_values_count' in self.parameters[parameter] else None
+                max_values_count = self.parameters[parameter]['max_values_count'] if 'max_values_count' in \
+                                                                                     self.parameters[
+                                                                                         parameter] else None
                 if json_field in json_data:
                     if max_values_count:
                         if isinstance(json_data[json_field], list):
@@ -188,17 +198,14 @@ class JsonImporterBase:
                 if imported_part:
                     part = imported_part
                     self.__save(imported_part)
-                    if 'files' in json_data:
-                        file = self.add_files(json_data['files'])
-                        for f in file:
-                            part.files.add(f)
-                        self.__save(part)
                     self.logger.info(f"{part.manufacturer_part_number} added")
             else:
                 self.update_part(part, imported_part, part_importer)
                 self.logger.info(f"{part.manufacturer_part_number} updated")
 
             self.add_manufacturer_order_numbers(manufacturer, part, json_data['orderNumbers'])
+            if 'files' in json_data:
+                self.add_files(part, json_data['files'])
         else:
             self.logger.error("Unknown manufacturer")
 
@@ -209,12 +216,14 @@ class JsonImporterBase:
                 present_value = getattr(present, variable)
                 new_value = getattr(new, variable)
                 if present_value != new_value and new_value is not None:
-                    if present_value is None or (isinstance(present_value, str) and len(present_value) == 0) or self.force_update:
+                    if present_value is None or (
+                            isinstance(present_value, str) and len(present_value) == 0) or self.force_update:
                         updated = True
                         self.logger.debug(f"{variable}, present: {present_value}, New: {new_value}")
                         setattr(present, variable, new_value)
                     else:
-                        self.logger.error(f"============= Update Error. Unable to update: {variable}. Value conflict detected.")
+                        self.logger.error(
+                            f"============= Update Error. Unable to update: {variable}. Value conflict detected.")
                         self.logger.error(f"\tPresent value:\t, {present_value}, \n\tNew value:\t, {new_value}")
                         return
         if updated:
@@ -225,33 +234,32 @@ class JsonImporterBase:
 
     def add_manufacturer_order_numbers(self, manufacturer, part, order_numbers):
         for order_number in order_numbers:
-            mon = ManufacturerOrderNumber.objects.filter(manufacturer_order_number=order_number,
-                                                         manufacturer=manufacturer)
             packaging = self.decode_packaging(order_numbers[order_number])
-            if len(mon) == 0:
-                self.logger.debug('%s %s', 'Adding MON for part', part.manufacturer_part_number)
-                order_number = ManufacturerOrderNumber(manufacturer_order_number=order_number,
-                                                       manufacturer=manufacturer,
-                                                       **packaging,
-                                                       part=part)
-                # print(order_number.packaging.to_dict())
-                self.__save(order_number)
-            elif not self.dry_run:
+            self.logger.debug(f'Updating MON: {order_number} for part {part.manufacturer_part_number}')
+            if not self.dry_run:
                 ManufacturerOrderNumber.objects.update_or_create(manufacturer_order_number=order_number,
                                                                  manufacturer=manufacturer,
-                                                                 #part=part,
-                                                                 defaults=packaging)
+                                                                 defaults={"packaging": packaging,
+                                                                           "part": part})
 
     def decode_packaging(self, packaging_json):
+        packaging = Packaging()
+        packaging.code = None
+        packaging.type = 'u'
+        packaging.quantity = None
+        packaging.packaging_data = None
         if packaging_json:
-            if packaging_json['Packaging Type'] in ["Paper Tape / Reel", "Embossed Tape / Reel"]:
-                return self.decode_tape_reel_packaging(packaging_json)
-        return {}
+            packaging.code = packaging_json['Code'] if 'Code' in packaging_json else None
+            packaging.type = packaging_json['Type'] if 'Type' in packaging_json else 'u'
+            packaging.quantity = packaging_json['Qty'] if 'Qty' in packaging_json else None
+            if packaging.type in ["Paper Tape / Reel", "Embossed Tape / Reel"] and 'PackagingData' in packaging_json:
+                packaging.packaging_data = self.decode_tape_reel_packaging(packaging_json)
+        return packaging
 
     def decode_tape_reel_packaging(self, packaging_json):
-        return {}
+        return packaging_json['PackagingData'] if packaging_json['PackagingData'] else None
 
-    def add_files(self, files_json):
+    def add_files(self, part, files_json):
         def get_filetype(field):
             if 'datasheet' in field:
                 return 'd'
@@ -262,30 +270,47 @@ class JsonImporterBase:
             else:
                 return 'u'
 
+        def get_or_create_file(file_data):
+            parsed_url = urlparse(file_data['url'])
+            filename = os.path.basename(parsed_url.path)
+            defaults = {"name": filename,
+                        "file_type": get_filetype(file_data),
+                        "description": file_data['description'],
+                        "manufacturer": part.manufacturer}
+            obj, created = File.objects.update_or_create(url=file_data['url'],
+                                                         defaults=defaults)
+            if created:
+                self.logger.info(f"File {filename} created")
+            return obj
+
         files = []
-        for file in files_json:
-            filetype = get_filetype(file)
-            url = files_json[file]
-            found = File.objects.filter(url=url)
-            if found:
-                files.append(found[0])
-            else:
-                # file not exist, lets create one
-                self.logger.debug(f"Adding file: {files_json[file]}")
-                parsed_url = urlparse(url)
-                filename = os.path.basename(parsed_url.path)
-                #print(filename)
-                file = File(url=url, name=filename, file_type=filetype)
-                self.__save(file)
-                #if not self.skip_file_download:
-                #    try:
-                #        create_file_version_from_url(file_model=file, filename=filename, version='unknown', url=url)
-                #    except requests.exceptions.ReadTimeout:
-                #        self.logger.error('File download timeout, %s', url)
-                # file_version = FileVersion(file=url, file_container=file, version='')
-                # file_version.save()
-                files.append(file)
-        self.logger.info(f"Added {len(files)}, files")
+        for file_type_str in files_json:
+            file_dict = files_json[file_type_str]
+            parsed_file = get_or_create_file(file_dict)
+            if parsed_file not in part.files.all():
+                part.files.add(parsed_file)
+                self.__save(part)
+
+            for file_version in file_dict['versions']:
+                file_version_dict = file_dict['versions'][file_version]
+                if 'md5sum' not in file_version_dict:
+                    logger.error(f"Missing required 'md5sum' key for {file_type_str}, version: {file_version}")
+                else:
+                    update_data = {
+                        'file_container': parsed_file,
+                        'version': file_version,
+                        'publication_date': file_version_dict['date'],
+                        'url': file_version_dict['url'] if 'url' in file_version_dict else None,
+                    }
+                    file_version, created = FileVersion.objects.update_or_create(md5sum=file_version_dict['md5sum'],
+                                                                                 defaults=update_data)
+                    if created:
+                        self.logger.info(f"File {file_version} created")
+                    file_version_name = file_version.generate_filename(parsed_file.name)
+                    if not file_version.file.name:
+                        file_version.file.name = file_version_name
+                        file_version.save()
+                        self.logger.info(f"Assigned existing file into {file_version}")
         return files
 
     def get_manufacturer(self, manufacturer_name):

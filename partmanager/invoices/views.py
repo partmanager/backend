@@ -48,9 +48,7 @@ class InvoiceItemViewSet(ModelViewSet):
     filterset_fields = ['invoice__distributor', 'bookkeeping']
 
     def get_serializer_class(self):
-        if self.action in ['retrieve', 'update']:
-            return InvoiceItemDetailSerializer
-        elif self.action == 'create':
+        if self.action in ['create', 'update']:
             return InvoiceItemCreateSerializer
         return InvoiceItemDetailSerializer
 

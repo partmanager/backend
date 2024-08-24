@@ -33,44 +33,7 @@ class Packaging(CompositeField):
     code = models.CharField(max_length=10, blank=True, null=True)
     type = models.CharField(max_length=40, choices=TYPE, default='u')
     quantity = models.IntegerField(blank=True, null=True)
-    reel_diameter = models.DecimalField(max_digits=4, decimal_places=1, blank=True, null=True)
-    reel_diameter_unit = models.CharField(max_length=1, choices=DIAMETER_UNIT, null=True, blank=True)
-    reel_width = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
-    tape_w = models.DecimalField(max_digits=4, decimal_places=2, help_text="Tape width in mm.", blank=True, null=True)
-    tape_t = models.DecimalField(max_digits=4, decimal_places=3, help_text="Tape thickness in mm",
-                                 blank=True, null=True)
-    tape_k = models.DecimalField(max_digits=4, decimal_places=2, help_text="Tape thickness with embossment in mm",
-                                 blank=True, null=True)
-    tape_e = models.DecimalField(max_digits=4, decimal_places=3,
-                                 help_text="Distance between sprocket hole center and tape edge in mm",
-                                 blank=True, null=True)
-    tape_f = models.DecimalField(max_digits=4, decimal_places=2,
-                                 help_text="Distance between sprocket hole center and component cavity center in mm",
-                                 blank=True, null=True)
-    tape_d = models.DecimalField(max_digits=4, decimal_places=3, help_text="Sprocket hole diameter in mm",
-                                 blank=True, null=True)
-    tape_d1 = models.DecimalField(max_digits=4, decimal_places=3, help_text="Component cavity hole diameter in mm",
-                                  blank=True, null=True)
-    tape_pin_1_quadrant = models.CharField(max_length=1, choices=PIN1_QUADRANT,
-                                           help_text="Part pin 1 orientation on tape.",
-                                           default='u')
-    tape_so = models.DecimalField(max_digits=4, decimal_places=2, help_text="Sprocket holes distance in mm.",
-                                  blank=True, null=True)
-    tape_p0 = models.DecimalField(max_digits=4, decimal_places=2, help_text="Sprocket holes pitch in mm.",
-                                  blank=True, null=True)
-    tape_p1 = models.DecimalField(max_digits=4, decimal_places=2, help_text="Tape cavity pitch in mm",
-                                  blank=True, null=True)
-    tape_p2 = models.DecimalField(max_digits=4, decimal_places=2,
-                                  help_text="Offset between cavity center and sprocket hole center in mm",
-                                  blank=True, null=True)
-    tape_a0 = models.DecimalField(max_digits=4, decimal_places=2, help_text="Tape cavity dimension A0 in mm.",
-                                  blank=True, null=True)
-    tape_a1 = models.DecimalField(max_digits=4, decimal_places=2, help_text="Tape cavity dimension A1 in mm.",
-                                  blank=True, null=True)
-    tape_b0 = models.DecimalField(max_digits=4, decimal_places=2, help_text="Tape cavity dimension B0 in mm.",
-                                  blank=True, null=True)
-    tape_b1 = models.DecimalField(max_digits=4, decimal_places=2, help_text="Tape cavity dimension B1 in mm.",
-                                  blank=True, null=True)
+    packaging_data = models.JSONField(null=True, blank=True)
 
     class Proxy(CompositeField.Proxy):
         def to_json(self):

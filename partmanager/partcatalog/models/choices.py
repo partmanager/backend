@@ -34,10 +34,24 @@ class MaterialType(models.IntegerChoices):
 
 class MSLevel(models.IntegerChoices):
     MSL_1 = 1
+    MSL_2 = 2
+    MSL_2a = 22
+    MSL_3 = 3
+    MSL_4 = 4
+    MSL_5 = 5
+    MSL_5a = 52
+    MSL_6 = 6
 
     @staticmethod
     def from_string(type_str):
-        values = {'MSL 1': 1, 'Level 1': 1, 'Level 1 → J-STD-020': 1}
+        values = {'MSL-1 UNLIM': 1,
+                  'MSL-2 1-YEAR': 2,
+                  'MSL-2A 4-WEEKS': 22,
+                  'MSL-3 168-HOURS': 3,
+                  'MSL-4 72-HOURS': 4,
+                  'MSL-5 48-HOURS': 5,
+                  'MSL-5A 24-HOURS': 52,
+                  'MSL-6 TOL': 6}
         return values[type_str]
 
 

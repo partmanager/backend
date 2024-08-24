@@ -25,8 +25,9 @@ def add_or_update_manufacturer(manufacturer):
         if to_update == {}:
             print("Manufacturer exist, nothing to do", manufacturer_list)
     else:
+        full_name = manufacturer['full_name'] if manufacturer['full_name'] is not None and len(manufacturer['full_name']) > 0 else None
         manufacturer = Manufacturer(name=manufacturer['name'],
-                                    full_name=manufacturer['full_name'],
+                                    full_name=full_name,
                                     address=manufacturer['address'],
                                     website=manufacturer['website'],
                                     email=manufacturer['email'],
