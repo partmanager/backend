@@ -11,3 +11,4 @@ class ModuleJsonImporter(ModelImporter):
                            }
         self.parameters_todo.add('Frequency')
         self.parameters_todo.add('Key')
+        self.parameters_todo.add('Supply Voltage Range')

@@ -1,6 +1,7 @@
 import decimal
 import json
 import logging
+import psycopg2
 import requests
 from manufacturers.models import get_or_create_manufacturer_by_name
 from .common import decode_common_part_parameters, decode_files, add_manufacturer_order_number, str_to_production_status
@@ -9,12 +10,17 @@ from partcatalog.models.part import Part
 from partcatalog.models.manufacturer_order_number import ManufacturerOrderNumber
 from partcatalog.models.packaging import Packaging
 from partcatalog.models.files import FileVersion, File, create_file_version_from_url
-from symbolandfootprint.models import get_or_create_symbol
+from symbolandfootprint.models import get_or_create_symbol, Symbol
 from .fields_decoder.storage_conditions_decoder import storage_conditions_decoder
 from .fields_decoder.operating_conditions_decoder import operating_conditions_decoder
 from urllib.parse import urlparse
 from enum import Enum
 import os
+from part_library_gen import symbol_generator
+from part_library_gen.symbol_generator import svg_exporter
+from django.core.files import File as DjangoFile
+from django.db import IntegrityError
+
 
 logger = logging.getLogger('partcatalog')
 
@@ -49,7 +55,7 @@ class ModelImporter:
         #logger.debug(f"Decoded common part parameters: {common_parameters}")
         parameters = self.decode_parameters(json_data['parameters'])
         #logger.debug(f"Decoded part specific parameters: {parameters}")
-        symbol = self.decode_symbol_and_footprint(json_data)
+        #     symbol = self.decode_symbol_and_footprint(json_data)
         #logger.debug(f"Decoded symbol and footprint: {symbol}")
         try:
             part = self.model_class(manufacturer_part_number=part_number,
@@ -58,8 +64,8 @@ class ModelImporter:
                                     storage_conditions=self.decode_storage_conditions(json_data['storageConditions']),
                                     **common_parameters,
                                     package=package,
-                                    **parameters,
-                                    symbol=symbol)
+                                    **parameters)  #,
+        #                                symbol=symbol)
         except AttributeError as e:
             logger.error(f"{repr(e)}, {json_data}")
             return None
@@ -81,7 +87,8 @@ class ModelImporter:
         return storage_conditions_decoder(json_data)
 
     def decode_operating_conditions(self, json_data):
-        return operating_conditions_decoder(json_data['operatingConditions'] if 'operatingConditions' in json_data else {})
+        return operating_conditions_decoder(
+            json_data['operatingConditions'] if 'operatingConditions' in json_data else {})
 
     def decode_common_part_parameters(self, json_data):
         common_parameters = {
@@ -101,12 +108,12 @@ class ModelImporter:
             common_parameters['notes'] = json_data['notes']
         return common_parameters
 
-    def decode_symbol_and_footprint(self, json_data):
-        if 'symbol&footprint' in json_data:
-            symbol_footprint = json_data['symbol&footprint']
-            if 'symbolName' in symbol_footprint:
-                symbol_name = symbol_footprint['symbolName']
-                return get_or_create_symbol(symbol_name)
+    # def decode_symbol_and_footprint(self, json_data):
+    #     if 'symbol&footprint' in json_data:
+    #         symbol_footprint = json_data['symbol&footprint']
+    #         if 'symbolName' in symbol_footprint:
+    #             symbol_name = symbol_footprint['symbolName']
+    #             return get_or_create_symbol(symbol_name)
 
     def get_package(self, package_json):
         return None
@@ -206,6 +213,10 @@ class JsonImporterBase:
             self.add_manufacturer_order_numbers(manufacturer, part, json_data['orderNumbers'])
             if 'files' in json_data:
                 self.add_files(part, json_data['files'])
+            if "symbol&footprint" in json_data:
+                symbol_footprint = json_data["symbol&footprint"]
+                if "pinmap" in symbol_footprint and symbol_footprint["pinmap"]:
+                    self.add_symbols(part, symbol_footprint)
         else:
             self.logger.error("Unknown manufacturer")
 
@@ -275,7 +286,7 @@ class JsonImporterBase:
             filename = os.path.basename(parsed_url.path)
             defaults = {"name": filename,
                         "file_type": get_filetype(file_data),
-                        "description": file_data['description'],
+                        "description": file_data['description'] if 'description' in file_data else None,
                         "manufacturer": part.manufacturer}
             obj, created = File.objects.update_or_create(url=file_data['url'],
                                                          defaults=defaults)
@@ -312,6 +323,38 @@ class JsonImporterBase:
                         file_version.save()
                         self.logger.info(f"Assigned existing file into {file_version}")
         return files
+
+    def add_symbols(self, part, symbol_footprint):
+        #print(f"adding symbols, {symbol_footprint['pinmap']}")
+        symbol_data = {
+            'designator': "*",
+            'manufacturer': "*",
+            'part': "*",
+            'pins': symbol_footprint['pinmap'],
+            'symbol_generator': None
+        }
+        if 'symbol_generator' not in symbol_footprint:
+            symbol_footprint['symbol_generator'] = {'default': {}}
+
+        for generator in symbol_footprint['symbol_generator']:
+            symbol_generator_data = symbol_footprint['symbol_generator'][generator]
+            symbol_data['symbol_generator'] = {generator: symbol_footprint['symbol_generator'][generator]}
+            generated = symbol_generator.generate(symbol_data)
+            if generated:
+                generated_symbol, symbol_name = generated[0]
+                symbol_name = symbol_name.replace('*_*', '').replace('#', '')
+                try:
+                    symbol, created = Symbol.objects.update_or_create(symbol=generated_symbol.to_dict(),
+                                                                      defaults={"name": symbol_name,
+                                                                                "generator_name": generator,
+                                                                                "generator_data": symbol_generator_data,
+                                                                                "pinmap": symbol_footprint['pinmap']})
+                    if created:
+                        self.logger.info(f"Symbol for {part.manufacturer_part_number} created")
+                    part.symbol = symbol
+                    part.save()
+                except IntegrityError as e:
+                    print(e)
 
     def get_manufacturer(self, manufacturer_name):
         if self.last_manufacturer:

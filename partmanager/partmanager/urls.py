@@ -21,7 +21,7 @@ from django.conf.urls import url
 from django.conf import settings
 from rest_framework.routers import DefaultRouter
 
-from .views import export, ImportView, UpdateGitView
+from .views import export, ImportView, UpdateGitView, GenerateSymbolsView
 
 from distributors.views import DistributorViewSet, DistributorOrderNumberViewSet, DistributorManufacturerViewSet, api_stock_and_price
 from inventory.views import InventoryPositionViewSet, StrageLocationFolderViewSet
@@ -76,6 +76,7 @@ urlpatterns = [
     path('import', ImportView.as_view(), name='import'),
     path('export', export),
     path('updategit', UpdateGitView.as_view(), name='updategit'),
+    path('symbolsgen', GenerateSymbolsView.as_view(), name='symbolsgen'),
     url(r'^', include(router.urls)),
     re_path(r'^celery-progress/', include('celery_progress.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

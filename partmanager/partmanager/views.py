@@ -23,6 +23,7 @@ from projects.importers.directory_importer import import_project
 from projects.exporters.directory_exporter import export as projects_export
 from .tasks import import_data
 from partdb_git.tasks import update_all
+from symbolandfootprint.tasks import generate_symbols
 
 
 class ImportView(APIView):
@@ -44,6 +45,12 @@ class ImportView(APIView):
 class UpdateGitView(APIView):
     def post(self, request, format=None):
         result = update_all.delay()
+        return Response({'task_id': result.task_id}, status=200)
+
+
+class GenerateSymbolsView(APIView):
+    def post(self, request, format=None):
+        result = generate_symbols.delay()
         return Response({'task_id': result.task_id}, status=200)
 
 

@@ -1,3 +1,4 @@
+drawsvg~=2.0
 Django>=3.2,<4.0
 psycopg2>=2.8
 djangorestframework>=3.14.0
@@ -5,9 +6,9 @@ django-composite-field>=1.1
 django-cors-headers==3.13.0
 django-filter>=21.1
 django-rest-polymorphic
+barcode-decoder
 requests>=2.26
 markdown>=3.4.1
-drawSvg==1.9.0
 django-celery-results
 celery>=5.3
 celery-progress
@@ -15,7 +16,6 @@ gitpython
 pandas
 openpyxl
 lxml
-odfpy
+#odfpy
 chardet
-
-
+part_library_gen>=0.1.17a0

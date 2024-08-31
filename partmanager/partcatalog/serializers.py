@@ -52,7 +52,11 @@ class ManufacturerOrderNumberWithLocationsSerializer(serializers.ModelSerializer
 
     class Meta:
         model = ManufacturerOrderNumber
-        fields = ['id', 'manufacturer_order_number', 'part', 'manufacturer', 'inventoryposition_set']
+        fields = ['id', 'manufacturer_order_number', 'part', 'manufacturer', 'inventoryposition_set',
+                  'packaging_code',
+                  'packaging_type',
+                  'packaging_quantity',
+                  'packaging_packaging_data']
 
 
 class ResistorTableViewSerializer(serializers.ModelSerializer):
