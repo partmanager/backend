@@ -61,24 +61,19 @@
                 "Packaging Type": "Paper Tape / Reel",
                 "Packaging Qty": 15000,
                 "Packaging Data": {
-                    "Reel Diameter": "178.5mm",
-                    "Reel Width": "12.5mm",
-                    "Tape Pin 1 Quadrant": "Q1",
-                    "Tape W": "8mm",
-                    "Tape E": "1.75mm\u00b10.1mm",
-                    "Tape F": "3.50mm\u00b10.05mm",
-                    "Tape SO": "",
-                    "Tape P0": "4mm\u00b10.10mm",
-                    "Tape P1": "2mm",
-                    "Tape P2": "2mm\u00b10.05mm",
-                    "Tape D": "",
-                    "Tape D1": "",
-                    "Tape A0": "",
-                    "Tape A1": "",
-                    "Tape B0": "",
-                    "Tape B1": "",
-                    "Tape T": "",
-                    "Tape K": ""
+                    "reel": {
+                        "Diameter": "178.5mm",
+                        "Width": "12.5mm"
+                    },
+                    "tape": {
+                        "Pin 1 Quadrant": "Q1",
+                        "W": "8mm",
+                        "E": "1.75mm\u00b10.1mm",
+                        "F": "3.50mm\u00b10.05mm",
+                        "P0": "4mm\u00b10.10mm",
+                        "P1": "2mm",
+                        "P2": "2mm\u00b10.05mm"
+                    }
                 }
             }
         }

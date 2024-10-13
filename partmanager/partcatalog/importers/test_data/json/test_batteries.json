@@ -57,7 +57,7 @@
             "TESTBATTERYA": {
                 "Packaging Code": "A",
                 "Packaging Type": "Foil",
-                "Packaging Qty": "2",
+                "Packaging Qty": 2,
                 "Packaging Data": {}
             }
         }

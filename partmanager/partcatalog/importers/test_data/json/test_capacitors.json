@@ -13,13 +13,16 @@
         "productUrl": null,
         "notes": "",
         "tags": [],
+        "operatingConditions": {
+            "temperature": "-55\u00baC ~ +125\u00baC",
+            "humidity": ""
+        },
         "storageConditions": {
             "temperature": "-40\u00b0C ~ 105\u00b0C",
             "humidity": "",
             "MSLevel": ""
         },
         "parameters": {
-            "Working Temp Range": "-55\u00baC ~ +125\u00baC",
             "Capacitance": {
                 "value": "10pF \u00b11 pF"
             },
@@ -71,24 +74,23 @@
                 "Packaging Code": "B",
                 "Packaging Type": "Paper Tape / Reel",
                 "Packaging Qty": 10000,
-                "Reel Diameter": "13\"",
-                "Reel Width": "11.5mm \u00b11.0mm",
-                "Tape Pin 1 Quadrant": "Q1",
-                "Tape W": "8mm \u00b10.1mm",
-                "Tape E": "1.75mm \u00b10.10mm",
-                "Tape F": "3.5mm \u00b10.05mm",
-                "Tape SO": "",
-                "Tape P0": "4mm \u00b10.1mm",
-                "Tape P1": "4mm \u00b10.10mm",
-                "Tape P2": "2mm \u00b10.05mm",
-                "Tape D": "1.50mm +0.10mm/-0.0mm",
-                "Tape D1": "",
-                "Tape A0": "0.7mm \u00b10.05mm",
-                "Tape A1": "",
-                "Tape B0": "1.16mm \u00b10.05mm",
-                "Tape B1": "",
-                "Tape T": "0.4mm \u00b10.03mm",
-                "Tape K": ""
+                "reel": {
+                    "Diameter": "13\"",
+                    "Width": "11.5mm \u00b11.0mm"
+                },
+                "tape": {
+                    "Pin 1 Quadrant": "Q1",
+                    "W": "8mm \u00b10.1mm",
+                    "E": "1.75mm \u00b10.10mm",
+                    "F": "3.5mm \u00b10.05mm",
+                    "P0": "4mm \u00b10.1mm",
+                    "P1": "4mm \u00b10.10mm",
+                    "P2": "2mm \u00b10.05mm",
+                    "D": "1.50mm +0.10mm/-0.0mm",
+                    "A0": "0.7mm \u00b10.05mm",
+                    "B0": "1.16mm \u00b10.05mm",
+                    "T": "0.4mm \u00b10.03mm"
+                }
             }
         }
     }

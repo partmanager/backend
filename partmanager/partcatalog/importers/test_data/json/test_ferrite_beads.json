@@ -45,24 +45,19 @@
                 "Packaging Type": "Embossed Tape / Reel",
                 "Packaging Qty": "1500",
                 "Packaging Data": {
-                    "Reel Diameter": "330mm",
-                    "Reel Width": "22.4mm",
-                    "Tape Pin 1 Quadrant": "Q2",
-                    "Tape W": "16mm",
-                    "Tape E": "2.525mm",
-                    "Tape F": "",
-                    "Tape SO": "",
-                    "Tape P0": "4mm",
-                    "Tape P1": "8mm",
-                    "Tape P2": "2mm",
-                    "Tape D": "1.55mm",
-                    "Tape D1": "",
-                    "Tape A0": "",
-                    "Tape A1": "",
-                    "Tape B0": "",
-                    "Tape B1": "",
-                    "Tape T": "",
-                    "Tape K": ""
+                    "reel": {
+                        "Diameter": "330mm",
+                        "Width": "22.4mm"
+                    },
+                    "tape": {
+                        "Pin 1 Quadrant": "Q2",
+                        "W": "16mm",
+                        "E": "2.525mm",
+                        "P0": "4mm",
+                        "P1": "8mm",
+                        "P2": "2mm",
+                        "D": "1.55mm"
+                    }
                 }
             }
         }

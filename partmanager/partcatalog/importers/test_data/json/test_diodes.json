@@ -99,26 +99,7 @@
                 "Packaging Code": "13",
                 "Packaging Type": "Embossed Tape / Reel",
                 "Packaging Qty": "5000",
-                "Packaging Data": {
-                    "Reel Diameter": "",
-                    "Reel Width": "",
-                    "Tape Pin 1 Quadrant": "",
-                    "Tape W": "",
-                    "Tape E": "",
-                    "Tape F": "",
-                    "Tape SO": "",
-                    "Tape P0": "",
-                    "Tape P1": "",
-                    "Tape P2": "",
-                    "Tape D": "",
-                    "Tape D1": "",
-                    "Tape A0": "",
-                    "Tape A1": "",
-                    "Tape B0": "",
-                    "Tape B1": "",
-                    "Tape T": "",
-                    "Tape K": ""
-                }
+                "Packaging Data": {}
             }
         }
     }

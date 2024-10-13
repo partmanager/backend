@@ -44,24 +44,25 @@
                 "Packaging Code": "A",
                 "Packaging Type": "Paper Tape / Reel",
                 "Packaging Qty": 10000,
-                "Reel Diameter": "7\"",
-                "Reel Width": "11.5mm \u00b11.0mm",
-                "Tape Pin 1 Quadrant": "Q1",
-                "Tape W": "8mm \u00b10.1mm",
-                "Tape E": "1.75mm \u00b10.10mm",
-                "Tape F": "3.5mm \u00b10.05mm",
-                "Tape SO": "",
-                "Tape P0": "4mm \u00b10.1mm",
-                "Tape P1": "4mm \u00b10.10mm",
-                "Tape P2": "2mm \u00b10.05mm",
-                "Tape D": "1.50mm +0.1mm/-0.0mm",
-                "Tape D1": "",
-                "Tape A0": "0.7mm \u00b10.05mm",
-                "Tape A1": "",
-                "Tape B0": "1.16mm \u00b10.05mm",
-                "Tape B1": "",
-                "Tape T": "0.4mm \u00b10.03mm",
-                "Tape K": ""
+                "Packaging Data": {
+                    "reel": {
+                        "Diameter": "7\"",
+                        "Width": "11.5mm \u00b11.0mm"
+                    },
+                    "tape": {
+                        "Pin 1 Quadrant": "Q1",
+                        "W": "8mm \u00b10.1mm",
+                        "E": "1.75mm \u00b10.10mm",
+                        "F": "3.5mm \u00b10.05mm",
+                        "P0": "4mm \u00b10.1mm",
+                        "P1": "4mm \u00b10.10mm",
+                        "P2": "2mm \u00b10.05mm",
+                        "D": "1.50mm +0.1mm/-0.0mm",
+                        "A0": "0.7mm \u00b10.05mm",
+                        "B0": "1.16mm \u00b10.05mm",
+                        "T": "0.4mm \u00b10.03mm"
+                    }
+                }
             }
         }
     }
