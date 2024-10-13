@@ -260,7 +260,8 @@ PARTSDB_CONFIG = {
     "repositories": {
         "partsdb-official": {
             "url": "https://github.com/partmanager/partsdb.git",
-            "branch": "main"
+            "branch": "main",
+            "credentials": None
         }
     }
 }
