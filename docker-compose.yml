@@ -16,8 +16,8 @@ services:
     volumes:
       - ./partmanager:/code
       - ./containers_data/partsdb:/var/partsdb
-      - ./containers_data/static:/var/static
-      - ./containers_data/media:/var/media
+      - ./containers_files/static:/var/static
+      - ./containers_files/media:/var/media
       - ./containers_data/var_log_shelftracker:/var/log/shelftracker
       - ./containers_data/etc/shelftracker:/etc/shelftracker
       - ./containers_data/tmp:/tmp
