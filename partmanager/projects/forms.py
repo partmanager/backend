@@ -7,4 +7,4 @@ class BOMImportForm(forms.ModelForm):
 
     class Meta:
         model = BOM
-        fields = ['name', 'multiply', 'description', 'project', 'bom_file']
+        fields = ['name', 'description', 'project', 'bom_file']

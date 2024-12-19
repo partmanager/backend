@@ -30,7 +30,7 @@ from invoices.views import InvoiceViewSet, InvoiceImportView
 from invoices.views import InvoiceItemViewSet, InvoiceItemWithStorageViewSet
 from manufacturers.views_api import ManufacturerViewSet
 from inventory.api import CategoryViewSet, StorageLocationViewSet, InventoryReservationViewSet
-from projects.views_api import AssemblyViewSet, BOMViewSet, BOMItemViewSet, ProjectViewSet, ProjectVersionViewSet, BOMImportView
+from projects.views_api import AssemblyViewSet, AssemblyJobViewSet, BOMViewSet, BOMItemViewSet, ProjectViewSet, ProjectVersionViewSet, BOMImportView, GenerateAssemblyViewSet, AssemblyItemViewSet
 from partcatalog.views import ManufacturerOrderNumberViewSet, PartPolimorphicViewSet
 
 
@@ -52,7 +52,11 @@ router.register(r'api/project', ProjectViewSet, basename='ProjectViewSet')
 router.register(r'api/project-version', ProjectVersionViewSet, basename='ProjectVersionViewSet')
 router.register(r'api/bom', BOMViewSet, basename='BOMViewSet')
 router.register(r'api/bom-item', BOMItemViewSet, basename='BOMItemViewSet')
+router.register(r'api/assembly-job', AssemblyJobViewSet, basename='AssemblyJobViewSet')
 router.register(r'api/assembly', AssemblyViewSet, basename='AssemblyViewSet')
+router.register(r'api/assembly-item', AssemblyItemViewSet, basename='AssemblyItemViewSet')
+
+
 
 
 router.register(r'api/part/mon', ManufacturerOrderNumberViewSet, basename='ManufacturerOrderNumberViewSet')
@@ -70,6 +74,7 @@ urlpatterns = [
     path('invoices/', include('invoices.urls')),
     path('api/invoiceImport', InvoiceImportView.as_view()),
     path('parts/', include('partcatalog.urls')),
+    path('api/assembly-job-generate/<int:pk>/', GenerateAssemblyViewSet.as_view()),
     path('projects/', include('projects.urls')),
     path('admin/', admin.site.urls),
     path('', RedirectView.as_view(url='inventory/', permanent=True)),

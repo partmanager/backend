@@ -1,4 +1,4 @@
-from .models import Assembly, AssemblyItem, Project, ProjectVersion, BOM, BOMItem
+from .models import Assembly, AssemblyItem, AssemblyJob, Project, ProjectVersion, BOM, BOMItem
 from partcatalog.models.part import Part
 from partcatalog.serializers import ManufacturerOrderNumberWithLocationsSerializer, ManufacturerOrderNumberMONAndIDSerializer
 from inventory.serializers import InventoryReservationSerializer, InventoryPositionSerializer
@@ -33,25 +33,6 @@ class AssemblyItemSerializer(serializers.ModelSerializer):
         return inventory
 
 
-class AssemblySerializer(serializers.ModelSerializer):
-    project_name = serializers.ReadOnlyField(source='project.name')
-    project_version = serializers.ReadOnlyField(source='project.version')
-
-    class Meta:
-        model = Assembly
-        fields = ['id', 'name', 'quantity', 'description', 'project', 'project_name', 'project_version']
-
-
-class AssemblyDetailSerializer(serializers.ModelSerializer):
-    project_name = serializers.ReadOnlyField(source='project.name')
-    project_version = serializers.ReadOnlyField(source='project.version')
-    assembly_item_set = AssemblyItemSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Assembly
-        fields = ['id', 'name', 'quantity', 'description', 'project', 'project_name', 'project_version', 'assembly_item_set']
-
-
 class BOMItemSerializer(serializers.ModelSerializer):
     part = PartSerializer(read_only=True)
     manufacturer_order_number = ManufacturerOrderNumberMONAndIDSerializer(read_only=True)
@@ -78,13 +59,13 @@ class BOMItemCreateSerializer(serializers.ModelSerializer):
 class BOMSerializer(serializers.ModelSerializer):
     class Meta:
         model = BOM
-        fields = ['id', 'project', 'name', 'note', 'description', 'multiply']
+        fields = ['id', 'project', 'name', 'note', 'description']
 
 
 class BOMUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = BOM
-        fields = ['id', 'name', 'note', 'description', 'multiply']
+        fields = ['id', 'name', 'note', 'description']
 
 
 class BOMDetailSerializer(serializers.ModelSerializer):
@@ -92,19 +73,53 @@ class BOMDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BOM
-        fields = ['id', 'name', 'note', 'description', 'multiply', 'item_set']
-
-
-class ProjectVersionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProjectVersion
-        fields = ['id', 'project', 'name']
+        fields = ['id', 'name', 'note', 'description', 'item_set']
 
 
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'description', 'creation_date']
+
+
+class ProjectVersionSerializer(serializers.ModelSerializer):
+    project = ProjectSerializer(read_only=True)
+    class Meta:
+        model = ProjectVersion
+        fields = ['id', 'project', 'name', 'description', 'creation_date']
+
+
+class ProjectVersionCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectVersion
+        fields = ['id', 'project', 'name', 'description', 'creation_date']
+
+
+class AssemblyJobSerializer(serializers.ModelSerializer):
+    project_version = ProjectVersionSerializer(read_only=True)
+    class Meta:
+        model = AssemblyJob
+        fields = ['id', 'name', 'description', 'creation_date', 'status', 'quantity', 'project_version']
+
+
+class AssemblyJobCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AssemblyJob
+        fields = ['id', 'name', 'description', 'creation_date', 'status', 'quantity', 'project_version']
+
+
+class AssemblySerializer(serializers.ModelSerializer):
+    assembly_job = AssemblyJobSerializer(read_only=True)
+    project_version = ProjectVersionSerializer(read_only=True)
+    class Meta:
+        model = Assembly
+        fields = ['id', 'project_version', 'assembly_job', 'serial_number', 'name', 'description', 'component_cost', 'build_cost', 'rework_set']
+
+
+class AssemblyCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Assembly
+        fields = ['id', 'project_version', 'assembly_job', 'serial_number', 'name', 'description', 'component_cost', 'build_cost']
 
 
 class ProjectVersionDetailSerializer(serializers.ModelSerializer):
@@ -122,7 +137,7 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Project
-        fields = ['id', 'name', 'projectversion_set']
+        fields = ['id', 'name', 'description', 'creation_date', 'projectversion_set']
 
 
 

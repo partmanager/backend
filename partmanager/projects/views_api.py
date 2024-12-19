@@ -1,15 +1,21 @@
 import io
 
 from django.http import JsonResponse
-from .models import Project, ProjectVersion, BOM, BOMItem, Assembly
+from rest_framework.views import APIView
+from rest_framework import filters
+from django_filters.rest_framework import DjangoFilterBackend
+
+from .models import Project, ProjectVersion, BOM, BOMItem, Assembly, AssemblyItem, AssemblyJob
 from .serializers import \
-    AssemblySerializer, AssemblyDetailSerializer,\
+    AssemblySerializer, AssemblyJobSerializer, \
     BOMSerializer, BOMDetailSerializer, BOMUpdateSerializer, \
     BOMItemSerializer, BOMItemUpdateSerializer, BOMItemCreateSerializer, \
-    ProjectSerializer, ProjectDetailSerializer, ProjectVersionSerializer, ProjectVersionDetailSerializer
+    ProjectSerializer, ProjectDetailSerializer, ProjectVersionSerializer, ProjectVersionDetailSerializer, \
+    ProjectVersionCreateSerializer, AssemblyJobCreateSerializer, AssemblyItemSerializer
 from .forms import BOMImportForm
 from .BomImporter import CircuitStudioImporter
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.response import Response
 from django.views.generic import FormView
 
 
@@ -61,10 +67,28 @@ class AssemblyViewSet(ModelViewSet):
     queryset = Assembly.objects.all()
     serializer_class = AssemblySerializer
 
+
+class AssemblyItemViewSet(ModelViewSet):
+    queryset = AssemblyItem.objects.all()
+    serializer_class = AssemblyItemSerializer
+    search_fields = ['designator', 'part__manufacturer_part_number']
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ['assembly', 'rework']
+
+    # def get_serializer_class(self):
+    #     if self.action == 'retrieve':
+    #         return AssemblyDetailSerializer
+    #     return AssemblySerializer
+
+
+class AssemblyJobViewSet(ModelViewSet):
+    queryset = AssemblyJob.objects.all()
+    serializer_class = AssemblyJobSerializer
+
     def get_serializer_class(self):
-        if self.action == 'retrieve':
-            return AssemblyDetailSerializer
-        return AssemblySerializer
+        if self.action == 'create':
+            return AssemblyJobCreateSerializer
+        return AssemblyJobSerializer
 
 
 class BOMViewSet(ModelViewSet):
@@ -107,7 +131,16 @@ class ProjectVersionViewSet(ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'retrieve':
             return ProjectVersionDetailSerializer
+        elif self.action == 'create':
+            return ProjectVersionCreateSerializer
         return ProjectVersionSerializer
+
+
+class GenerateAssemblyViewSet(APIView):
+    def post(self, request, pk):
+        assembly_job = AssemblyJob.objects.get(pk=pk)
+        assembly_job.generate_from_bom()
+        return Response('')
 
 
 class BOMImportView(FormView):

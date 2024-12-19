@@ -25,3 +25,11 @@ class QuantityUnit(models.IntegerChoices):
 
     __empty__ = _('(Unknown)')
 
+
+class Status(models.IntegerChoices):
+    DATA_PREPARATION = 1, _('Data Preparation')
+    ORDERED = 2, _('Ordered')
+    FINISHED = 3, _('Finished')
+
+    __empty__ = _('(Unknown)')
+
