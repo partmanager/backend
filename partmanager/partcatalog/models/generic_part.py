@@ -3,5 +3,5 @@ from .part import Part
 
 
 class GenericPart(Part):
-    parts = models.ManyToManyField(Part)
+    #parts = models.ManyToManyField(Part)
     filters = models.JSONField()

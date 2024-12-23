@@ -5,18 +5,19 @@ from rest_framework.views import APIView
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .models import Project, ProjectVersion, BOM, BOMItem, Assembly, AssemblyItem, AssemblyJob
+from .models import Project, ProjectVersion, BOM, BOMItem, Assembly, AssemblyItem, AssemblyJob, Rework
 from .serializers import \
     AssemblySerializer, AssemblyJobSerializer, \
     BOMSerializer, BOMDetailSerializer, BOMUpdateSerializer, \
     BOMItemSerializer, BOMItemUpdateSerializer, BOMItemCreateSerializer, \
     ProjectSerializer, ProjectDetailSerializer, ProjectVersionSerializer, ProjectVersionDetailSerializer, \
-    ProjectVersionCreateSerializer, AssemblyJobCreateSerializer, AssemblyItemSerializer
+    ProjectVersionCreateSerializer, AssemblyJobCreateSerializer, AssemblyItemSerializer, AssemblyItemCreateSerializer, ReworkSerializer
 from .forms import BOMImportForm
 from .BomImporter import CircuitStudioImporter
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from django.views.generic import FormView
+from .tasks import close_rework
 
 
 def projects_menu(request):
@@ -66,6 +67,8 @@ def projects_menu(request):
 class AssemblyViewSet(ModelViewSet):
     queryset = Assembly.objects.all()
     serializer_class = AssemblySerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['project_version']
 
 
 class AssemblyItemViewSet(ModelViewSet):
@@ -73,22 +76,32 @@ class AssemblyItemViewSet(ModelViewSet):
     serializer_class = AssemblyItemSerializer
     search_fields = ['designator', 'part__manufacturer_part_number']
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['assembly', 'rework']
+    filterset_fields = ['assembly', 'rework', 'assembly__assembly_job']
 
-    # def get_serializer_class(self):
-    #     if self.action == 'retrieve':
-    #         return AssemblyDetailSerializer
-    #     return AssemblySerializer
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return AssemblyItemCreateSerializer
+        return AssemblyItemSerializer
 
 
 class AssemblyJobViewSet(ModelViewSet):
     queryset = AssemblyJob.objects.all()
     serializer_class = AssemblyJobSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['project_version']
 
     def get_serializer_class(self):
         if self.action == 'create':
             return AssemblyJobCreateSerializer
         return AssemblyJobSerializer
+
+
+class ReworkViewSet(ModelViewSet):
+    queryset = Rework.objects.all()
+    serializer_class = ReworkSerializer
+
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['assembly']
 
 
 class BOMViewSet(ModelViewSet):
@@ -143,8 +156,13 @@ class GenerateAssemblyViewSet(APIView):
         return Response('')
 
 
+class CloseReworkViewSet(APIView):
+    def post(self, request, pk):
+        close_rework(pk)
+        return Response('')
+
+
 class BOMImportView(FormView):
-   # template_name = 'invoices/invoice_import.html'
     form_class = BOMImportForm
 
     def form_invalid(self, form):

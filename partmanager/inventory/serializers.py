@@ -24,11 +24,11 @@ class StorageLocationDetailSerializer(serializers.ModelSerializer):
 
 class InventoryPositionMinimalSerializer(serializers.ModelSerializer):
     storage_location = StorageLocationSerializer(read_only=True)
-    #invoice = InvoiceItemSerializer(read_only=True)
+    invoice = InvoiceItemDetailSerializer(read_only=True)
 
     class Meta:
         model = InventoryPosition
-        fields = ['id']
+        fields = ['id', 'stock', 'stock_unit', 'condition', 'status', 'storage_location', 'invoice']
 
 
 class InventoryPositionCreateSerializer(serializers.ModelSerializer):

@@ -1,5 +1,5 @@
 from .models.part import Part
-
+from .models.generic_part import GenericPart
 
 from .models.manufacturer_order_number import ManufacturerOrderNumber
 from django.http import JsonResponse
@@ -11,7 +11,7 @@ from rest_framework.pagination import PageNumberPagination
 
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .serializers import ManufacturerOrderNumberSerializer
+from .serializers import ManufacturerOrderNumberSerializer, GenericPartSerializer
 from .part_serializers import PartPolymorphicSerializer
 
 menu = {"Passives": {"Balun": "/parts/balun", "Resistors": "/parts/0", "Capacitors": "/parts/1", "Inductors": "/parts/2", "Ferrite Bead": "/parts/8"},
@@ -91,6 +91,11 @@ class PartPolimorphicViewSet(ModelViewSet):
         'part_type': ["in", "exact"],
         'manufacturer': ["exact"]
     }
+
+class GenericPartViewSet(ModelViewSet):
+    queryset = GenericPart.objects.all()
+    serializer_class = GenericPartSerializer
+    pagination_class = StandardResultsSetPagination
 
 
 def api_get_part_list(request):

@@ -4,6 +4,7 @@ from inventory.serializers import InventoryPositionSerializer
 from manufacturers.serializers import ManufacturerSerializer
 
 from .models.part import Part
+from .models.generic_part import GenericPart
 from .models.balun import Balun
 from .models.files import File, FileVersion
 from .models.manufacturer_order_number import ManufacturerOrderNumber
@@ -32,6 +33,10 @@ class PartSerializer(serializers.ModelSerializer):
         fields = ['id', 'manufacturer_part_number', 'description', 'manufacturer', 'storage_temperature_range',
                   'package']
 
+class GenericPartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GenericPart
+        fields = '__all__'
 
 class ManufacturerOrderNumberSerializer(serializers.ModelSerializer):
     part = PartSerializer(read_only=True)

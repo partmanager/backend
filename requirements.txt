@@ -13,9 +13,11 @@ django-celery-results
 celery>=5.3
 celery-progress
 gitpython
-pandas
 openpyxl
 lxml
-#odfpy
 chardet
 part_library_gen>=0.1.17a0
+distributors-api>=0.1.2a0
+#required by part db
+odfpy
+pandas

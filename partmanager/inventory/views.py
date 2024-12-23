@@ -1,4 +1,4 @@
-from .models import InventoryPosition, InventoryPositionHistory, Category, StorageLocationFolder
+from .models import InventoryPosition, InventoryPositionHistory, Category, StorageLocationFolder, InventoryReservation
 from .forms import InventoryPositionStockQuantityCommentForm
 from django.http import JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
@@ -10,7 +10,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from .serializers_simple import StorageLocationFolderSerializer
 from .tasks import update_inventory_mpn_assignments
-from .serializers import InventoryPositionSerializer, InventoryPositionHistorySerializer, InventoryPositionCreateSerializer
+from .serializers import InventoryPositionSerializer, InventoryPositionHistorySerializer, InventoryPositionCreateSerializer, InventoryPositionMinimalSerializer, InventoryReservationSerializer
 
 
 class StandardResultsSetPagination(PageNumberPagination):
@@ -35,9 +35,19 @@ class InventoryPositionViewSet(ModelViewSet):
         return InventoryPositionSerializer
 
 
+class PartLocationsViewSet(ModelViewSet):
+    queryset = InventoryPosition.objects.all()
+    serializer_class = InventoryPositionMinimalSerializer
+
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    search_fields = ['name', 'description', 'part__manufacturer_order_number', 'storage_location__location']
+    filterset_fields = {'part__part': ['exact'], 'part': ['exact'], 'archived': ['exact'], 'flagged': ['exact']}
+
+
 class StrageLocationFolderViewSet(ModelViewSet):
     queryset = StorageLocationFolder.objects.all()
     serializer_class = StorageLocationFolderSerializer
+
 
 
 class CategoryFilterSet(APIView):

@@ -1,6 +1,7 @@
 from .models import InventoryPosition, Category, StorageLocation, StorageLocationFolder, InventoryReservation
 from django.db.models import Sum
 from django.http import JsonResponse
+from django_filters.rest_framework import DjangoFilterBackend
 from invoices.models import InvoiceItem
 from invoices.serializers import InvoiceItemDetailSerializer
 from manufacturers.serializers import ManufacturerSerializer
@@ -133,6 +134,8 @@ class StorageLocationWithItemsViewSet(ModelViewSet):
 class InventoryReservationViewSet(ModelViewSet):
     queryset = InventoryReservation.objects.all()
     serializer_class = InventoryReservationSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = {'inventory'}
 
 
 def assign_missing_mon(request):

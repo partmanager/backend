@@ -109,6 +109,14 @@ class Part(PolymorphicModel):
         ('F', 'Fuse'),
         ('Integrated Circuits', (
             ('IC', 'Integrated Circuit'),
+            ('ICL', 'IC Level translator'),
+            ('ICC', 'IC Current Sense'),
+            ('ICO', 'IC Comparator'),
+            ('IMC', 'IC MCU'),
+            ('IDA', 'IC DAC'),
+            ('IAD', 'IC ADC'),
+            ('ICN', 'IC Sensor'),
+            ('ICS', 'IC Load Switch'),
             ('ICV', 'Integrated Circuit Voltage Regulator'),
             ('ICR', 'Integrated Circuit Voltage Reference'),
             ('IRF', 'Integrated Circuit RF Amplifier'),
@@ -175,7 +183,7 @@ class Part(PolymorphicModel):
     storage_conditions = StorageConditions()
     symbol = models.ForeignKey('symbolandfootprint.Symbol', on_delete=models.PROTECT, blank=True, null=True)
     #footprints = models.ManyToManyField(Footprint)
-    files = models.ManyToManyField(File)
+    files = models.ManyToManyField(File, blank=True)
 
     fields_begin = {'MPN': 'manufacturer_part_number', 'OPN': 'manufacturer_order_number',
                     'Production Status': 'production_status', 'Description': 'description'}
@@ -299,14 +307,21 @@ class Part(PolymorphicModel):
                   'Transistor MOSFET N': 'MON',
                   'Transistor MOSFET P': 'MOP',
                   'IC': 'IC',
-                  'IC ADC': 'IC',
+                  'IC ADC': 'IAD',
+                  'IC DAC': 'IDA',
                   'IC Opamp': 'IC',
+                  'IC Comparator': 'ICO',
                   'IC Voltage Regulator': 'ICV',
                   'IC Voltage Reference': 'ICR',
                   'IC RF Amplifier': 'IRF',
                   'IC RF Synthesizer': 'IRS',
                   'IC LDO': "ICV",
                   'IC Voltage Regulator Switching': 'ICV',
+                  'IC Level translator': 'ICL',
+                  'IC Current Sense': 'ICC',
+                  'IC MCU': 'IMC',
+                  'IC Load Switch': 'ICS',
+                  'IC Sensor': 'ICN',
                   'Module': 'M',
                   'Battery Holder': 'BH',
                   'Switch': 'S',

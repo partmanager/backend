@@ -24,14 +24,15 @@ from rest_framework.routers import DefaultRouter
 from .views import export, ImportView, UpdateGitView, GenerateSymbolsView
 
 from distributors.views import DistributorViewSet, DistributorOrderNumberViewSet, DistributorManufacturerViewSet, api_stock_and_price
-from inventory.views import InventoryPositionViewSet, StrageLocationFolderViewSet
+from inventory.views import InventoryPositionViewSet, StrageLocationFolderViewSet, PartLocationsViewSet
 from inventory.api import StorageLocationWithItemsViewSet
 from invoices.views import InvoiceViewSet, InvoiceImportView
 from invoices.views import InvoiceItemViewSet, InvoiceItemWithStorageViewSet
 from manufacturers.views_api import ManufacturerViewSet
 from inventory.api import CategoryViewSet, StorageLocationViewSet, InventoryReservationViewSet
-from projects.views_api import AssemblyViewSet, AssemblyJobViewSet, BOMViewSet, BOMItemViewSet, ProjectViewSet, ProjectVersionViewSet, BOMImportView, GenerateAssemblyViewSet, AssemblyItemViewSet
-from partcatalog.views import ManufacturerOrderNumberViewSet, PartPolimorphicViewSet
+from projects.views_api import AssemblyViewSet, AssemblyJobViewSet, BOMViewSet, BOMItemViewSet, ProjectViewSet, \
+    ProjectVersionViewSet, BOMImportView, GenerateAssemblyViewSet, AssemblyItemViewSet, ReworkViewSet, CloseReworkViewSet
+from partcatalog.views import ManufacturerOrderNumberViewSet, PartPolimorphicViewSet, GenericPartViewSet
 
 
 router = DefaultRouter()
@@ -48,6 +49,9 @@ router.register(r'api/manufacturer', ManufacturerViewSet, basename='Manufacturer
 router.register(r'api/storage_location', StorageLocationViewSet, basename='StorageLocationViewSet')
 router.register(r'api/storage_location_items', StorageLocationWithItemsViewSet, basename='StorageLocationWithItemsViewSet')
 router.register(r'api/storage_location_folder', StrageLocationFolderViewSet, basename='StorageLocationFolderViewSet')
+router.register(r'api/rework', ReworkViewSet, basename='ReworkViewSet')
+router.register(r'api/part_locations', PartLocationsViewSet, basename='PartLocationsViewSet')
+
 router.register(r'api/project', ProjectViewSet, basename='ProjectViewSet')
 router.register(r'api/project-version', ProjectVersionViewSet, basename='ProjectVersionViewSet')
 router.register(r'api/bom', BOMViewSet, basename='BOMViewSet')
@@ -56,12 +60,10 @@ router.register(r'api/assembly-job', AssemblyJobViewSet, basename='AssemblyJobVi
 router.register(r'api/assembly', AssemblyViewSet, basename='AssemblyViewSet')
 router.register(r'api/assembly-item', AssemblyItemViewSet, basename='AssemblyItemViewSet')
 
-
-
-
 router.register(r'api/part/mon', ManufacturerOrderNumberViewSet, basename='ManufacturerOrderNumberViewSet')
 
 router.register(r'api/part-poli', PartPolimorphicViewSet, basename='PartPolimorphicViewSet')
+router.register(r'api/part-generic', GenericPartViewSet, basename='GenericPartViewSet')
 
 
 urlpatterns = [
@@ -75,6 +77,7 @@ urlpatterns = [
     path('api/invoiceImport', InvoiceImportView.as_view()),
     path('parts/', include('partcatalog.urls')),
     path('api/assembly-job-generate/<int:pk>/', GenerateAssemblyViewSet.as_view()),
+    path('api/close-rework/<int:pk>/', CloseReworkViewSet.as_view()),
     path('projects/', include('projects.urls')),
     path('admin/', admin.site.urls),
     path('', RedirectView.as_view(url='inventory/', permanent=True)),

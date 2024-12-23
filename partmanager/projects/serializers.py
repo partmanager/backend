@@ -1,4 +1,4 @@
-from .models import Assembly, AssemblyItem, AssemblyJob, Project, ProjectVersion, BOM, BOMItem
+from .models import Assembly, AssemblyItem, AssemblyJob, Project, ProjectVersion, BOM, BOMItem, Rework
 from partcatalog.models.part import Part
 from partcatalog.serializers import ManufacturerOrderNumberWithLocationsSerializer, ManufacturerOrderNumberMONAndIDSerializer
 from inventory.serializers import InventoryReservationSerializer, InventoryPositionSerializer
@@ -17,20 +17,16 @@ class AssemblyItemSerializer(serializers.ModelSerializer):
     part = PartSerializer(read_only=True)
     manufacturer_order_number = ManufacturerOrderNumberWithLocationsSerializer(read_only=True)
     inventoryreservation_set = InventoryReservationSerializer(many=True, read_only=True)
-    inventory_positions_set = serializers.SerializerMethodField()
 
     class Meta:
         model = AssemblyItem
         fields = '__all__'
 
-    def get_inventory_positions_set(self, obj):
-        inventory = []
-        if obj.part is not None:
-            for mon in obj.part.manufacturer_order_number_set.all():
-                for inventory_position in mon.inventoryposition_set.all():
-                    serializer = InventoryPositionSerializer(inventory_position)
-                    inventory.append(serializer.data)
-        return inventory
+
+class AssemblyItemCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AssemblyItem
+        fields = '__all__'
 
 
 class BOMItemSerializer(serializers.ModelSerializer):
@@ -40,20 +36,20 @@ class BOMItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BOMItem
-        fields = ['id', 'group', 'get_group_display', 'quantity', 'designators', 'note', 'part',
+        fields = ['id', 'group', 'get_group_display', 'designators', 'note', 'part',
                   'manufacturer_order_number', 'part_not_found_fallback']
 
 
 class BOMItemUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = BOMItem
-        fields = ['id', 'group', 'quantity', 'designators', 'note', 'part', 'manufacturer_order_number']
+        fields = ['id', 'group', 'designators', 'note', 'part', 'manufacturer_order_number']
 
 
 class BOMItemCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = BOMItem
-        fields = ['id', 'bom', 'group', 'quantity', 'designators', 'note', 'part', 'manufacturer_order_number']
+        fields = ['id', 'bom', 'group', 'designators', 'note', 'part', 'manufacturer_order_number']
 
 
 class BOMSerializer(serializers.ModelSerializer):
@@ -99,7 +95,7 @@ class AssemblyJobSerializer(serializers.ModelSerializer):
     project_version = ProjectVersionSerializer(read_only=True)
     class Meta:
         model = AssemblyJob
-        fields = ['id', 'name', 'description', 'creation_date', 'status', 'quantity', 'project_version']
+        fields = ['id', 'name', 'description', 'creation_date', 'status', 'quantity', 'project_version', 'rework']
 
 
 class AssemblyJobCreateSerializer(serializers.ModelSerializer):
@@ -138,6 +134,11 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = ['id', 'name', 'description', 'creation_date', 'projectversion_set']
+
+class ReworkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Rework
+        fields = '__all__'
 
 
 
