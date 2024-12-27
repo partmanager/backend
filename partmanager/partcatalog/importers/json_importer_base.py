@@ -1,25 +1,25 @@
+import os
 import decimal
 import json
 import logging
-import psycopg2
-import requests
+from enum import Enum
+from urllib.parse import urlparse
+
+from django.db import IntegrityError
+
 from manufacturers.models import get_or_create_manufacturer_by_name
-from .common import decode_common_part_parameters, decode_files, add_manufacturer_order_number, str_to_production_status
-from .parameter_decoder import celsius_str_to_decimal, voltage_str_to_decimal
+from packages.importers.package_importer import get_or_create_package_from_dict
+from packages.models.common import Package
 from partcatalog.models.part import Part
 from partcatalog.models.manufacturer_order_number import ManufacturerOrderNumber
 from partcatalog.models.packaging import Packaging
-from partcatalog.models.files import FileVersion, File, create_file_version_from_url
-from symbolandfootprint.models import get_or_create_symbol, Symbol
+from partcatalog.models.files import FileVersion, File
+from symbolandfootprint.models import Symbol
+from .common import  str_to_production_status
 from .fields_decoder.storage_conditions_decoder import storage_conditions_decoder
 from .fields_decoder.operating_conditions_decoder import operating_conditions_decoder
-from urllib.parse import urlparse
-from enum import Enum
-import os
+
 from part_library_gen import symbol_generator
-from part_library_gen.symbol_generator import svg_exporter
-from django.core.files import File as DjangoFile
-from django.db import IntegrityError
 
 
 logger = logging.getLogger('partcatalog')
@@ -50,7 +50,7 @@ class ModelImporter:
 
     def create_part(self, manufacturer, part_number, json_data):
         logger.info(f"Creating {part_number}")
-        package = self.get_package(json_data['package'])
+        package = self.get_or_create_package(json_data['package'])
         common_parameters = self.decode_common_part_parameters(json_data)
         #logger.debug(f"Decoded common part parameters: {common_parameters}")
         parameters = self.decode_parameters(json_data['parameters'])
@@ -80,7 +80,7 @@ class ModelImporter:
                 logger.info(f"Generated description {part.description}")
         elif self.generate_description == GenerateDescriptionPolicy.AlwaysUseFileDescription:
             part.description = json_data['description'] if 'description' in json_data else None
-        logger.info(f"Created {part_number}")
+        logger.info(f"Created {part_number}, Package: {package}")
         return part
 
     def decode_storage_conditions(self, json_data):
@@ -115,8 +115,15 @@ class ModelImporter:
     #             symbol_name = symbol_footprint['symbolName']
     #             return get_or_create_symbol(symbol_name)
 
-    def get_package(self, package_json):
-        return None
+    def get_or_create_package(self, package_data_json):
+        try:
+            package, created = get_or_create_package_from_dict(package_data_json)
+            if created:
+                logger.info(f"Created package {package.name}")
+            return package
+        except ValueError as e:
+            logger.error(f"Exception during package generation {e}")
+            return None
 
     def validate_parameters(self, json_data):
         json_parameters_set = set(json_data.keys())

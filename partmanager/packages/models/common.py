@@ -1,5 +1,7 @@
 from django.db import models
 from .fields import Dimension
+from polymorphic.models import PolymorphicModel
+
 
 inch_to_mm = {'008004': '0201M',
               '0075': '0315',
@@ -50,11 +52,11 @@ mm_to_inch = {'0201M': '008004',
               '9194': '3637'}
 
 
-class PackageBase(models.Model):
-    hostname = 'http://localhost:8000'
+class Package(PolymorphicModel):
     type = models.CharField(max_length=100)
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
+    generated = models.BooleanField(default=False)
     freecad_file = models.FilePathField(path="/partmanager/packages/static/package_image",
                                         recursive=True, allow_files=True, allow_folders=False, max_length=200,
                                         blank=True, null=True)
@@ -71,42 +73,8 @@ class PackageBase(models.Model):
                                               recursive=True, allow_files=True, allow_folders=False, max_length=200,
                                               blank=True, null=True)
 
-    @property
-    def rendered_image(self):
-        print(self.rendering_png_file)
-        if self.rendering_png_file:
-            return self.hostname + self.rendering_png_file.replace('/home/pokas/work/django/partmanager/packages', '')
 
-    @property
-    def xhtml(self):
-        if self.xhtml_file:
-            return self.hostname + self.xhtml_file.replace('/home/pokas/work/django/partmanager/packages', '')
-
-    def image_icon(self):
-        if self.rendering_png_file:
-            file = self.rendering_png_file.replace('/home/pokas/work/django/partmanager/packages', '')
-            file = file.replace(".png", "_ico.png")
-            return self.hostname + file
-
-    def to_ajax(self):
-        return {
-            'name': self.name,
-            'type': self.type,
-            'description': self.description,
-            'files': {
-                'freecad': self.hostname + self.freecad_file.replace('/home/pokas/work/django/partmanager/packages', '') if self.freecad_file else None,
-                'iges_file': self.hostname + self.iges_file.replace('/home/pokas/work/django/partmanager/packages', '') if self.iges_file else None,
-                'xhtml_file': self.xhtml,
-                'step_file': self.hostname + self.step_file.replace('/home/pokas/work/django/partmanager/packages', '') if self.step_file else None,
-                'rendered_image': self.rendered_image
-            }
-        }
-
-    class Meta:
-        abstract = True
-
-
-class ChipPackageBase(PackageBase):
+class ChipPackageBase(Package):
     length = Dimension()  # in mm
     width = Dimension()  # in mm
     thickness = Dimension()  # in mm

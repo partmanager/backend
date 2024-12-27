@@ -23,3 +23,8 @@ class Dimension(CompositeField):
             return {'value': '{} mm {}'.format(self.value, tolerance_to_str()) if tolerance_to_str() else '{} mm'.format(self.value),
                     'max': '{} mm'.format(self.value + self.tolerance_oversize) if self.tolerance_oversize else '-',
                     'min': '{} mm'.format(self.value + self.tolerance_undersize) if self.tolerance_undersize else '-'}
+
+        def to_dict(self):
+            return {'value': self.value,
+                    'tol_over': self.tolerance_oversize,
+                    'tol_under': self.tolerance_undersize}

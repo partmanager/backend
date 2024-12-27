@@ -17,9 +17,6 @@ class ChipResistorPackage(ChipPackageBase):
                       **dimensions)
         return package
 
-    @property
-    def dimensions_drawing(self):
-        return '/package_dimension_drawing/chip_resistor_package_dimensions.svg'
 
     @property
     def dimensions(self):
@@ -29,9 +26,3 @@ class ChipResistorPackage(ChipPackageBase):
                 {'name': 'Terminal length top', 'symbol': 'T1', **self.t1.to_string_dict()},
                 {'name': 'Terminal length bottom', 'symbol': 'T2', **self.t2.to_string_dict()}
                 ]
-
-    def to_ajax(self):
-        response = super(ChipPackageBase, self).to_ajax()
-        response['files']['dimensions_drawing'] = self.hostname + '/static' + self.dimensions_drawing
-        response['dimensions'] = self.dimensions
-        return response

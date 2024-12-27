@@ -40,7 +40,6 @@ class PartBaseSerializer(serializers.ModelSerializer):
     manufacturer = ManufacturerSerializer()
     storage_conditions = serializers.SerializerMethodField()
     operating_conditions = serializers.SerializerMethodField()
-    package = serializers.SerializerMethodField()
     files = FileSerializer(many=True, read_only=True)
     manufacturer_order_number_set = ManufacturerOrderNumberWithLocationsSerializer(many=True, read_only=True)
     distributors = serializers.SerializerMethodField()
@@ -55,9 +54,6 @@ class PartBaseSerializer(serializers.ModelSerializer):
 
     def get_storage_conditions(self, obj):
         return obj.storage_conditions.to_ajax()
-
-    def get_package(self, obj):
-        return None # obj.get_package_display()
 
     def get_distributors(self, obj):
         return obj.distributor_pk_set()

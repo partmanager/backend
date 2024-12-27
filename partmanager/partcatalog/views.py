@@ -1,3 +1,5 @@
+from rest_framework.views import APIView
+
 from .models.part import Part
 from .models.generic_part import GenericPart
 
@@ -8,11 +10,14 @@ from django.core.paginator import Paginator
 from rest_framework import filters
 from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
 
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .serializers import ManufacturerOrderNumberSerializer, GenericPartSerializer
 from .part_serializers import PartPolymorphicSerializer
+
+from .tasks import generate_generic_parts
 
 menu = {"Passives": {"Balun": "/parts/balun", "Resistors": "/parts/0", "Capacitors": "/parts/1", "Inductors": "/parts/2", "Ferrite Bead": "/parts/8"},
         "Diodes": {"Small signal": "/parts/3", "LED": "/parts/4", "Bridge Rectifiers": "/parts/17"},
@@ -96,6 +101,13 @@ class GenericPartViewSet(ModelViewSet):
     queryset = GenericPart.objects.all()
     serializer_class = GenericPartSerializer
     pagination_class = StandardResultsSetPagination
+
+
+class TaskViewSet(APIView):
+    def post(self, request):
+        generate_generic_parts()
+        return Response()
+
 
 
 def api_get_part_list(request):

@@ -1,6 +1,17 @@
 import decimal
 from decimal import Decimal
 from packages.models.packages import add_package
+from ..models.fields import Dimension
+from ..models.ChipResistorPackage import ChipResistorPackage
+from ..models.ChipCapacitorPackage import ChipCapacitorPackage
+from ..models.SOPackage import SOPackage
+
+package_type_map = {
+    "Chip Resistor": ChipResistorPackage,
+    "Chip Capacitor": ChipCapacitorPackage,
+    "SO": SOPackage,
+    "SOIC": SOPackage,
+}
 
 
 def str_to_dimension_and_tolerance(dimension_str):
@@ -9,38 +20,43 @@ def str_to_dimension_and_tolerance(dimension_str):
             if '±' in dimension_str:
                 dimension_tolerance_str = dimension_str.replace('mm', '').split('±')
                 return {'value': Decimal(dimension_tolerance_str[0]),
-                        'tolerance_pos': Decimal(dimension_tolerance_str[1]),
-                        'tolerance_neg': Decimal(dimension_tolerance_str[1]) * -1}
+                        'tolerance_oversize': Decimal(dimension_tolerance_str[1]),
+                        'tolerance_undersize': Decimal(dimension_tolerance_str[1]) * -1}
             elif '~' in dimension_str:
                 dimension_tolerance_str = dimension_str.replace('mm', '').split('~')
                 min = Decimal(dimension_tolerance_str[0])
                 max = Decimal(dimension_tolerance_str[1])
                 value = min + ((max - min) / 2)
                 return {'value': value,
-                        'tolerance_pos': max - value,
-                        'tolerance_neg': min - value}
+                        'tolerance_oversize': max - value,
+                        'tolerance_undersize': min - value}
             elif 'min' in dimension_str:
                 dimension_tolerance_str = dimension_str.replace('mm', '').replace('min.', '')
                 min = Decimal(dimension_tolerance_str)
                 max = None
                 value = min
                 return {'value': value,
-                        'tolerance_pos': None,
-                        'tolerance_neg': min - value}
+                        'tolerance_oversize': None,
+                        'tolerance_undersize': min - value}
             elif 'max' in dimension_str:
                 dimension_tolerance_str = dimension_str.replace('mm', '').replace('max.', '')
                 min = None
                 max = Decimal(dimension_tolerance_str)
                 value = max
                 return {'value': value,
-                        'tolerance_pos': 0,
-                        'tolerance_neg': None}
+                        'tolerance_oversize': 0,
+                        'tolerance_undersize': None}
             else:
                 dimensions = dimension_str.replace('mm', '').split(' ')
-                tolerance = dimensions[1].split('/')
-                return {'value': Decimal(dimensions[0]),
-                        'tolerance_pos': Decimal(tolerance[0].replace('+', '')),
-                        'tolerance_neg': Decimal(tolerance[1])}
+                if len(dimensions) == 1:
+                    return {'value': Decimal(dimensions[0]),
+                            'tolerance_oversize': None,
+                            'tolerance_undersize': None}
+                else:
+                    tolerance = dimensions[1].split('/')
+                    return {'value': Decimal(dimensions[0]),
+                            'tolerance_oversize': Decimal(tolerance[0].replace('+', '')),
+                            'tolerance_undersize': Decimal(tolerance[1])}
     except decimal.InvalidOperation:
         print(dimension_str)
         raise
@@ -178,3 +194,35 @@ def part_dict_to_package(package_type, part_dictionary):
                       }
         name = part_dictionary['Package Type'].replace('Chip ', '')
         return add_package(package_type, name, dimensions)
+
+
+
+def get_or_create_package_from_dict(package_dictionary):
+    if 'package_type' in package_dictionary and 'dimensions' in package_dictionary:
+        package_type = package_dictionary["package_type"]
+        if package_type not in package_type_map:
+            print("Unable to find package type", package_type)
+            raise ValueError("Unsupported package type")
+        else:
+            dimensions = decode_dimensions(package_dictionary["dimensions"])
+            print(dimensions)
+            package_class = package_type_map[package_type]
+
+            package_object, created = package_class.objects.get_or_create(
+                type=package_type,
+                name=package_dictionary["name"],
+                description=package_class(package_dictionary["name"], dimensions),
+                pin_count = package_dictionary["pin_count"],
+                **dimensions)
+            print(package_object, created)
+            return package_object, created
+    return None, False
+
+
+def decode_dimensions(dimensions):
+    decoded_dimensions = {}
+    for key, value in dimensions.items():
+        print(key, value)
+        for k, v in str_to_dimension_and_tolerance(value).items():
+            decoded_dimensions[f"{key}_{k}"] = v
+    return decoded_dimensions

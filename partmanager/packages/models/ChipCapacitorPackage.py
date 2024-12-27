@@ -17,10 +17,6 @@ class ChipCapacitorPackage(ChipPackageBase):
                 ]
 
     @property
-    def dimensions_drawing(self):
-        return '/package_dimension_drawing/ChipCapacitorPackageDimensions.png'
-
-    @property
     def case_code_metric(self):
         return inch_to_mm[self.name]
 
@@ -38,12 +34,6 @@ class ChipCapacitorPackage(ChipPackageBase):
                       description=ChipCapacitorPackage.generate_description(name, dimensions),
                       **dimensions)
         return package
-
-    def to_ajax(self):
-        response = super(ChipPackageBase, self).to_ajax()
-        response['files']['dimensions_drawing'] = self.hostname + '/static' + self.dimensions_drawing
-        response['dimensions'] = self.dimensions
-        return response
 
     def __str__(self):
         return 'Chip Capacitor ' + str(self.name) + '(' + inch_to_mm[self.name] + ')'

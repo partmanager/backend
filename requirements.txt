@@ -6,7 +6,6 @@ django-composite-field>=1.1
 django-cors-headers==3.13.0
 django-filter>=21.1
 django-rest-polymorphic
-barcode-decoder
 requests>=2.26
 markdown>=3.4.1
 django-celery-results
@@ -16,7 +15,8 @@ gitpython
 openpyxl
 lxml
 chardet
-part_library_gen>=0.1.17a0
+barcode-decoder
+part_library_gen>=0.1.26a0
 distributors-api>=0.1.2a0
 #required by part db
 odfpy
