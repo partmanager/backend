@@ -36,7 +36,7 @@ class BOM(models.Model):
     name = models.CharField(max_length=200)
     note = models.CharField(max_length=200, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
-    project = models.ForeignKey('ProjectVersion', on_delete=models.PROTECT, related_name="bom_set")
+    project = models.ForeignKey('ProjectVersion', on_delete=models.CASCADE, related_name="bom_set")
     bom_file = models.FileField(upload_to='BOMs/', max_length=100, null=True,
                                 blank=True)  # nice looking file that is used only for reference and manual verification
     raw_source_file = models.FileField(upload_to='BOMs/', max_length=100, null=True,
@@ -183,15 +183,6 @@ class Assembly(models.Model):
         unique_together = ['name', 'project_version']
         ordering = ['project_version', 'name']
 
-    # @staticmethod
-    # def _generate_origin_info(bom_item):
-    #     origin = {bom_item.id: {'name': bom_item.bom.name,
-    #                             'bom_id': bom_item.bom.id,
-    #                             'bom_qty': bom_item.quantity,
-    #                             'project_qty': bom_item.bom.multiply * bom_item.quantity,
-    #                             'designators': bom_item.designators}}
-    #     return origin
-
 
 class Rework(models.Model):
     assembly = models.ForeignKey('Assembly', on_delete=models.CASCADE, related_name="rework_set")
@@ -219,3 +210,5 @@ class AssemblyItem(models.Model):
     class Meta:
         unique_together = ['assembly', 'rework', 'designator']
         ordering = ['assembly', 'rework', 'designator', 'manufacturer_order_number', 'part']
+
+from .signals import *
