@@ -107,7 +107,7 @@ class InventoryPosition(models.Model):
     note = models.CharField(max_length=1000, null=True, blank=True)
     manufacturer = models.ForeignKey('manufacturers.Manufacturer', on_delete=models.PROTECT, null=True,
                                      blank=True)  # used when part is null
-    part = models.ForeignKey('partcatalog.ManufacturerOrderNumber', on_delete=models.PROTECT, null=True, blank=True)
+    mon = models.ForeignKey('partcatalog.ManufacturerOrderNumber', on_delete=models.PROTECT, null=True, blank=True)
     storage_location = models.ForeignKey('StorageLocation', on_delete=models.PROTECT)
     invoice = models.ForeignKey('invoices.InvoiceItem', on_delete=models.SET_NULL, null=True, blank=True)
     stock = models.IntegerField(help_text='Current stock')
@@ -124,7 +124,7 @@ class InventoryPosition(models.Model):
     flagged = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ['category', '-archived', 'part']
+        ordering = ['category', '-archived', 'mon']
 
     def get_stock_value_display(self):
         stock_value = self.get_stock_value()
@@ -190,10 +190,10 @@ class InventoryPosition(models.Model):
                                'path': self.category.get_path()},
                   'archived': self.archived,
                   'flagged': self.flagged}
-        if self.part is not None:
-            result['part'] = {'manufacturer': self.part.manufacturer.name,
-                              'order_number': self.part.manufacturer_order_number,
-                              'description': self.part.part.description}
+        if self.mon is not None:
+            result['part'] = {'manufacturer': self.mon.manufacturer.name,
+                              'order_number': self.mon.manufacturer_order_number,
+                              'description': self.mon.part.description}
         if self.invoice is not None:
             result['invoice'] = {'distributor': self.invoice.get_distributor_display(),
                                  'invoice_number': self.invoice.invoice.number,
@@ -242,7 +242,7 @@ class InventoryPosition(models.Model):
         inventory_position.description = get_description(mon)
         inventory_position.note = dictionary['note'] if 'note' in dictionary else None
         inventory_position.manufacturer = manufacturer or part_manufacturer
-        inventory_position.part = mon
+        inventory_position.mon = mon
         inventory_position.storage_location = StorageLocation.objects.get(location=dictionary['storage_location'])
         inventory_position.invoice = get_invoice_item(dictionary['invoice']['invoice_number'],
                                                       dictionary['invoice']['invoice_position']) if dictionary[
@@ -264,14 +264,14 @@ class InventoryPosition(models.Model):
         return inventory_position
 
     def get_name_display(self):
-        if self.part:
-            return self.part.manufacturer_order_number
+        if self.mon:
+            return self.mon.manufacturer_order_number
         else:
             return self.name
 
     def get_manufacturer_display(self):
-        if self.part:
-            return self.part.manufacturer.name
+        if self.mon:
+            return self.mon.manufacturer.name
         elif self.manufacturer:
             return self.manufacturer.name
         else:

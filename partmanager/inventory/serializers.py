@@ -47,6 +47,7 @@ class InventoryPositionSerializer(serializers.ModelSerializer):
     stock_unit_display = serializers.SerializerMethodField()
     alternative_locations = serializers.SerializerMethodField()
     distributors = serializers.SerializerMethodField()
+    part = serializers.SerializerMethodField()
 
     class Meta:
         model = InventoryPosition
@@ -65,8 +66,12 @@ class InventoryPositionSerializer(serializers.ModelSerializer):
         return obj.get_stock_unit_display()
 
     def get_distributors(self, obj):
-        if obj.part and obj.part.distributorordernumber_set:
-            return obj.part.part.distributor_pk_set()
+        if obj.mon and obj.mon.distributorordernumber_set:
+            return obj.mon.part.distributor_pk_set()
+
+    def get_part(self, obj):
+        if obj.mon and obj.mon:
+            return obj.mon.part.id
 
     def get_alternative_locations(self, obj):
         def add_invoice_info(self, dictionary, invoice):
@@ -78,9 +83,9 @@ class InventoryPositionSerializer(serializers.ModelSerializer):
             #dictionary['invoice_number'] = invoice.get_invoice_number_display()  # todo remove
             dictionary['shipped_quantity'] = invoice.shipped_quantity  # todo remove
 
-        if obj.part:
+        if obj.mon:
             other_positions = []
-            for position in obj.part.inventoryposition_set.all():
+            for position in obj.mon.inventoryposition_set.all():
                 if position != obj:
                     position_dict = {'storage_location': position.storage_location.location,
                                      'stock': position.stock,
@@ -105,7 +110,7 @@ class StorageLocationWithItemsSerializer(serializers.ModelSerializer):
 class InventoryPositionDetailSerializer(serializers.ModelSerializer):
     storage_location = StorageLocationSerializer(read_only=True)
     invoice = InvoiceItemSerializer(read_only=True)
-    part = serializers.SerializerMethodField()
+    mon = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
     part_pk = serializers.SerializerMethodField()
     manufacturer = serializers.SerializerMethodField()
@@ -129,11 +134,11 @@ class InventoryPositionDetailSerializer(serializers.ModelSerializer):
         model = InventoryPosition
         fields = '__all__'
 
-    def get_part(self, obj):
+    def get_mon(self, obj):
         return {
-            'name': obj.part.manufacturer_order_number if obj.part else obj.name,
-            'description': obj.part.part.description if obj.part else obj.description,
-            'mon_id': obj.part.pk if obj.part else None,
+            'name': obj.mon.manufacturer_order_number if obj.mon else obj.name,
+            'description': obj.mon.part.description if obj.mon else obj.description,
+            'mon_id': obj.mon.pk if obj.mon else None,
         }
 
     def get_image(self, obj):

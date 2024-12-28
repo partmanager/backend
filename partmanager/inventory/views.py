@@ -41,7 +41,7 @@ class PartLocationsViewSet(ModelViewSet):
 
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ['name', 'description', 'part__manufacturer_order_number', 'storage_location__location']
-    filterset_fields = {'part__part': ['exact'], 'part': ['exact'], 'archived': ['exact'], 'flagged': ['exact']}
+    filterset_fields = {'mon__part': ['exact'], 'mon': ['exact'], 'archived': ['exact'], 'flagged': ['exact']}
 
 
 class StrageLocationFolderViewSet(ModelViewSet):

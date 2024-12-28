@@ -4,9 +4,9 @@ from .importer_base import InventoryImporterBase
 
 class DirectoryImporter(InventoryImporterBase):
     def import_inventory(self, workdir):
-        self.__process_storage_location_file(workdir + '/storage_locations.json')
-        self.__process_categories_file(workdir + '/categories.json')
-        self.__process_inventory_positions_file(workdir + '/inventory_positions.json')
+        self.__process_storage_location_file(workdir.joinpath('storage_locations.json'))
+        self.__process_categories_file(workdir.joinpath('categories.json'))
+        self.__process_inventory_positions_file(workdir.joinpath('inventory_positions.json'))
 
     def __process_storage_location_file(self, storage_locations_filename):
         print("Importing storage locations", storage_locations_filename)
