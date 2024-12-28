@@ -32,7 +32,7 @@ class FileVersion(models.Model):
     def generate_filename(self, name):
         filename = pathlib.Path(name)
         manufacturer_name = self.file_container.manufacturer.name.replace(' ', '_').lower()
-        return f'part_catalog/docs/{manufacturer_name}/{filename.stem}_md5:{self.md5sum}{"".join(filename.suffixes)}'
+        return f'part_catalog/docs/{manufacturer_name}/{filename.stem}__{self.md5sum}{"".join(filename.suffixes)}'
 
 
 def create_file_version_from_url(file_model, filename, version, url):
