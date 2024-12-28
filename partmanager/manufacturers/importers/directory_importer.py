@@ -46,4 +46,4 @@ def __process_manufacturers_file(manufacturers_filename):
 
 
 def import_manufacturers(workdir):
-    __process_manufacturers_file(workdir + '/manufacturers.json')
+    __process_manufacturers_file(workdir.joinpath('manufacturers.json'))

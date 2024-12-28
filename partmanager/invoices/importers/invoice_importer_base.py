@@ -28,7 +28,7 @@ class InvoiceImporterBase:
             invoice.save()
             logger.info('New invoice was created: %s', invoice.number)
             if 'file' in invoice_dict and invoice_dict['file']:
-                f = open(files_dir + '/' + invoice_dict['file']['filename'], mode='rb')
+                f = open(files_dir.joinpath(invoice_dict['file']['filename']), mode='rb')
                 django_file = File(f)
                 invoice.invoice_file.save(invoice_dict['file']['filename'], django_file)
         return invoice

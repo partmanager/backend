@@ -34,8 +34,8 @@ def import_distributor_order_number(distributor, distributor_order_numbers):
             distributor_order_number, created = DistributorOrderNumber.objects.get_or_create(
                 distributor=distributor,
                 don=don['distributor_order_number'],
-                mon=don['manufacturer_order_number'],
                 defaults={
+                    'mon': don['manufacturer_order_number'],
                     'manufacturer_name': don['manufacturer_name'],
                     'part_url': don['part_url']
                 })
@@ -77,4 +77,4 @@ def process_distributor_file(distributor_filename):
 def import_distributor(workdir):
     for distributor_file in os.listdir(workdir):
         if distributor_file.endswith('.json'):
-            process_distributor_file(workdir + '/' + distributor_file)
+            process_distributor_file(workdir.joinpath(distributor_file))

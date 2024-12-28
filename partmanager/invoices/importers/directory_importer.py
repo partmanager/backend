@@ -13,4 +13,4 @@ class DirectoryInvoiceImporter(InvoiceImporterBase):
     def import_invoice(self, workdir):
         for invoice_file in os.listdir(workdir):
             if invoice_file.endswith('.json'):
-                self.__process_invoice_file(workdir + '/' + invoice_file, workdir + '/files')
+                self.__process_invoice_file(workdir.joinpath(invoice_file), workdir.joinpath('files'))
