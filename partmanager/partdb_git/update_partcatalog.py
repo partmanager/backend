@@ -12,7 +12,7 @@ logger = logging.getLogger('partdb_git')
 def update_manufacturers(directory):
     try:
         logger.info(f"Updating manufacturers data")
-        import_manufacturers(directory + "/manufacturers")
+        import_manufacturers(directory.joinpath("manufacturers"))
     except FileNotFoundError:
         logger.warning(f"Manufacturers data file not found")
 
@@ -20,7 +20,7 @@ def update_manufacturers(directory):
 def update_distributors(directory):
     try:
         logger.info(f"Updating distributors data")
-        import_distributor(directory + "/distributors")
+        import_distributor(directory.joinpath("distributors"))
     except FileNotFoundError:
         logger.warning(f"Distributors data file not found")
 
