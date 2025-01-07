@@ -7,23 +7,18 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from distributors.models import Distributor
-from distributors.importers.directory_importer import import_distributor
 from distributors.exporters.directory_exporter import export as distributors_export
 from inventory.models import InventoryPosition, StorageLocation, Category
 from inventory.exporters.directory_exporter import export as inventory_export
 from invoices.models import Invoice
-from invoices.importers.directory_importer import DirectoryInvoiceImporter
 from invoices.exporters.directory_exporter import export as invoices_export
 from manufacturers.models import Manufacturer
-from manufacturers.importers.directory_importer import import_manufacturers
 from manufacturers.exporters.directory_exporter import export as manufacturers_export
-from inventory.importers.directory_importer import DirectoryImporter
 from projects.models import ProjectVersion
-from projects.importers.directory_importer import import_project
 from projects.exporters.directory_exporter import export as projects_export
 from .tasks import import_data
 from partdb_git.tasks import update_all
-from symbolandfootprint.tasks import generate_symbols
+from symbolandfootprint.tasks import generate_symbols, generate_footprints
 
 
 class ImportView(APIView):
@@ -50,6 +45,7 @@ class UpdateGitView(APIView):
 
 class GenerateSymbolsView(APIView):
     def post(self, request, format=None):
+        generate_footprints()
         result = generate_symbols.delay()
         return Response({'task_id': result.task_id}, status=200)
 

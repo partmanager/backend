@@ -16,7 +16,7 @@ openpyxl
 lxml
 chardet
 barcode-decoder
-part_library_gen>=0.1.26a0
+part_library_gen>=0.1.28a0
 distributors-api>=0.1.2a0
 #required by part db
 odfpy

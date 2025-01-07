@@ -26,7 +26,7 @@ class InventoryPositionViewSet(ModelViewSet):
     pagination_class = StandardResultsSetPagination
 
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
-    search_fields = ['name', 'description', 'part__manufacturer_order_number', 'storage_location__location']
+    search_fields = ['name', 'description', 'mon__manufacturer_order_number', 'storage_location__location']
     filterset_fields = {'category': ['in'], 'archived': ['exact'], 'flagged': ['exact']}
 
     def get_serializer_class(self):

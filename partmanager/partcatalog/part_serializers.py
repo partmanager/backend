@@ -237,5 +237,6 @@ class PartPolymorphicSerializer(PolymorphicSerializer):
         Balun: BalunSerializer,
         Capacitor: CapacitorSerializer,
         IntegratedCircuit: IntegratedCircuitSerializer,
-        Resistor: ResistorSerializer
+        Resistor: ResistorSerializer,
+        Enclosure: EnclosureSerializer,
     }

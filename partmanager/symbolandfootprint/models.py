@@ -41,7 +41,18 @@ class Symbol(models.Model):
 
 
 class Footprint(models.Model):
-    name = models.CharField(max_length=200, unique=True)
+    name = models.CharField(max_length=200)
+    footprint = models.JSONField(null=True, unique=True)
+    package = models.ForeignKey(
+        'packages.Package',
+        on_delete=models.CASCADE,
+        related_name="footprint_set",
+        blank=True,
+        null=True
+    )
+
+    def export_svg(self):
+        pass
 
 
 def get_symbol_by_name(symbol_name):
