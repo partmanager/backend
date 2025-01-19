@@ -3,6 +3,7 @@ import shutil
 import git
 import logging
 import subprocess
+import filecmp
 from pathlib import Path
 from git import RemoteProgress
 from git.exc import NoSuchPathError
@@ -79,12 +80,34 @@ def generate_modified_component_list(directory, repo, commit):
             if commit != head_commit.hexsha:
                 tmp_modified_files = repo.commit(commit).diff(head_commit.hexsha)
                 modified_files = [f'{directory}/{i.a_path}' for i in tmp_modified_files if i.change_type in ['A', 'M'] and i.a_path.endswith('.json')]
+                modified_files += generate_modified_generated_components_list(directory)
             else:
                 modified_files = []
         except git.exc.GitCommandError as e:
             logger.warning(f"Error while checking for modified files in repository. Updating all files. Error: {e}")
             modified_files = list(directory.joinpath("components").rglob('*.json'))
+            modified_files += generate_modified_generated_components_list(directory)
     else:
         logger.info(f"No commit provided. Loading all files from repository")
         modified_files = list(directory.joinpath("components").rglob('*.json'))
+        modified_files += generate_modified_generated_components_list(directory)
     return modified_files
+
+
+def generate_modified_generated_components_list(local_path: Path):
+    old_path = local_path.joinpath('../generated/parts_old')
+    new_path = local_path.joinpath('../generated/parts_new')
+    if old_path.exists():
+        result = compare_dirs(old_path, new_path)
+        return result
+    else:
+        return list(new_path.rglob('*.json'))
+
+def compare_dirs(old_path, new_path):
+    dir_cmp = filecmp.dircmp(old_path.resolve(), new_path.resolve(), shallow=False)
+    result = [new_path.joinpath(x).resolve() for x in dir_cmp.right_only]
+    result += [new_path.joinpath(x).resolve() for x in dir_cmp.diff_files]
+
+    for x in dir_cmp.common_dirs:
+        result += compare_dirs(old_path.joinpath(x).resolve(), new_path.joinpath(x))
+    return  result

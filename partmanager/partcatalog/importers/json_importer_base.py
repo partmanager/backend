@@ -66,21 +66,25 @@ class ModelImporter:
                                     package=package,
                                     **parameters)  #,
         #                                symbol=symbol)
-        except AttributeError as e:
-            logger.error(f"{repr(e)}, {json_data}")
+        except Exception as e:
+            logger.error(f"Creating part error {repr(e)}, {json_data}")
             return None
-        if self.generate_description == GenerateDescriptionPolicy.AlwaysGenerateDescription:
-            part.description = part.generate_description()
-            logger.info(f"Generated description {part.description}")
-        elif self.generate_description == GenerateDescriptionPolicy.GenerateDescriptionIfMissing:
-            if 'description' in json_data and len(json_data['description']) > 0:
-                part.description = json_data['description'] if 'description' in json_data else None
-            else:
+        try:
+            if self.generate_description == GenerateDescriptionPolicy.AlwaysGenerateDescription:
                 part.description = part.generate_description()
                 logger.info(f"Generated description {part.description}")
-        elif self.generate_description == GenerateDescriptionPolicy.AlwaysUseFileDescription:
-            part.description = json_data['description'] if 'description' in json_data else None
-        logger.info(f"Created {part_number}, Package: {package}")
+            elif self.generate_description == GenerateDescriptionPolicy.GenerateDescriptionIfMissing:
+                if 'description' in json_data and len(json_data['description']) > 0:
+                    part.description = json_data['description'] if 'description' in json_data else None
+                else:
+                    part.description = part.generate_description()
+                    logger.info(f"Generated description {part.description}")
+            elif self.generate_description == GenerateDescriptionPolicy.AlwaysUseFileDescription:
+                part.description = json_data['description'] if 'description' in json_data else None
+            logger.info(f"Created {part_number}, Package: {package}")
+        except Exception as e:
+            logger.error(f"Exception during description generation {repr(e)}, {json_data}")
+            return None
         return part
 
     def decode_storage_conditions(self, json_data):
@@ -198,7 +202,10 @@ class JsonImporterBase:
         self.dry_run = dry
         if self.parts:
             for part in self.parts:
-                self.add_part(part)
+                try:
+                    self.add_part(part)
+                except Exception as e:
+                    self.logger.error(e)
 
     def add_part(self, json_data):
         manufacturer = self.get_manufacturer(json_data['manufacturer'])
@@ -216,7 +223,8 @@ class JsonImporterBase:
             else:
                 self.update_part(part, imported_part, part_importer)
                 self.logger.info(f"{part.manufacturer_part_number} updated")
-
+            if part is None:
+                raise ValueError("Part creation error")
             self.add_manufacturer_order_numbers(manufacturer, part, json_data['orderNumbers'])
             if 'files' in json_data:
                 self.add_files(part, json_data['files'])

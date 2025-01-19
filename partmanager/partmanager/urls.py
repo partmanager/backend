@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import include, path, re_path
 from django.views.generic import RedirectView
 from django.conf.urls.static import static
-from django.conf.urls import url
+#from django.conf.urls import url
 from django.conf import settings
 from rest_framework.routers import DefaultRouter
 
@@ -92,7 +92,7 @@ urlpatterns = [
     path('export', export),
     path('updategit', UpdateGitView.as_view(), name='updategit'),
     path('symbolsgen', GenerateSymbolsView.as_view(), name='symbolsgen'),
-    url(r'^', include(router.urls)),
+    re_path(r'^', include(router.urls)),
     re_path(r'^celery-progress/', include('celery_progress.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

@@ -52,7 +52,10 @@ class MSLevel(models.IntegerChoices):
                   'MSL-5 48-HOURS': 5,
                   'MSL-5A 24-HOURS': 52,
                   'MSL-6 TOL': 6}
-        return values[type_str]
+        if type_str in values:
+            return values[type_str]
+        else:
+            raise ValueError(f"Invalid MSL level: {type_str}")
 
 
 class ToleranceType(models.IntegerChoices):

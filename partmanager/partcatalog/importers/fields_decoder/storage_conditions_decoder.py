@@ -28,5 +28,8 @@ def storage_conditions_decoder(json_data):
     else:
         storage_conditions.humidity_min = None
         storage_conditions.humidity_max = None
-    storage_conditions.msl_level = MSLevel.from_string(json_data['MSLevel']) if 'MSLevel' in json_data else None
+    if 'MSLevel' in json_data and json_data['MSLevel'] is not None:
+        storage_conditions.msl_level = MSLevel.from_string(json_data['MSLevel'])
+    else:
+        storage_conditions.msl_level = None
     return storage_conditions
