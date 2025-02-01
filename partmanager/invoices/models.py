@@ -1,4 +1,5 @@
 import decimal
+import logging
 from pathlib import Path
 from django.db import models
 from django.db.models import Q
@@ -13,6 +14,8 @@ BOOKKEEPING_TYPE = (
     ('e', 'Track as equipment'),
     ('p', 'Private use, skip')
 )
+
+logger = logging.getLogger('invoices')
 
 
 class Invoice(models.Model):
@@ -56,8 +59,7 @@ class Invoice(models.Model):
         elif manufacturer_order_number:
             invoice_items = self.invoiceitem_set.filter(
                 distributor_order_number__mon=manufacturer_order_number)
-            print("Searching invoice:", self.get_invoice_number_display(), " by MON:", manufacturer_order_number,
-                  "Found:", invoice_items)
+            logger.info(f"Searching invoice: {self.get_invoice_number_display()} by MON: {manufacturer_order_number}, Found: {invoice_items}")
         if len(invoice_items) == 1:
             invoice_item = invoice_items[0]
             if self.__validate_invoice_item(invoice_item, manufacturer_order_number.manufacturer_order_number,
@@ -92,15 +94,17 @@ class Invoice(models.Model):
         return dictionary
 
     def update_calculated_fields(self):
-        if len(self.invoiceitem_set.all()):
+        if self.pk is not None and len(self.invoiceitem_set.all()):
             bookkeeping = 'p'
             net_price = decimal.Decimal('0')
             gross_price = decimal.Decimal('0')
             local_net_price = decimal.Decimal('0')
             local_gross_price = decimal.Decimal('0')
             for item in self.invoiceitem_set.all():
-                net_price += item.price.net
-                local_net_price += item.local_price.net
+                if item.price.net:
+                    net_price += item.price.net
+                if item.local_price.net:
+                    local_net_price += item.local_price.net
                 if item.price.gross:
                     gross_price += item.price.gross
                 if item.local_price.gross:
@@ -156,12 +160,18 @@ class InvoiceItem(models.Model):
             self.local_price.currency = settings.LOCAL_CURRENCY
 
         self.unit_price.currency = self.local_price.currency
-        if self.delivered_quantity is not None and self.shipped_quantity is not None:
-            self.unit_price.net = self.local_price.net / min(self.delivered_quantity, self.shipped_quantity)
-        elif self.shipped_quantity:
-            self.unit_price.net = self.local_price.net / self.shipped_quantity
-        elif self.delivered_quantity:
-            self.unit_price.net = self.local_price.net / self.delivered_quantity
+        if self.shipped_quantity is not None and self.shipped_quantity > 0:
+            if self.local_price.net is not None:
+                if self.delivered_quantity is not None and self.shipped_quantity is not None:
+                    self.unit_price.net = self.local_price.net / min(self.delivered_quantity, self.shipped_quantity)
+                elif self.shipped_quantity:
+                    self.unit_price.net = self.local_price.net / self.shipped_quantity
+                elif self.delivered_quantity:
+                    self.unit_price.net = self.local_price.net / self.delivered_quantity
+                else:
+                    self.unit_price.net = None
+            else:
+                logger.error(f"{self.invoice.number}/{self.position_in_invoice} quantity: {self.shipped_quantity}, local price: {self.local_price}")
         else:
             self.unit_price.net = None
 

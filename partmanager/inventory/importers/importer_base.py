@@ -70,19 +70,19 @@ class InventoryImporterBase:
     def create_category_recursive(self, category_dict):
         assert category_dict['path'][0] == 'Root'
 
-        category_parent = Category.get_root()
-        for path in category_dict['path'][1:-1]:
-            try:
-                category_parent = category_parent.category_set.get(name=path)
-            except Category.DoesNotExist:
-                logger.info(f"\t\tUnable to find parent: {path} creating...")
-                category_parent = Category(name=path, parent=category_parent)
-                category_parent.save()
+        if category_dict['name'] == 'Root':
+            return Category.get_root()
+        else:
+            category_parent = Category.get_root()
+            for path in category_dict['path'][1:-1]:
+                category_parent, created = category_parent.category_set.get_or_create(name=path, parent=category_parent)
+                if created:
+                    logger.info(f"\tCreated new category: {category_parent}")
 
-        category = Category(name=category_dict['name'])
-        category.description = category_dict['description']
-        category.default_part_types = category_dict['default_part_types'] if 'default_part_types' in category_dict else None
-        print("Parent", category_parent)
-        category.parent = category_parent
-        category.save()
-        return category
+            category, created = Category.objects.update_or_create(name=category_dict['name'],
+                                                                  parent=category_parent,
+                                                                  defaults={
+                                                                      'description': category_dict['description'],
+                                                                      'default_part_types': category_dict['default_part_types'] if 'default_part_types' in category_dict else None
+                                                                  })
+            return category
