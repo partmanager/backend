@@ -7,7 +7,11 @@ WORKDIR /code
 
 COPY requirements.txt /code/
 RUN pip install -r requirements.txt
-
 RUN mkdir /var/log/shelftracker
 
-RUN apt update && apt install -y rabbitmq-server
+RUN adduser \
+        --disabled-password \
+        --no-create-home \
+        django-user
+
+USER django-user

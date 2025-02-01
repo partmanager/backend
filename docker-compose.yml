@@ -12,6 +12,7 @@ services:
       - POSTGRES_PASSWORD=postgres
   backend:
     build: .
+    user: "1000:1000"
     command: /bin/bash create_initial_migration.sh
     volumes:
       - ./partmanager:/code
@@ -29,3 +30,25 @@ services:
       - POSTGRES_PASSWORD=postgres
     depends_on:
       - db
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    expose:
+      - 6379
+
+  celery:
+    build: .
+    user: "1000:1000"
+    command: ["celery", "-A", "partmanager", "worker", "--loglevel=info"]
+    volumes:
+      - ./partmanager:/code
+      - ./containers_data/partsdb:/var/partsdb
+      - ./containers_files/static:/var/static
+      - ./containers_files/media:/var/media
+      - ./containers_data/var_log_shelftracker:/var/log/shelftracker
+      - ./containers_data/etc/shelftracker:/etc/shelftracker
+      - ./containers_data/tmp:/tmp
+    depends_on:
+      - redis

@@ -1,6 +1,3 @@
-rabbitmq-server &
-celery -A partmanager worker -l INFO &
-
 python3 manage.py makemigrations manufacturers
 python3 manage.py makemigrations packages
 python3 manage.py makemigrations symbolandfootprint

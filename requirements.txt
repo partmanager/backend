@@ -10,8 +10,9 @@ django-rest-polymorphic
 requests>=2.26
 markdown>=3.4.1
 django-celery-results
-celery>=5.3
+celery>=5.4
 celery-progress
+redis
 gitpython
 openpyxl
 lxml
@@ -22,3 +23,4 @@ distributors-api>=0.1.2a0
 #required by part db
 odfpy
 pandas
+
