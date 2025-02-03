@@ -54,7 +54,7 @@ class InventoryPositionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_reserved_quantity(self, obj):
-        return obj.get_reserved_quantity() + 10
+        return obj.get_reserved_quantity()
 
     def get_condition_display(self, obj):
         return obj.get_condition_display()
@@ -77,10 +77,7 @@ class InventoryPositionSerializer(serializers.ModelSerializer):
         def add_invoice_info(self, dictionary, invoice):
             dictionary['invoice_id'] = invoice.pk
             dictionary['distributor_id'] = invoice.invoice.distributor.pk
-            #dictionary['price'] = invoice.get_price_per_unit_display()  # todo remove
-            #dictionary['stock_value'] = self.get_stock_value_display()  # todo remove
             dictionary['distributor'] = invoice.get_distributor_display()  # todo remove
-            #dictionary['invoice_number'] = invoice.get_invoice_number_display()  # todo remove
             dictionary['shipped_quantity'] = invoice.shipped_quantity  # todo remove
 
         if obj.mon:
@@ -91,7 +88,6 @@ class InventoryPositionSerializer(serializers.ModelSerializer):
                                      'stock': position.stock,
                                      'condition': position.get_condition_display()}
                     if position.invoice:
-                        #add_invoice_info(position, position_dict, position.invoice)
                         serializer = InvoiceItemDetailSerializer(position.invoice)
                         position_dict['invoice_item'] = serializer.data
 
