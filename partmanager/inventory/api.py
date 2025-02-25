@@ -172,10 +172,10 @@ def add_item_barcode_search(request):
             if don:
                 new_item_candidate['distributor_id'] = don.distributor.pk
                 new_item_candidate['don'] = don.don
-                if don.mon:
-                    manufacturer = ManufacturerSerializer(don.mon, read_only=True)
+                if don.manufacturer_order_number:
+                    manufacturer_order_number = don.manufacturer_order_number
+                    manufacturer = ManufacturerSerializer(manufacturer_order_number.manufacturer, read_only=True)
                     new_item_candidate['manufacturer'] = manufacturer.data
-                    manufacturer_order_number = don.mon
                     part_type = manufacturer_order_number.part.part_type
                     default_categories = Category.objects.filter(default_part_types__contains=[part_type])
                     if len(default_categories) > 0:
