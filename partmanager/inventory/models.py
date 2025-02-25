@@ -102,11 +102,11 @@ class InventoryPosition(models.Model):
         ('b', 'In stock')
     )
 
-    name = models.CharField(max_length=200, null=True, blank=True)  # used when part is null
-    description = models.CharField(max_length=1000, null=True, blank=True)  # used when part is null
+    name = models.CharField(max_length=200, null=True, blank=True)  # used when mon is null
+    description = models.CharField(max_length=1000, null=True, blank=True)  # used when mon is null
     note = models.CharField(max_length=1000, null=True, blank=True)
     manufacturer = models.ForeignKey('manufacturers.Manufacturer', on_delete=models.PROTECT, null=True,
-                                     blank=True)  # used when part is null
+                                     blank=True)  # used when mon is null
     mon = models.ForeignKey('partcatalog.ManufacturerOrderNumber', on_delete=models.PROTECT, null=True, blank=True)
     storage_location = models.ForeignKey('StorageLocation', on_delete=models.PROTECT)
     invoice = models.ForeignKey('invoices.InvoiceItem', on_delete=models.SET_NULL, null=True, blank=True)
@@ -126,7 +126,7 @@ class InventoryPosition(models.Model):
     flagged = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ['category', '-archived', 'mon']
+        ordering = ['category', '-archived', 'mon', 'manufacturer', 'name', 'storage_location']
 
     def get_stock_value_display(self):
         stock_value = self.get_stock_value()

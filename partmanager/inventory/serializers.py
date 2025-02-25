@@ -42,9 +42,6 @@ class InventoryPositionSerializer(serializers.ModelSerializer):
     invoice = InvoiceItemDetailSerializer(read_only=True)
     manufacturer = ManufacturerSerializer(read_only=True)
     reserved_quantity = serializers.SerializerMethodField()
-    condition_display = serializers.SerializerMethodField()
-    status_display = serializers.SerializerMethodField()
-    stock_unit_display = serializers.SerializerMethodField()
     alternative_locations = serializers.SerializerMethodField()
     distributors = serializers.SerializerMethodField()
     part = serializers.SerializerMethodField()
@@ -55,15 +52,6 @@ class InventoryPositionSerializer(serializers.ModelSerializer):
 
     def get_reserved_quantity(self, obj):
         return obj.get_reserved_quantity()
-
-    def get_condition_display(self, obj):
-        return obj.get_condition_display()
-
-    def get_status_display(self, obj):
-        return obj.get_status_display()
-
-    def get_stock_unit_display(self, obj):
-        return obj.get_stock_unit_display()
 
     def get_distributors(self, obj):
         if obj.mon and obj.mon.distributorordernumber_set:
