@@ -2,9 +2,11 @@ from django.http import FileResponse
 import os
 import time
 import shutil
+from django.contrib.auth.models import User
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import viewsets, views
 
 from distributors.models import Distributor
 from distributors.exporters.directory_exporter import export as distributors_export
@@ -19,6 +21,18 @@ from projects.exporters.directory_exporter import export as projects_export
 from .tasks import import_data
 from partdb_git.tasks import update_all
 from symbolandfootprint.tasks import generate_symbols, generate_footprints
+
+from .serializers import UserSerializer
+
+
+class UsersViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class WhoAmIView(views.APIView):
+    def get(self, request):
+        return Response(UserSerializer(request.user).data)
 
 
 class ImportView(APIView):

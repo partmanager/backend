@@ -9,6 +9,7 @@ from .fields.storage_conditions import StorageConditions
 from .to_string_conversions import decimal_ppm_to_str, decimal_celsius_to_str
 from symbolandfootprint.models import Footprint
 from polymorphic.models import PolymorphicModel
+from django.contrib.postgres.fields import ArrayField
 
 
 def decimal_voltage_to_str(voltage):
@@ -177,6 +178,8 @@ class Part(PolymorphicModel):
     symbol = models.ForeignKey('symbolandfootprint.Symbol', on_delete=models.PROTECT, blank=True, null=True)
     #footprints = models.ManyToManyField(Footprint)
     files = models.ManyToManyField(File, blank=True)
+    thumbnail = models.ImageField(max_length=250, upload_to='part_catalog/images/', blank=True, null=True)
+    images = ArrayField(models.ImageField(max_length=250, upload_to='part_catalog/images/'), blank=True, null=True)
 
     fields_begin = {'MPN': 'manufacturer_part_number', 'OPN': 'manufacturer_order_number',
                     'Production Status': 'production_status', 'Description': 'description'}

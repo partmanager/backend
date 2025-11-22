@@ -20,8 +20,9 @@ from django.conf.urls.static import static
 #from django.conf.urls import url
 from django.conf import settings
 from rest_framework.routers import DefaultRouter
+from rest_framework.authtoken import views
 
-from .views import export, ImportView, UpdateGitView, GenerateSymbolsView
+from .views import export, ImportView, UpdateGitView, GenerateSymbolsView, UsersViewSet, WhoAmIView
 
 from distributors.views import DistributorViewSet, DistributorOrderNumberViewSet, DistributorManufacturerViewSet, api_stock_and_price
 from inventory.views import InventoryPositionViewSet, StrageLocationFolderViewSet, PartLocationsViewSet
@@ -38,6 +39,7 @@ from partcatalog.views import ManufacturerOrderNumberViewSet, PartPolimorphicVie
 
 
 router = DefaultRouter()
+router.register(r'api/user', UsersViewSet)
 router.register(r'api/distributor', DistributorViewSet, basename='Distributor')
 router.register(r'api/distributor-order-number', DistributorOrderNumberViewSet, basename='DistributorOrderNumberViewSet')
 router.register(r'api/distributor-manufacturer', DistributorManufacturerViewSet, basename='DistributorManufacturer')
@@ -73,6 +75,7 @@ router.register(r'api/part-generic', GenericPartViewSet, basename='GenericPartVi
 
 urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
+    path('api-token-auth/', views.obtain_auth_token),
     path('api/bom-import/', BOMImportView.as_view(), name='bom-import'),
     path('api/distributor/stock_and_price/', api_stock_and_price, name='DistributorStockAndPrice'),
     path('manufacturers/', include('manufacturers.urls')),
@@ -92,6 +95,7 @@ urlpatterns = [
     path('export', export),
     path('updategit', UpdateGitView.as_view(), name='updategit'),
     path('symbolsgen', GenerateSymbolsView.as_view(), name='symbolsgen'),
+    path('whoami', WhoAmIView.as_view()),
     re_path(r'^', include(router.urls)),
     re_path(r'^celery-progress/', include('celery_progress.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
