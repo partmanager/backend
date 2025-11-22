@@ -1,7 +1,7 @@
 import os
 import tempfile
 
-from .models import Invoice, InvoiceItem
+from .models import Invoice, InvoiceItem, PaymentConfirmation
 from rest_framework import status
 from rest_framework import filters
 from rest_framework.viewsets import ModelViewSet
@@ -11,7 +11,15 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .serializers import InvoiceSerializer, InvoiceItemSerializer, InvoiceItemDetailSerializer, InvoiceItemCreateSerializer, InvoiceItemDetailWithStorageSerializer, InvoiceCreateSerializer
+from .serializers import \
+    InvoiceSerializer, \
+    InvoiceItemSerializer, \
+    InvoiceItemDetailSerializer, \
+    InvoiceItemCreateSerializer, \
+    InvoiceItemDetailWithStorageSerializer, \
+    InvoiceCreateSerializer, \
+    PaymentConfirmationSerializer
+
 from .tasks import update_invoice_item_don_assignments, import_invoice_from_file
 from .filters import InvoiceItemFilter
 
@@ -37,6 +45,22 @@ class InvoiceViewSet(ModelViewSet):
         if self.action in ['create', 'update']:
             return InvoiceCreateSerializer
         return InvoiceSerializer
+
+
+class PaymentConfirmationViewSet(ModelViewSet):
+    """
+    Used by frontend to display payment confirmation
+    """
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    search_fields = ['invoice', 'payment_date']
+    filterset_fields = ['payment_date', 'note']
+    queryset = PaymentConfirmation.objects.all()
+
+    def get_serializer_class(self):
+        if self.action in ['create', 'update']:
+            return PaymentConfirmationSerializer
+        return PaymentConfirmationSerializer
 
 
 class InvoiceItemViewSet(ModelViewSet):

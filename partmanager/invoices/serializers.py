@@ -1,9 +1,15 @@
 import decimal
 
-from .models import Invoice, InvoiceItem
+from .models import Invoice, InvoiceItem, PaymentConfirmation
 from partmanager.choices import QuantityUnit
 from rest_framework import serializers
 from distributors.serializers import DistributorOrderNumberDetailSerializer, DistributorSerializer, DistributorOrderNumberSerializer
+
+
+class PaymentConfirmationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentConfirmation
+        fields = '__all__'
 
 
 class InvoiceMinimalSerializer(serializers.ModelSerializer):
@@ -34,11 +40,11 @@ class InvoiceSerializer(serializers.ModelSerializer):
                   'invoice_date',
                   'distributor',
                   'invoice_file',
-                  'payment_confirmation_file',
                   'item_count',
                   'all_items_mapped',
                   'price',
-                  'local_price']
+                  'local_price',
+                  'paymentconfirmation_set']
         extra_kwargs = {
             'id': {'read_only': True},
             'bookkeeping': {'read_only': True}
@@ -57,8 +63,7 @@ class InvoiceCreateSerializer(serializers.ModelSerializer):
         fields = ['number',
                   'invoice_date',
                   'distributor',
-                  'invoice_file',
-                  'payment_confirmation_file']
+                  'invoice_file']
 
 
 class InvoiceItemSerializer(serializers.ModelSerializer):

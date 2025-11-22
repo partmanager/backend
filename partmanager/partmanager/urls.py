@@ -27,7 +27,7 @@ from .views import export, ImportView, UpdateGitView, GenerateSymbolsView, Users
 from distributors.views import DistributorViewSet, DistributorOrderNumberViewSet, DistributorManufacturerViewSet, api_stock_and_price
 from inventory.views import InventoryPositionViewSet, StrageLocationFolderViewSet, PartLocationsViewSet
 from inventory.api import StorageLocationWithItemsViewSet
-from invoices.views import InvoiceViewSet, InvoiceImportView
+from invoices.views import InvoiceViewSet, InvoiceImportView, PaymentConfirmationViewSet
 from invoices.views import InvoiceItemViewSet, InvoiceItemWithStorageViewSet
 from manufacturers.views_api import ManufacturerViewSet
 from inventory.api import CategoryViewSet, StorageLocationViewSet, InventoryReservationViewSet
@@ -43,12 +43,16 @@ router.register(r'api/user', UsersViewSet)
 router.register(r'api/distributor', DistributorViewSet, basename='Distributor')
 router.register(r'api/distributor-order-number', DistributorOrderNumberViewSet, basename='DistributorOrderNumberViewSet')
 router.register(r'api/distributor-manufacturer', DistributorManufacturerViewSet, basename='DistributorManufacturer')
+
 router.register(r'api/inventory', InventoryPositionViewSet, basename='InventoryPositionViewSet')
 router.register(r'api/inventory-category', CategoryViewSet, basename='CategoryViewSet')
 router.register(r'api/inventory-reservation', InventoryReservationViewSet, basename='InventoryReservationViewSet')
-router.register(r'api/invoice', InvoiceViewSet, basename='Invoice')
-router.register(r'api/invoiceItem', InvoiceItemViewSet, basename='InvoiceItem')
-router.register(r'api/invoiceItemWithStorage', InvoiceItemWithStorageViewSet, basename='InvoiceItemStorage')
+
+router.register(r'api/invoice/invoice', InvoiceViewSet, basename='Invoice')
+router.register(r'api/invoice/item', InvoiceItemViewSet, basename='InvoiceItem')
+router.register(r'api/invoice/itemWithStorage', InvoiceItemWithStorageViewSet, basename='InvoiceItemStorage')
+router.register(r'api/invoice/paymentConfirmation', PaymentConfirmationViewSet, basename='PaymentConfirmation')
+
 router.register(r'api/manufacturer', ManufacturerViewSet, basename='ManufacturerViewSet')
 router.register(r'api/storage_location', StorageLocationViewSet, basename='StorageLocationViewSet')
 router.register(r'api/storage_location_items', StorageLocationWithItemsViewSet, basename='StorageLocationWithItemsViewSet')

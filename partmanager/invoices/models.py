@@ -24,9 +24,9 @@ class Invoice(models.Model):
     invoice_date = models.DateField()
     distributor = models.ForeignKey('distributors.Distributor', on_delete=models.PROTECT)
     invoice_file = models.FileField(upload_to='invoices', null=True, blank=True)
-    payment_confirmation_file = models.FileField(upload_to='invoices', null=True, blank=True)
     price = NetGrossPrice()  # calculated field
     local_price = NetGrossPrice()  # calculated field, Price converted to local currency
+    # paymentconfirmation_set -> reverse key from PaymentConfirmation class
     # invoiceitem_set -> reverse key from InvoiceItem class
 
     class Meta:
@@ -123,6 +123,17 @@ class Invoice(models.Model):
     def save(self, *args, **kwargs):
         self.update_calculated_fields()
         super(Invoice, self).save(*args, **kwargs)
+
+
+class PaymentConfirmation(models.Model):
+    invoice = models.ForeignKey('Invoice', on_delete=models.CASCADE)
+    confirmation_file = models.FileField(upload_to='invoices', null=True, blank=True)
+    payment_date = models.DateField()
+    value = Price()
+    note = models.TextField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['invoice', 'payment_date', 'id']
 
 
 class InvoiceItem(models.Model):
