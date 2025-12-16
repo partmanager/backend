@@ -56,6 +56,8 @@ class Invoice(models.Model):
     payment_expected_title = models.CharField(max_length=250, null=True, blank=True)
     paid = models.BooleanField(default=False)
     note = models.TextField(null=True, blank=True)
+    status = models.CharField(max_length=10, null=True, blank=True)
+    status_message = models.TextField(null=True, blank=True)
     # paymentconfirmation_set -> reverse key from PaymentConfirmation class
     # invoiceitem_set -> reverse key from InvoiceItem class
 
@@ -67,17 +69,9 @@ class Invoice(models.Model):
     def item_count(self):
         return len(self.invoiceitem_set.all())
 
-    @property
-    def all_items_mapped(self):
-        return self.invoiceitem_set.filter(
-            Q(distributor_order_number__manufacturer_order_number__isnull=True)).count() == 0
-
     @staticmethod
     def get_by_invoice_number(invoice_number):
         return Invoice.objects.filter(number=invoice_number)
-
-    # def get_invoice_number_display(self):
-    #     return "{}: {}".format(self.distributor.name, self.number)
 
     def get_item(self, manufacturer_order_number, distributor_order_number_text, position):
         invoice_items = None
