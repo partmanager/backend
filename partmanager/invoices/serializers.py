@@ -1,9 +1,15 @@
 import decimal
 
-from .models import Invoice, InvoiceItem, PaymentConfirmation
+from .models import BankAccount, Invoice, InvoiceItem, PaymentConfirmation
 from partmanager.choices import QuantityUnit
 from rest_framework import serializers
 from distributors.serializers import DistributorOrderNumberDetailSerializer, DistributorSerializer, DistributorOrderNumberSerializer
+
+
+class BankAccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BankAccount
+        fields = '__all__'
 
 
 class PaymentConfirmationSerializer(serializers.ModelSerializer):
@@ -86,7 +92,7 @@ class InvoiceItemDetailSerializer(serializers.ModelSerializer):
         model = InvoiceItem
         fields = ['id', 'invoice', 'unit_price', 'extended_price', 'order_number', 'type',
                   'position_in_invoice', 'ordered_quantity', 'shipped_quantity',
-                  'delivered_quantity', 'quantity_unit', 'bookkeeping', 'LOT', 'ECCN', 'COO', 'TARIC',
+                  'delivered_quantity', 'quantity_unit', 'tax_rate', 'bookkeeping', 'LOT', 'ECCN', 'COO', 'TARIC',
                   'distributor_order_number']
         extra_kwargs = {
             'id': {'read_only': True},
@@ -118,6 +124,7 @@ class InvoiceItemDetailWithStorageSerializer(serializers.ModelSerializer):
                   'type',
                   'type_display',
                   'position_in_invoice',
+                  'tax_rate',
                   'bookkeeping',
                   'bookkeeping_display',
                   'invoice',

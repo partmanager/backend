@@ -25,6 +25,13 @@ class QuantityUnit(models.IntegerChoices):
 
     __empty__ = _('(Unknown)')
 
+class PaymentMethod(models.IntegerChoices):
+    BANK_TRANSFER = 1, _('Bank transfer')
+    CASH = 2, _('Cash')
+    CREDIT_CARD = 3, _('Credit card')
+    PAY_PAL = 4, _('PayPal')
+
+    __empty__ = _('(Unknown)')
 
 class Status(models.IntegerChoices):
     DATA_PREPARATION = 1, _('Data Preparation')

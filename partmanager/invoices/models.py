@@ -6,6 +6,7 @@ from django.db.models import Q
 from partmanager.choices import MerchandiseType, QuantityUnit
 from partmanager.common_fields import Price, NetGrossPrice, PriceWithTax
 from django.conf import settings
+from partmanager.choices import Currency, PaymentMethod
 
 BOOKKEEPING_TYPE = (
     ('k', 'Track this invoice in bookkeeping'),
@@ -18,14 +19,43 @@ BOOKKEEPING_TYPE = (
 logger = logging.getLogger('invoices')
 
 
+class BankAccount(models.Model):
+    bank_name = models.CharField(max_length=250, help_text="Name of the bank")
+    holder_name = models.CharField(max_length=250, help_text="Account holder's name")
+    number = models.CharField(max_length=20, unique=True)
+    currency = models.IntegerField(choices=Currency.choices)
+    distributor = models.ForeignKey('distributors.Distributor', on_delete=models.PROTECT)
+    # invoice_set -> reverse field from Invoice model
+
+    class Meta:
+        ordering = ['distributor', 'currency', 'bank_name', 'number', 'id']
+
+
+class PaymentConfirmation(models.Model):
+    invoice = models.ForeignKey('Invoice', on_delete=models.CASCADE)
+    confirmation_file = models.FileField(upload_to='invoices', null=True, blank=True)
+    payment_date = models.DateField()
+    value = Price()
+    payment_method = models.IntegerField(choices=PaymentMethod.choices)
+    note = models.TextField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['invoice', 'payment_date', 'id']
+
+
 class Invoice(models.Model):
     number = models.CharField(max_length=250)
     bookkeeping = models.CharField(max_length=1, choices=BOOKKEEPING_TYPE, default='p')  # calculated field
     invoice_date = models.DateField()
+    due_date = models.DateField(null=True, blank=True)
     distributor = models.ForeignKey('distributors.Distributor', on_delete=models.PROTECT)
     invoice_file = models.FileField(upload_to='invoices', null=True, blank=True)
     price = NetGrossPrice()  # calculated field
     local_price = NetGrossPrice()  # calculated field, Price converted to local currency
+    bank_account = models.ForeignKey('BankAccount', on_delete=models.PROTECT, null=True)
+    payment_expected_title = models.CharField(max_length=250, null=True, blank=True)
+    paid = models.BooleanField(default=False)
+    note = models.TextField(null=True, blank=True)
     # paymentconfirmation_set -> reverse key from PaymentConfirmation class
     # invoiceitem_set -> reverse key from InvoiceItem class
 
@@ -125,17 +155,6 @@ class Invoice(models.Model):
         super(Invoice, self).save(*args, **kwargs)
 
 
-class PaymentConfirmation(models.Model):
-    invoice = models.ForeignKey('Invoice', on_delete=models.CASCADE)
-    confirmation_file = models.FileField(upload_to='invoices', null=True, blank=True)
-    payment_date = models.DateField()
-    value = Price()
-    note = models.TextField(null=True, blank=True)
-
-    class Meta:
-        ordering = ['invoice', 'payment_date', 'id']
-
-
 class InvoiceItem(models.Model):
     invoice = models.ForeignKey('Invoice', on_delete=models.CASCADE)
     position_in_invoice = models.IntegerField()
@@ -149,6 +168,7 @@ class InvoiceItem(models.Model):
     price = PriceWithTax()  # price in invoice currency
     local_price = PriceWithTax()  # calculated field, price converted to local currency
     unit_price = Price()  # calculated field, price converted to local currency
+    tax_rate = models.IntegerField(null=True, blank=True)
     bookkeeping = models.CharField(max_length=1, choices=BOOKKEEPING_TYPE, default='p')
     LOT = models.CharField(max_length=20, null=True, blank=True, verbose_name="Lot number")
     ECCN = models.CharField(max_length=20, null=True, blank=True, verbose_name="Export Control Classification Number")
