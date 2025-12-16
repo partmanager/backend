@@ -43,9 +43,10 @@ class InvoiceSerializer(serializers.ModelSerializer):
         model = Invoice
         fields = ['id',
                   'number',
+                  'distributor',
                   'bookkeeping',
                   'invoice_date',
-                  'due_date'
+                  'due_date',
                   'distributor',
                   'invoice_file',
                   'item_count',
@@ -71,6 +72,8 @@ class InvoiceCreateSerializer(serializers.ModelSerializer):
         model = Invoice
         fields = ['number',
                   'invoice_date',
+                  'due_date',
+                  'paid',
                   'distributor',
                   'invoice_file']
 
