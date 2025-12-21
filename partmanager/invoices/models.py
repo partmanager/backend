@@ -37,8 +37,8 @@ class PaymentConfirmation(models.Model):
     payment_date = models.DateField()
     value = Price()
     payment_method = models.IntegerField(choices=PaymentMethod.choices)
-    from_bank_account = models.ForeignKey('BankAccount', on_delete=models.PROTECT, null=True)
-    to_bank_account = models.ForeignKey('BankAccount', on_delete=models.PROTECT, null=True)
+    from_bank_account = models.ForeignKey('BankAccount', related_name="paymentconfirmation_from_set", on_delete=models.PROTECT, null=True)
+    to_bank_account = models.ForeignKey('BankAccount', related_name="paymentconfirmation_to_set", on_delete=models.PROTECT, null=True)
     note = models.TextField(null=True, blank=True)
 
     class Meta:
