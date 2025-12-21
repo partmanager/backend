@@ -25,8 +25,10 @@ class InvoiceMinimalSerializer(serializers.ModelSerializer):
         model = Invoice
         fields = ['id',
                   'number',
+                  'is_income',
                   'invoice_date',
                   'due_date',
+                  'paid',
                   'distributor'
                   ]
         extra_kwargs = {
@@ -43,6 +45,7 @@ class InvoiceSerializer(serializers.ModelSerializer):
         model = Invoice
         fields = ['id',
                   'number',
+                  'is_income',
                   'distributor',
                   'bookkeeping',
                   'invoice_date',
@@ -53,8 +56,11 @@ class InvoiceSerializer(serializers.ModelSerializer):
                   'price',
                   'local_price',
                   'paid',
+                  'paid_date',
+                  'note',
                   'status',
-                  'status_message']
+                  'status_message',
+                  'paymentconfirmation_set']
         extra_kwargs = {
             'id': {'read_only': True},
             'bookkeeping': {'read_only': True}
@@ -71,9 +77,11 @@ class InvoiceCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Invoice
         fields = ['number',
+                  'is_income',
                   'invoice_date',
                   'due_date',
                   'paid',
+                  'note',
                   'distributor',
                   'invoice_file']
 

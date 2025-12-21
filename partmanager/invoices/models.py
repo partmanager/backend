@@ -33,18 +33,40 @@ class BankAccount(models.Model):
 
 class PaymentConfirmation(models.Model):
     invoice = models.ForeignKey('Invoice', on_delete=models.CASCADE)
-    confirmation_file = models.FileField(upload_to='invoices', null=True, blank=True)
+    confirmation_file = models.FileField(upload_to='paymentConfirm', null=True, blank=True)
     payment_date = models.DateField()
     value = Price()
     payment_method = models.IntegerField(choices=PaymentMethod.choices)
+    from_bank_account = models.ForeignKey('BankAccount', on_delete=models.PROTECT, null=True)
+    to_bank_account = models.ForeignKey('BankAccount', on_delete=models.PROTECT, null=True)
     note = models.TextField(null=True, blank=True)
 
     class Meta:
         ordering = ['invoice', 'payment_date', 'id']
 
+    def to_dict(self):
+        dictionary = {
+            'invoice': {
+                'number': self.invoice.number,
+                'distributor': self.invoice.distributor.name
+            },
+            'file': None,
+            'payment_date': self.payment_date.isoformat(),
+            'value': self.value.to_dict(),
+            'method': self.get_payment_method_display(),
+            'from_bank_account': self.from_bank_account.number,
+            'to_bank_account': self.to_bank_account.number,
+            'note': self.note
+        }
+        if self.confirmation_file:
+            dictionary['file'] = {'filename_org': Path(self.confirmation_file.name).name,
+                                  'filename': Path(self.confirmation_file.path).name}
+        return dictionary
+
 
 class Invoice(models.Model):
     number = models.CharField(max_length=250)
+    is_income = models.BooleanField(default=False)
     bookkeeping = models.CharField(max_length=1, choices=BOOKKEEPING_TYPE, default='p')  # calculated field
     invoice_date = models.DateField()
     due_date = models.DateField(null=True, blank=True)
@@ -55,6 +77,7 @@ class Invoice(models.Model):
     bank_account = models.ForeignKey('BankAccount', on_delete=models.PROTECT, null=True)
     payment_expected_title = models.CharField(max_length=250, null=True, blank=True)
     paid = models.BooleanField(default=False)
+    paid_date = models.DateField(null=True, blank=True)
     note = models.TextField(null=True, blank=True)
     status = models.CharField(max_length=10, null=True, blank=True)
     status_message = models.TextField(null=True, blank=True)
@@ -106,15 +129,22 @@ class Invoice(models.Model):
     def to_dict(self):
         dictionary = {'distributor': self.distributor.name,
                       'invoice_number': self.number,
+                      'is_income': self.is_income,
                       'bookkeeping': self.bookkeeping,
                       'invoice_date': self.invoice_date.isoformat(),
+                      'due_date': self.due_date.isoformat(),
+                      'paid': self.paid,
+                      'note': self.note,
                       'file': None,
-                      'items': []}
+                      'items': [],
+                      'payment_confirmations': []}
         if self.invoice_file:
             dictionary['file'] = {'filename_org': Path(self.invoice_file.name).name,
                                   'filename': Path(self.invoice_file.path).name}
         for invoice_item in self.invoiceitem_set.all():
             dictionary['items'].append(invoice_item.to_dict())
+        for payment_confirmation in self.paymentconfirmation_set.all():
+            dictionary['payment_confirmations'].append(payment_confirmation.to_dict())
         return dictionary
 
     def update_calculated_fields(self):

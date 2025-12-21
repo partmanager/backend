@@ -38,7 +38,13 @@ class InvoiceViewSet(ModelViewSet):
     pagination_class = StandardResultsSetPagination
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ['number', 'distributor__name']
-    filterset_fields = ['distributor', 'bookkeeping']
+    filterset_fields = {'distributor': ['in', 'exact'],
+                        'bookkeeping': ['exact'],
+                        'is_income': ['exact'],
+                        'paid': ['exact'],
+                        'paid_date': ['in', 'exact', 'gte', 'lte'],
+                        'invoice_date': ['in', 'exact', 'gte', 'lte'],
+                        'due_date': ['in', 'exact', 'gte', 'lte']}
     queryset = Invoice.objects.all()
 
     def get_serializer_class(self):
@@ -53,8 +59,8 @@ class PaymentConfirmationViewSet(ModelViewSet):
     """
     pagination_class = StandardResultsSetPagination
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
-    search_fields = ['invoice', 'payment_date']
-    filterset_fields = ['payment_date', 'note']
+    search_fields = ['payment_date', 'note']
+    filterset_fields = ['invoice', 'payment_date', 'payment_method']
     queryset = PaymentConfirmation.objects.all()
 
     def get_serializer_class(self):
