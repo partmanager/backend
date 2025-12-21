@@ -54,8 +54,8 @@ class PaymentConfirmation(models.Model):
             'payment_date': self.payment_date.isoformat(),
             'value': self.value.to_dict(),
             'method': self.get_payment_method_display(),
-            'from_bank_account': self.from_bank_account.number,
-            'to_bank_account': self.to_bank_account.number,
+            'from_bank_account': self.from_bank_account.number if self.from_bank_account else None,
+            'to_bank_account': self.to_bank_account.number if self.to_bank_account else None,
             'note': self.note
         }
         if self.confirmation_file:
@@ -132,8 +132,9 @@ class Invoice(models.Model):
                       'is_income': self.is_income,
                       'bookkeeping': self.bookkeeping,
                       'invoice_date': self.invoice_date.isoformat(),
-                      'due_date': self.due_date.isoformat(),
+                      'due_date': self.due_date.isoformat() if self.due_date else None,
                       'paid': self.paid,
+                      'paid_date': self.paid_date.isoformat() if self.paid_date else None,
                       'note': self.note,
                       'file': None,
                       'items': [],
