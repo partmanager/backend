@@ -1,6 +1,8 @@
 import decimal
 import logging
 
+from django.conf import settings
+
 from invoices.models import Invoice, InvoiceItem
 from distributors.models import Distributor, DistributorOrderNumber
 from django.db import IntegrityError
@@ -22,15 +24,19 @@ class InvoiceImporterBase:
             self.update_or_create_invoice_item(distributor, item['invoice_model'], item)
 
     def create_invoice(self, distributor, invoice_dict, files_dir):
-        invoice = Invoice(distributor=distributor,
-                          number=invoice_dict['invoice_number'],
-                          is_income=invoice_dict['is_income'],
-                          bookkeeping=invoice_dict['bookkeeping'],
-                          invoice_date=invoice_dict['invoice_date'],
-                          due_date=invoice_dict['due_date'],
-                          paid=invoice_dict['paid'],
-                          paid_date=invoice_dict['paid_date'],
-                          note=invoice_dict['note'])
+        invoice = Invoice(
+            distributor=distributor,
+            number=invoice_dict['invoice_number'],
+            is_income=invoice_dict['is_income'] if 'is_income' in invoice_dict else False,
+            bookkeeping=invoice_dict['bookkeeping'],
+            invoice_date=invoice_dict['invoice_date'],
+            due_date=invoice_dict['due_date'] if 'due_date' in invoice_dict else None,
+            currency=invoice_dict['currency'] if 'currency' in invoice_dict else settings.LOCAL_CURRENCY,
+            price_exchange_rate=decimal.Decimal(invoice_dict['price_exchange_rate']) if 'price_exchange_rate' in invoice_dict else 1,
+            paid=invoice_dict['paid'] if 'paid' in invoice_dict else False,
+            paid_date=invoice_dict['paid_date'] if 'paid_date' in invoice_dict else None,
+            note=invoice_dict['note'] if 'note' in invoice_dict else None
+        )
         if not self.dry:
             invoice.save()
             logger.info('New invoice was created: %s', invoice.number)
@@ -74,8 +80,9 @@ class InvoiceImporterBase:
                 #         invoice_item.save()
                 # except IntegrityError as e:
                 #     logger.error(e)
-            for payment_confirmation_dict in invoice_dict['payment_confirmations']:
-                create_payment_confirmation(db_invoice, payment_confirmation_dict, files_dir.joinpath('confirmations'))
+            if 'payment_confirmations' in invoice_dict:
+                for payment_confirmation_dict in invoice_dict['payment_confirmations']:
+                    create_payment_confirmation(db_invoice, payment_confirmation_dict, files_dir.joinpath('confirmations'))
             db_invoice.save()
         else:
             logger.error(f"Unable to find distributor: {invoice_dict['distributor']}, Skipping")
@@ -120,6 +127,7 @@ class InvoiceImporterBase:
             invoice=invoice_model,
             position_in_invoice=int(position['position']),
             defaults={
+                "description": position['description'] if 'description' in position else None,
                 "order_number": position['order_number'] if 'order_number' in position else None,
                 "distributor_order_number": distributor_order_number,
                 "ordered_quantity": position['ordered_quantity'],
@@ -130,6 +138,7 @@ class InvoiceImporterBase:
                 "price_vat_tax": tax,
                 "price_currency": Currency[position['price']['currency_display']],
                 "bookkeeping": position['bookkeeping'] if 'bookkeeping' in position else 'p',
+                "serial_number": position['serial_number'] if 'serial_number' in position else None,
                 "LOT": position['LOT'] if 'LOT' in position else None,
                 "ECCN": position['ECCN'] if 'ECCN' in position else None,
                 "COO": position['COO'] if 'COO' in position else None,

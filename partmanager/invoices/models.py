@@ -73,6 +73,8 @@ class Invoice(models.Model):
     distributor = models.ForeignKey('distributors.Distributor', on_delete=models.PROTECT)
     invoice_file = models.FileField(upload_to='invoices', null=True, blank=True)
     price = NetGrossPrice()  # calculated field
+    currency = models.IntegerField(choices=Currency.choices, default=settings.LOCAL_CURRENCY)
+    price_exchange_rate = models.DecimalField(max_digits=8, decimal_places=4, null=True, blank=True)
     local_price = NetGrossPrice()  # calculated field, Price converted to local currency
     bank_account = models.ForeignKey('BankAccount', on_delete=models.PROTECT, null=True)
     payment_expected_title = models.CharField(max_length=250, null=True, blank=True)
@@ -133,6 +135,8 @@ class Invoice(models.Model):
                       'bookkeeping': self.bookkeeping,
                       'invoice_date': self.invoice_date.isoformat(),
                       'due_date': self.due_date.isoformat() if self.due_date else None,
+                      'currency': self.currency,
+                      'price_exchange_rate': self.price_exchange_rate,
                       'paid': self.paid,
                       'paid_date': self.paid_date.isoformat() if self.paid_date else None,
                       'note': self.note,
@@ -183,8 +187,8 @@ class Invoice(models.Model):
 class InvoiceItem(models.Model):
     invoice = models.ForeignKey('Invoice', on_delete=models.CASCADE)
     position_in_invoice = models.IntegerField()
+    description = models.TextField(null=True, blank=True)
     order_number = models.CharField(max_length=250, null=True, blank=True)
-    type = models.IntegerField(choices=MerchandiseType.choices, default=MerchandiseType.PART)
     distributor_order_number = models.ForeignKey('distributors.DistributorOrderNumber', on_delete=models.PROTECT)
     ordered_quantity = models.IntegerField(null=True, blank=True)
     shipped_quantity = models.IntegerField(null=True, blank=True)
@@ -193,8 +197,9 @@ class InvoiceItem(models.Model):
     price = PriceWithTax()  # price in invoice currency
     local_price = PriceWithTax()  # calculated field, price converted to local currency
     unit_price = Price()  # calculated field, price converted to local currency
-    tax_rate = models.IntegerField(null=True, blank=True)
+    type = models.IntegerField(choices=MerchandiseType.choices, default=MerchandiseType.PART)
     bookkeeping = models.CharField(max_length=1, choices=BOOKKEEPING_TYPE, default='p')
+    serial_number = models.CharField(max_length=250, null=True, blank=True)
     LOT = models.CharField(max_length=20, null=True, blank=True, verbose_name="Lot number")
     ECCN = models.CharField(max_length=20, null=True, blank=True, verbose_name="Export Control Classification Number")
     COO = models.CharField(max_length=20, null=True, blank=True, verbose_name="Country of origin")
@@ -207,12 +212,13 @@ class InvoiceItem(models.Model):
         ordering = ['invoice', 'position_in_invoice']
 
     def save(self, *args, **kwargs):
+        self.price.calculate_gross()
         if self.price.currency == settings.LOCAL_CURRENCY:
             self.local_price = self.price
         else:
-            convertion_ratio = 4
-            self.local_price.net = self.price.net / convertion_ratio
-            self.local_price.gross = self.price.gross / convertion_ratio
+            convertion_ratio = self.invoice.price_exchange_rate
+            self.local_price.net = self.price.net * convertion_ratio
+            self.local_price.gross = self.price.gross * convertion_ratio
             self.local_price.currency = settings.LOCAL_CURRENCY
 
         self.unit_price.currency = self.local_price.currency
@@ -249,12 +255,14 @@ class InvoiceItem(models.Model):
     def to_dict(self):
         dictionary = {'order_number': self.order_number,
                       'position': self.position_in_invoice,
+                      'description': self.description,
                       'ordered_quantity': self.ordered_quantity,
                       'shipped_quantity': self.shipped_quantity,
                       'quantity_unit': self.quantity_unit,
                       'distributor_number': self.distributor_order_number.don,
                       'price': self.price.to_dict(),
                       'bookkeeping': self.bookkeeping,
+                      'serial_number': self.serial_number,
                       'LOT': self.LOT,
                       'ECCN': self.ECCN,
                       'COO': self.COO,

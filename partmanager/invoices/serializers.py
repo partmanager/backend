@@ -52,6 +52,8 @@ class InvoiceSerializer(serializers.ModelSerializer):
                   'due_date',
                   'distributor',
                   'invoice_file',
+                  'currency',
+                  'price_exchange_rate'
                   'item_count',
                   'price',
                   'local_price',
@@ -76,14 +78,18 @@ class InvoiceSerializer(serializers.ModelSerializer):
 class InvoiceCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Invoice
-        fields = ['number',
-                  'is_income',
-                  'invoice_date',
-                  'due_date',
-                  'paid',
-                  'note',
-                  'distributor',
-                  'invoice_file']
+        fields = [
+            'number',
+            'is_income',
+            'invoice_date',
+            'due_date',
+            'paid',
+            'note',
+            'distributor',
+            'invoice_file',
+            'currency',
+            'price_exchange_rate'
+        ]
 
 
 class InvoiceItemSerializer(serializers.ModelSerializer):
@@ -105,8 +111,9 @@ class InvoiceItemDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = InvoiceItem
         fields = ['id', 'invoice', 'unit_price', 'extended_price', 'order_number', 'type',
-                  'position_in_invoice', 'ordered_quantity', 'shipped_quantity',
-                  'delivered_quantity', 'quantity_unit', 'tax_rate', 'bookkeeping', 'LOT', 'ECCN', 'COO', 'TARIC',
+                  'position_in_invoice', 'description', 'ordered_quantity', 'shipped_quantity',
+                  'delivered_quantity', 'quantity_unit', 'tax_rate', 'bookkeeping',
+                  'serial_number', 'LOT', 'ECCN', 'COO', 'TARIC',
                   'distributor_order_number']
         extra_kwargs = {
             'id': {'read_only': True},
@@ -137,6 +144,7 @@ class InvoiceItemDetailWithStorageSerializer(serializers.ModelSerializer):
                   'type',
                   'type_display',
                   'position_in_invoice',
+                  'description',
                   'tax_rate',
                   'bookkeeping',
                   'invoice',
@@ -146,6 +154,7 @@ class InvoiceItemDetailWithStorageSerializer(serializers.ModelSerializer):
                   'local_price',
                   'stock_data',
                   'distributor_order_number',
+                  'serial_number',
                   'LOT',
                   'ECCN',
                   'COO',
