@@ -53,7 +53,7 @@ class PaymentConfirmation(models.Model):
             'file': None,
             'payment_date': self.payment_date.isoformat(),
             'value': self.value.to_dict(),
-            'method': self.get_payment_method_display(),
+            'method': self.payment_method.label,
             'from_bank_account': self.from_bank_account.number if self.from_bank_account else None,
             'to_bank_account': self.to_bank_account.number if self.to_bank_account else None,
             'note': self.note

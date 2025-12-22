@@ -6,6 +6,7 @@ from distributors.models import Distributor, DistributorOrderNumber
 from django.db import IntegrityError
 from django.core.files import File
 from partmanager.choices import Currency
+from .payment_confirmation_importer import create_payment_confirmation
 
 logger = logging.getLogger('invoices')
 
@@ -21,9 +22,15 @@ class InvoiceImporterBase:
             self.update_or_create_invoice_item(distributor, item['invoice_model'], item)
 
     def create_invoice(self, distributor, invoice_dict, files_dir):
-        invoice = Invoice(number=invoice_dict['invoice_number'],
-                          distributor=distributor,
-                          invoice_date=invoice_dict['invoice_date'])
+        invoice = Invoice(distributor=distributor,
+                          number=invoice_dict['invoice_number'],
+                          is_income=invoice_dict['is_income'],
+                          bookkeeping=invoice_dict['bookkeeping'],
+                          invoice_date=invoice_dict['invoice_date'],
+                          due_date=invoice_dict['due_date'],
+                          paid=invoice_dict['paid'],
+                          paid_date=invoice_dict['paid_date'],
+                          note=invoice_dict['note'])
         if not self.dry:
             invoice.save()
             logger.info('New invoice was created: %s', invoice.number)
@@ -67,6 +74,8 @@ class InvoiceImporterBase:
                 #         invoice_item.save()
                 # except IntegrityError as e:
                 #     logger.error(e)
+            for payment_confirmation_dict in invoice_dict['payment_confirmations']:
+                create_payment_confirmation(db_invoice, payment_confirmation_dict, files_dir.joinpath('confirmations'))
             db_invoice.save()
         else:
             logger.error(f"Unable to find distributor: {invoice_dict['distributor']}, Skipping")
@@ -115,9 +124,15 @@ class InvoiceImporterBase:
                 "distributor_order_number": distributor_order_number,
                 "ordered_quantity": position['ordered_quantity'],
                 "shipped_quantity": position['shipped_quantity'],
+                "quantity_unit": position['quantity_unit'],
                 "price_net": net_price,
                 "price_gross": gross_price,
                 "price_vat_tax": tax,
-                "price_currency": Currency[position['price']['currency_display']]
+                "price_currency": Currency[position['price']['currency_display']],
+                "bookkeeping": position['bookkeeping'] if 'bookkeeping' in position else 'p',
+                "LOT": position['LOT'] if 'LOT' in position else None,
+                "ECCN": position['ECCN'] if 'ECCN' in position else None,
+                "COO": position['COO'] if 'COO' in position else None,
+                "TARIC": position['TARIC'] if 'TARIC' in position else None
             })
         return invoice_item, created
