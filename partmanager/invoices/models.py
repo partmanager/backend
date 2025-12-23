@@ -173,9 +173,30 @@ class Invoice(models.Model):
                 self.local_price.gross = self.price.net * self.price_exchange_rate
                 self.local_price.currency = settings.LOCAL_CURRENCY
 
+    def validate(self):
+        if self.pk is not None and len(self.invoiceitem_set.all()):
+            # check if sum of item prices is equal to invoice amount
+            price_net = decimal.Decimal(0)
+            price_gross = decimal.Decimal(0)
+            status_message = ""
+            for item in self.invoiceitem_set.all():
+                if item.price.currency != self.price.currency:
+                    status_message += f"ERROR: Incorrect currency on item {item.position_in_invoice}.\n\r"
+                if item.price.net is not None:
+                    price_net += item.price.net
+                if item.price.gross is not None:
+                    price_gross += item.price.gross
+            price_gross = price_gross.quantize(decimal.Decimal("1.00"))
+
+            if price_net != self.price.net:
+                status_message += f"ERROR: Sum of invoice items net prices is not equal to invoice net amount, calculated: {price_net}.\n\r"
+            if price_gross != self.price.gross:
+                status_message += f"ERROR: Sum of invoice items gross prices is not equal to invoice gross amount, calculated: {price_gross}.\n\r"
+            self.status_message = status_message
 
     def save(self, *args, **kwargs):
         self.update_calculated_fields()
+        self.validate()
         super(Invoice, self).save(*args, **kwargs)
 
 
