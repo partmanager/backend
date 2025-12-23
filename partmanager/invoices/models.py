@@ -187,7 +187,7 @@ class InvoiceItem(models.Model):
     unit_price = Price()  # calculated field, price converted to local currency
     type = models.IntegerField(choices=MerchandiseType.choices, default=MerchandiseType.PART)
     bookkeeping = models.CharField(max_length=1, choices=BOOKKEEPING_TYPE, default='p')
-    serial_number = models.CharField(max_length=250, null=True, blank=True)
+    serial_number = models.CharField(max_length=250, null=True, blank=True, verbose_name="Serial number")
     LOT = models.CharField(max_length=20, null=True, blank=True, verbose_name="Lot number")
     ECCN = models.CharField(max_length=20, null=True, blank=True, verbose_name="Export Control Classification Number")
     COO = models.CharField(max_length=20, null=True, blank=True, verbose_name="Country of origin")

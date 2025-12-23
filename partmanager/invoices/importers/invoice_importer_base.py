@@ -36,6 +36,15 @@ class InvoiceImporterBase:
             paid_date=invoice_dict['paid_date'] if 'paid_date' in invoice_dict else None,
             note=invoice_dict['note'] if 'note' in invoice_dict else None
         )
+        if 'price' in invoice_dict:
+            invoice.price.net = invoice_dict['price']['net']
+            invoice.price.gross = invoice_dict['price']['gross']
+            invoice.price.currency = invoice_dict['price']['currency']
+        else:
+            invoice.price.net = 0
+            invoice.price.gross = 0
+            invoice.price.currency = settings.LOCAL_CURRENCY
+
         if not self.dry:
             invoice.save()
             logger.info('New invoice was created: %s', invoice.number)
