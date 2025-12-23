@@ -52,8 +52,7 @@ class InvoiceSerializer(serializers.ModelSerializer):
                   'due_date',
                   'distributor',
                   'invoice_file',
-                  'currency',
-                  'price_exchange_rate'
+                  'price_exchange_rate',
                   'item_count',
                   'price',
                   'local_price',
@@ -87,7 +86,6 @@ class InvoiceCreateSerializer(serializers.ModelSerializer):
             'note',
             'distributor',
             'invoice_file',
-            'currency',
             'price_exchange_rate'
         ]
 
@@ -112,7 +110,7 @@ class InvoiceItemDetailSerializer(serializers.ModelSerializer):
         model = InvoiceItem
         fields = ['id', 'invoice', 'unit_price', 'extended_price', 'order_number', 'type',
                   'position_in_invoice', 'description', 'ordered_quantity', 'shipped_quantity',
-                  'delivered_quantity', 'quantity_unit', 'tax_rate', 'bookkeeping',
+                  'delivered_quantity', 'quantity_unit', 'bookkeeping',
                   'serial_number', 'LOT', 'ECCN', 'COO', 'TARIC',
                   'distributor_order_number']
         extra_kwargs = {
@@ -145,7 +143,6 @@ class InvoiceItemDetailWithStorageSerializer(serializers.ModelSerializer):
                   'type_display',
                   'position_in_invoice',
                   'description',
-                  'tax_rate',
                   'bookkeeping',
                   'invoice',
                   'quantity',

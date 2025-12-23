@@ -31,7 +31,6 @@ class InvoiceImporterBase:
             bookkeeping=invoice_dict['bookkeeping'],
             invoice_date=invoice_dict['invoice_date'],
             due_date=invoice_dict['due_date'] if 'due_date' in invoice_dict else None,
-            currency=invoice_dict['currency'] if 'currency' in invoice_dict else settings.LOCAL_CURRENCY,
             price_exchange_rate=decimal.Decimal(invoice_dict['price_exchange_rate']) if 'price_exchange_rate' in invoice_dict else 1,
             paid=invoice_dict['paid'] if 'paid' in invoice_dict else False,
             paid_date=invoice_dict['paid_date'] if 'paid_date' in invoice_dict else None,

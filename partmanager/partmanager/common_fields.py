@@ -1,3 +1,5 @@
+import decimal
+
 from django.db import models
 from composite_field import CompositeField
 from .choices import Currency
@@ -34,7 +36,7 @@ class PriceWithTax(CompositeField):
 
         def calculate_gross(self):
             if self.net is not None and self.vat_tax is not None:
-                self.tax_amount = self.net * self.vat_tax
+                self.tax_amount = self.net * (self.vat_tax / decimal.Decimal(100))
                 self.gross = self.net + self.tax_amount
 
         def to_dict(self):

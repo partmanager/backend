@@ -53,7 +53,7 @@ class PaymentConfirmation(models.Model):
             'file': None,
             'payment_date': self.payment_date.isoformat(),
             'value': self.value.to_dict(),
-            'method': self.payment_method.label,
+            'method': self.get_payment_method_display(),
             'from_bank_account': self.from_bank_account.number if self.from_bank_account else None,
             'to_bank_account': self.to_bank_account.number if self.to_bank_account else None,
             'note': self.note
@@ -66,23 +66,22 @@ class PaymentConfirmation(models.Model):
 
 class Invoice(models.Model):
     number = models.CharField(max_length=250)
-    is_income = models.BooleanField(default=False)
-    bookkeeping = models.CharField(max_length=1, choices=BOOKKEEPING_TYPE, default='p')  # calculated field
     invoice_date = models.DateField()
     due_date = models.DateField(null=True, blank=True)
+    price = NetGrossPrice()  # total amount in sellers currency, used to determine invoice currency
+    local_price = NetGrossPrice()  # calculated field, Price converted to local currency. Uses price_exchange_rate
+    price_exchange_rate = models.DecimalField(max_digits=8, decimal_places=4, null=True, blank=True)
+    is_income = models.BooleanField(default=False)
     distributor = models.ForeignKey('distributors.Distributor', on_delete=models.PROTECT)
     invoice_file = models.FileField(upload_to='invoices', null=True, blank=True)
-    price = NetGrossPrice()  # calculated field
-    currency = models.IntegerField(choices=Currency.choices, default=settings.LOCAL_CURRENCY)
-    price_exchange_rate = models.DecimalField(max_digits=8, decimal_places=4, null=True, blank=True)
-    local_price = NetGrossPrice()  # calculated field, Price converted to local currency
-    bank_account = models.ForeignKey('BankAccount', on_delete=models.PROTECT, null=True)
     payment_expected_title = models.CharField(max_length=250, null=True, blank=True)
     paid = models.BooleanField(default=False)
     paid_date = models.DateField(null=True, blank=True)
     note = models.TextField(null=True, blank=True)
-    status = models.CharField(max_length=10, null=True, blank=True)
-    status_message = models.TextField(null=True, blank=True)
+
+    bookkeeping = models.CharField(max_length=1, choices=BOOKKEEPING_TYPE, default='p')  # calculated field
+    status = models.CharField(max_length=10, null=True, blank=True) # calculated field, result of automatic audit
+    status_message = models.TextField(null=True, blank=True) # calculated field, result of automatic audit
     # paymentconfirmation_set -> reverse key from PaymentConfirmation class
     # invoiceitem_set -> reverse key from InvoiceItem class
 
@@ -135,8 +134,8 @@ class Invoice(models.Model):
                       'bookkeeping': self.bookkeeping,
                       'invoice_date': self.invoice_date.isoformat(),
                       'due_date': self.due_date.isoformat() if self.due_date else None,
-                      'currency': self.currency,
-                      'price_exchange_rate': self.price_exchange_rate,
+                      'price': self.price.to_dict(),
+                      'price_exchange_rate': str(self.price_exchange_rate),
                       'paid': self.paid,
                       'paid_date': self.paid_date.isoformat() if self.paid_date else None,
                       'note': self.note,
@@ -155,29 +154,18 @@ class Invoice(models.Model):
     def update_calculated_fields(self):
         if self.pk is not None and len(self.invoiceitem_set.all()):
             bookkeeping = 'p'
-            net_price = decimal.Decimal('0')
-            gross_price = decimal.Decimal('0')
-            local_net_price = decimal.Decimal('0')
-            local_gross_price = decimal.Decimal('0')
             for item in self.invoiceitem_set.all():
-                if item.price.net:
-                    net_price += item.price.net
-                if item.local_price.net:
-                    local_net_price += item.local_price.net
-                if item.price.gross:
-                    gross_price += item.price.gross
-                if item.local_price.gross:
-                    local_gross_price += item.local_price.gross
                 if item.bookkeeping != 'p':
                     bookkeeping = 'k'
-
-            self.price.net = net_price
-            self.price.gross = gross_price
-            self.price.currency = self.invoiceitem_set.first().price.currency
-            self.local_price.net = local_net_price
-            self.local_price.gross = local_gross_price
-            self.local_price.currency = self.invoiceitem_set.first().local_price.currency
             self.bookkeeping = bookkeeping
+
+            if self.price.currency == settings.LOCAL_CURRENCY:
+                self.local_price = self.price
+            else:
+                self.local_price.net = self.price.net * self.price_exchange_rate
+                self.local_price.gross = self.price.net * self.price_exchange_rate
+                self.local_price.currency = settings.LOCAL_CURRENCY
+
 
     def save(self, *args, **kwargs):
         self.update_calculated_fields()
