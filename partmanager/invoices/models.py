@@ -64,6 +64,13 @@ class PaymentConfirmation(models.Model):
         return dictionary
 
 
+class InvoiceAttachment(models.Model):
+    invoice = models.ForeignKey('Invoice', on_delete=models.CASCADE)
+    attachment = models.FileField(upload_to='invoices')
+    description = models.CharField(max_length=250)
+    note = models.TextField(null=True, blank=True)
+
+
 class Invoice(models.Model):
     number = models.CharField(max_length=250)
     invoice_date = models.DateField()

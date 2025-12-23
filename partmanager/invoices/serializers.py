@@ -1,6 +1,6 @@
 import decimal
 
-from .models import BankAccount, Invoice, InvoiceItem, PaymentConfirmation
+from .models import BankAccount, Invoice, InvoiceAttachment, InvoiceItem, PaymentConfirmation
 from partmanager.choices import QuantityUnit
 from rest_framework import serializers
 from distributors.serializers import DistributorOrderNumberDetailSerializer, DistributorSerializer, DistributorOrderNumberSerializer
@@ -15,6 +15,12 @@ class BankAccountSerializer(serializers.ModelSerializer):
 class PaymentConfirmationSerializer(serializers.ModelSerializer):
     class Meta:
         model = PaymentConfirmation
+        fields = '__all__'
+
+
+class InvoiceAttachmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InvoiceAttachment
         fields = '__all__'
 
 

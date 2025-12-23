@@ -1,7 +1,7 @@
 import os
 import tempfile
 
-from .models import Invoice, InvoiceItem, PaymentConfirmation
+from .models import Invoice, InvoiceItem, PaymentConfirmation, InvoiceAttachment
 from rest_framework import status
 from rest_framework import filters
 from rest_framework.viewsets import ModelViewSet
@@ -18,7 +18,8 @@ from .serializers import \
     InvoiceItemCreateSerializer, \
     InvoiceItemDetailWithStorageSerializer, \
     InvoiceCreateSerializer, \
-    PaymentConfirmationSerializer
+    PaymentConfirmationSerializer, \
+    InvoiceAttachmentSerializer
 
 from .tasks import update_invoice_item_don_assignments, import_invoice_from_file
 from .filters import InvoiceItemFilter
@@ -67,6 +68,16 @@ class PaymentConfirmationViewSet(ModelViewSet):
         if self.action in ['create', 'update']:
             return PaymentConfirmationSerializer
         return PaymentConfirmationSerializer
+
+class InvoiceAttachmentViewSet(ModelViewSet):
+    serializer_class = InvoiceAttachmentSerializer
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    search_fields = ['description', 'note']
+    filterset_fields = ['invoice', 'description', 'note']
+    queryset = InvoiceAttachment.objects.all()
+
+
 
 
 class InvoiceItemViewSet(ModelViewSet):
