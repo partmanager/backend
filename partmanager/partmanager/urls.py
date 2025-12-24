@@ -27,7 +27,7 @@ from .views import export, ImportView, UpdateGitView, GenerateSymbolsView, Users
 from distributors.views import DistributorViewSet, DistributorOrderNumberViewSet, DistributorManufacturerViewSet, api_stock_and_price
 from inventory.views import InventoryPositionViewSet, StrageLocationFolderViewSet, PartLocationsViewSet
 from inventory.api import StorageLocationWithItemsViewSet
-from invoices.views import InvoiceViewSet, InvoiceImportView, PaymentConfirmationViewSet, InvoiceAttachmentViewSet
+from invoices.views import InvoiceViewSet, InvoiceImportView, PaymentConfirmationViewSet, InvoiceAttachmentViewSet, TagViewSet
 from invoices.views import InvoiceItemViewSet, InvoiceItemWithStorageViewSet
 from manufacturers.views_api import ManufacturerViewSet
 from inventory.api import CategoryViewSet, StorageLocationViewSet, InventoryReservationViewSet
@@ -53,6 +53,7 @@ router.register(r'api/invoice/invoice', InvoiceViewSet, basename='Invoice')
 router.register(r'api/invoice/item', InvoiceItemViewSet, basename='InvoiceItem')
 router.register(r'api/invoice/itemWithStorage', InvoiceItemWithStorageViewSet, basename='InvoiceItemStorage')
 router.register(r'api/invoice/paymentConfirmation', PaymentConfirmationViewSet, basename='PaymentConfirmation')
+router.register(r'api/invoice/tag', TagViewSet, basename='TagViewSet')
 
 router.register(r'api/manufacturer', ManufacturerViewSet, basename='ManufacturerViewSet')
 router.register(r'api/storage_location', StorageLocationViewSet, basename='StorageLocationViewSet')

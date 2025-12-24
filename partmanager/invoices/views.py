@@ -1,7 +1,7 @@
 import os
 import tempfile
 
-from .models import Invoice, InvoiceItem, PaymentConfirmation, InvoiceAttachment
+from .models import Invoice, InvoiceItem, PaymentConfirmation, InvoiceAttachment, Tag
 from rest_framework import status
 from rest_framework import filters
 from rest_framework.viewsets import ModelViewSet
@@ -19,7 +19,8 @@ from .serializers import \
     InvoiceItemDetailWithStorageSerializer, \
     InvoiceCreateSerializer, \
     PaymentConfirmationSerializer, \
-    InvoiceAttachmentSerializer
+    InvoiceAttachmentSerializer, \
+    TagSerializer
 
 from .tasks import update_invoice_item_don_assignments, import_invoice_from_file
 from .filters import InvoiceItemFilter
@@ -69,6 +70,7 @@ class PaymentConfirmationViewSet(ModelViewSet):
             return PaymentConfirmationSerializer
         return PaymentConfirmationSerializer
 
+
 class InvoiceAttachmentViewSet(ModelViewSet):
     serializer_class = InvoiceAttachmentSerializer
     pagination_class = StandardResultsSetPagination
@@ -78,6 +80,13 @@ class InvoiceAttachmentViewSet(ModelViewSet):
     queryset = InvoiceAttachment.objects.all()
 
 
+class TagViewSet(ModelViewSet):
+    serializer_class = TagSerializer
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    search_fields = ['name']
+    filterset_fields = ['name']
+    queryset = Tag.objects.all()
 
 
 class InvoiceItemViewSet(ModelViewSet):

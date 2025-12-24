@@ -1,6 +1,6 @@
 import decimal
 
-from .models import BankAccount, Invoice, InvoiceAttachment, InvoiceItem, PaymentConfirmation, INVOICE_STATUS_CHOICES
+from .models import BankAccount, Invoice, InvoiceAttachment, Tag, InvoiceItem, PaymentConfirmation, INVOICE_STATUS_CHOICES
 from partmanager.choices import QuantityUnit
 from rest_framework import serializers
 from distributors.serializers import DistributorOrderNumberDetailSerializer, DistributorSerializer, DistributorOrderNumberSerializer
@@ -24,6 +24,12 @@ class InvoiceAttachmentSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = '__all__'
+
+
 class InvoiceMinimalSerializer(serializers.ModelSerializer):
     distributor = DistributorSerializer(read_only=True)
 
@@ -35,7 +41,8 @@ class InvoiceMinimalSerializer(serializers.ModelSerializer):
                   'invoice_date',
                   'due_date',
                   'paid',
-                  'distributor'
+                  'distributor',
+                  'tags'
                   ]
         extra_kwargs = {
             'id': {'read_only': True},
@@ -66,6 +73,7 @@ class InvoiceSerializer(serializers.ModelSerializer):
                   'paid',
                   'paid_date',
                   'note',
+                  'tags',
                   'status',
                   'status_message',
                   'paymentconfirmation_set']
@@ -94,6 +102,7 @@ class InvoiceCreateSerializer(serializers.ModelSerializer):
             'price_currency',
             'paid',
             'note',
+            'tags',
             'distributor',
             'invoice_file',
             'price_exchange_rate'

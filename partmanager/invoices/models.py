@@ -77,6 +77,28 @@ class InvoiceAttachment(models.Model):
     description = models.CharField(max_length=250)
     note = models.TextField(null=True, blank=True)
 
+    class Meta:
+        ordering = ['invoice', 'description', 'id']
+
+    def to_dict(self):
+        dictionary = {
+            'invoice': {
+                'number': self.invoice.number,
+                'distributor': self.invoice.distributor.name
+            },
+            'attachment': None,
+            'description': self.description,
+            'note': self.note
+        }
+        if self.attachment:
+            dictionary['attachment'] = {
+                'filename_org': Path(self.attachment.name).name,
+                'filename': Path(self.attachment.path).name
+            }
+        return dictionary
+
+class Tag(models.Model):
+    name = models.CharField(max_length=250, unique=True)
 
 class Invoice(models.Model):
     number = models.CharField(max_length=250)
@@ -92,6 +114,7 @@ class Invoice(models.Model):
     paid = models.BooleanField(default=False)
     paid_date = models.DateField(null=True, blank=True)
     note = models.TextField(null=True, blank=True)
+    tags = models.ManyToManyField('Tag', blank=True)
 
     bookkeeping = models.CharField(max_length=1, choices=BOOKKEEPING_TYPE, default='p')  # calculated field
     status = models.CharField(max_length=10, choices=INVOICE_STATUS_CHOICES, null=True, blank=True) # calculated field, result of automatic audit
