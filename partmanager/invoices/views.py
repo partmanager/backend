@@ -122,11 +122,16 @@ class InvoiceImportView(APIView):
 
         importer = request.data['importer']
         invoice_import_file = request.FILES['file']
-        distributor_name = request.data['distributor']
-        invoice_date = request.data['invoice_date']
-
+        invoice_date = None
+        distributor_name = None
         if importer not in ['Archive importer', 'TME CSV file importer', 'Generic CSV file importer']:
             return Response({'error': 'Incorrect importer'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if importer == 'TME CSV file importer':
+            distributor_name = "TME"
+        elif importer == 'Generic CSV file importer':
+            distributor_name = request.data['distributor']
+            invoice_date = request.data['invoice_date']
 
         fd, tmp_invoice_import_file = tempfile.mkstemp()
         with open(tmp_invoice_import_file, 'wb') as f:

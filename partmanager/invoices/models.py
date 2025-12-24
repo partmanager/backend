@@ -16,6 +16,13 @@ BOOKKEEPING_TYPE = (
     ('p', 'Private use, skip')
 )
 
+INVOICE_STATUS_CHOICES = (
+('a', 'No issues found'),
+('b', 'Items net sum not equal invoice amount'),
+('c', 'Items gross sum not equal to invoice amount'),
+('d', 'Mixed currency in items')
+)
+
 logger = logging.getLogger('invoices')
 
 
@@ -87,7 +94,7 @@ class Invoice(models.Model):
     note = models.TextField(null=True, blank=True)
 
     bookkeeping = models.CharField(max_length=1, choices=BOOKKEEPING_TYPE, default='p')  # calculated field
-    status = models.CharField(max_length=10, null=True, blank=True) # calculated field, result of automatic audit
+    status = models.CharField(max_length=10, choices=INVOICE_STATUS_CHOICES, null=True, blank=True) # calculated field, result of automatic audit
     status_message = models.TextField(null=True, blank=True) # calculated field, result of automatic audit
     # paymentconfirmation_set -> reverse key from PaymentConfirmation class
     # invoiceitem_set -> reverse key from InvoiceItem class
@@ -159,6 +166,13 @@ class Invoice(models.Model):
         return dictionary
 
     def update_calculated_fields(self):
+        if self.price.currency == settings.LOCAL_CURRENCY:
+            self.local_price = self.price
+        else:
+            self.local_price.net = self.price.net * self.price_exchange_rate
+            self.local_price.gross = self.price.net * self.price_exchange_rate
+            self.local_price.currency = settings.LOCAL_CURRENCY
+
         if self.pk is not None and len(self.invoiceitem_set.all()):
             bookkeeping = 'p'
             for item in self.invoiceitem_set.all():
@@ -166,12 +180,7 @@ class Invoice(models.Model):
                     bookkeeping = 'k'
             self.bookkeeping = bookkeeping
 
-            if self.price.currency == settings.LOCAL_CURRENCY:
-                self.local_price = self.price
-            else:
-                self.local_price.net = self.price.net * self.price_exchange_rate
-                self.local_price.gross = self.price.net * self.price_exchange_rate
-                self.local_price.currency = settings.LOCAL_CURRENCY
+
 
     def validate(self):
         if self.pk is not None and len(self.invoiceitem_set.all()):
@@ -179,9 +188,11 @@ class Invoice(models.Model):
             price_net = decimal.Decimal(0)
             price_gross = decimal.Decimal(0)
             status_message = ""
+            status = ""
             for item in self.invoiceitem_set.all():
                 if item.price.currency != self.price.currency:
                     status_message += f"ERROR: Incorrect currency on item {item.position_in_invoice}.\n\r"
+                    status += 'd'
                 if item.price.net is not None:
                     price_net += item.price.net
                 if item.price.gross is not None:
@@ -190,8 +201,11 @@ class Invoice(models.Model):
 
             if price_net != self.price.net:
                 status_message += f"ERROR: Sum of invoice items net prices is not equal to invoice net amount, calculated: {price_net}.\n\r"
+                status += 'b'
             if price_gross != self.price.gross:
                 status_message += f"ERROR: Sum of invoice items gross prices is not equal to invoice gross amount, calculated: {price_gross}.\n\r"
+                status += 'c'
+            self.status = status
             self.status_message = status_message
 
     def save(self, *args, **kwargs):

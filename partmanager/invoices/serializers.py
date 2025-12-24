@@ -1,6 +1,6 @@
 import decimal
 
-from .models import BankAccount, Invoice, InvoiceAttachment, InvoiceItem, PaymentConfirmation
+from .models import BankAccount, Invoice, InvoiceAttachment, InvoiceItem, PaymentConfirmation, INVOICE_STATUS_CHOICES
 from partmanager.choices import QuantityUnit
 from rest_framework import serializers
 from distributors.serializers import DistributorOrderNumberDetailSerializer, DistributorSerializer, DistributorOrderNumberSerializer
@@ -46,6 +46,7 @@ class InvoiceSerializer(serializers.ModelSerializer):
     distributor = DistributorSerializer(read_only=True)
     price = serializers.SerializerMethodField()
     local_price = serializers.SerializerMethodField()
+    status = serializers.MultipleChoiceField(choices=INVOICE_STATUS_CHOICES)
 
     class Meta:
         model = Invoice
