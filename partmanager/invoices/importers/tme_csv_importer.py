@@ -2,7 +2,13 @@ import csv
 from decimal import Decimal
 from .invoice_importer_base import InvoiceImporterBase
 from distributors.models import Distributor
+from partmanager.choices import  QuantityUnit
 
+quantity_map = {
+    'SZT': QuantityUnit.PCS,
+    'M': QuantityUnit.M,
+    'KG': QuantityUnit.KG
+}
 
 class TMECSVImporter(InvoiceImporterBase):
     distributor = None
@@ -42,12 +48,13 @@ class TMECSVImporter(InvoiceImporterBase):
             if 'Numer faktury' in row:
                 invoice_item_dict = {'order_number': row['Numer zamówienia'],
                                      'position': row["Numer pozycji"],
+                                     'description': row["Skrócony opis produktu"],
                                      'distributor_number': row['Symbol TME'],
                                      'ordered_quantity': ordered_quantity,
                                      'shipped_quantity': ordered_quantity,
-                                     "unit": row["Jednostka"],
+                                     "quantity_unit": quantity_map[row["Jednostka"]],
                                      'price': {'net': net_price,
-                                               'vat_tax': '23',
+                                               'vat_tax': 23,
                                                'currency_display': row['Waluta']},
                                      'invoice_model': invoice_model}
             elif 'Invoice number' in row:
@@ -56,9 +63,9 @@ class TMECSVImporter(InvoiceImporterBase):
                                      'distributor_number': row['TME Symbol'],
                                      'ordered_quantity': ordered_quantity,
                                      'shipped_quantity': ordered_quantity,
-                                     "unit": row["Unit"],
+                                     "quantity_unit": row["Unit"],
                                      'price': {'net': net_price,
-                                               'vat_tax': '23',
+                                               'vat_tax': 23,
                                                'currency_display': row['Currency']},
                                      'invoice_model': invoice_model}
             else:

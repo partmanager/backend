@@ -28,7 +28,6 @@ class InvoiceImporterBase:
             distributor=distributor,
             number=invoice_dict['invoice_number'],
             is_income=invoice_dict['is_income'] if 'is_income' in invoice_dict else False,
-            bookkeeping=invoice_dict['bookkeeping'],
             invoice_date=invoice_dict['invoice_date'],
             due_date=invoice_dict['due_date'] if 'due_date' in invoice_dict else None,
             price_exchange_rate=decimal.Decimal(invoice_dict['price_exchange_rate']) if 'price_exchange_rate' in invoice_dict else 1,
@@ -36,6 +35,8 @@ class InvoiceImporterBase:
             paid_date=invoice_dict['paid_date'] if 'paid_date' in invoice_dict else None,
             note=invoice_dict['note'] if 'note' in invoice_dict else None
         )
+        if 'bookkeeping' in invoice_dict:
+            invoice.bookkeeping=invoice_dict['bookkeeping']
         if 'price' in invoice_dict:
             invoice.price.net = invoice_dict['price']['net']
             invoice.price.gross = invoice_dict['price']['gross']
