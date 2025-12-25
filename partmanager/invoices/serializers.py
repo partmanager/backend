@@ -54,6 +54,7 @@ class InvoiceSerializer(serializers.ModelSerializer):
     price = serializers.SerializerMethodField()
     local_price = serializers.SerializerMethodField()
     status = serializers.MultipleChoiceField(choices=INVOICE_STATUS_CHOICES)
+    tags = TagSerializer(read_only=True, many=True)
 
     class Meta:
         model = Invoice
@@ -90,6 +91,8 @@ class InvoiceSerializer(serializers.ModelSerializer):
 
 
 class InvoiceCreateSerializer(serializers.ModelSerializer):
+    tags = serializers.PrimaryKeyRelatedField(many=True, queryset=Tag.objects.all())
+
     class Meta:
         model = Invoice
         fields = [
