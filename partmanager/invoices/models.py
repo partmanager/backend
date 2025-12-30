@@ -97,18 +97,25 @@ class InvoiceAttachment(models.Model):
             }
         return dictionary
 
+
 class Tag(models.Model):
     name = models.CharField(max_length=250, unique=True)
 
+    class Meta:
+        ordering = ['name']
+
+    def to_dict(self):
+        return {'name': self.name}
+
+
 class Invoice(models.Model):
+    distributor = models.ForeignKey('distributors.Distributor', on_delete=models.PROTECT)
     number = models.CharField(max_length=250)
     invoice_date = models.DateField()
     due_date = models.DateField(null=True, blank=True)
     price = NetGrossPrice()  # total amount in sellers currency, used to determine invoice currency
-    local_price = NetGrossPrice()  # calculated field, Price converted to local currency. Uses price_exchange_rate
     price_exchange_rate = models.DecimalField(max_digits=8, decimal_places=4, null=True, blank=True)
     is_income = models.BooleanField(default=False)
-    distributor = models.ForeignKey('distributors.Distributor', on_delete=models.PROTECT)
     invoice_file = models.FileField(upload_to='invoices', null=True, blank=True)
     payment_expected_title = models.CharField(max_length=250, null=True, blank=True)
     paid = models.BooleanField(default=False)
@@ -116,10 +123,12 @@ class Invoice(models.Model):
     note = models.TextField(null=True, blank=True)
     tags = models.ManyToManyField('Tag', blank=True)
 
+    local_price = NetGrossPrice()  # calculated field, Price converted to local currency. Uses price_exchange_rate
     bookkeeping = models.CharField(max_length=1, choices=BOOKKEEPING_TYPE, default='p')  # calculated field
     status = models.CharField(max_length=10, choices=INVOICE_STATUS_CHOICES, null=True, blank=True) # calculated field, result of automatic audit
     status_message = models.TextField(null=True, blank=True) # calculated field, result of automatic audit
     # paymentconfirmation_set -> reverse key from PaymentConfirmation class
+    # invoiceattachment_set -> reverse key from InvoiceAttachment class
     # invoiceitem_set -> reverse key from InvoiceItem class
 
     class Meta:
@@ -167,18 +176,24 @@ class Invoice(models.Model):
     def to_dict(self):
         dictionary = {'distributor': self.distributor.name,
                       'invoice_number': self.number,
-                      'is_income': self.is_income,
-                      'bookkeeping': self.bookkeeping,
                       'invoice_date': self.invoice_date.isoformat(),
                       'due_date': self.due_date.isoformat() if self.due_date else None,
+                      'is_income': self.is_income,
                       'price': self.price.to_dict(),
                       'price_exchange_rate': str(self.price_exchange_rate),
+                      'payment_expected_title': self.payment_expected_title,
                       'paid': self.paid,
                       'paid_date': self.paid_date.isoformat() if self.paid_date else None,
                       'note': self.note,
+                      'tags': [],
                       'file': None,
                       'items': [],
-                      'payment_confirmations': []}
+                      'payment_confirmations': [],
+                      'attachments': []
+        }
+
+        for tag in self.tags.all():
+            dictionary['tags'].append(tag.to_dict())
         if self.invoice_file:
             dictionary['file'] = {'filename_org': Path(self.invoice_file.name).name,
                                   'filename': Path(self.invoice_file.path).name}
@@ -186,6 +201,8 @@ class Invoice(models.Model):
             dictionary['items'].append(invoice_item.to_dict())
         for payment_confirmation in self.paymentconfirmation_set.all():
             dictionary['payment_confirmations'].append(payment_confirmation.to_dict())
+        for attachment in self.invoiceattachment_set.all():
+            dictionary['attachments'].append(attachment.to_dict())
         return dictionary
 
     def update_calculated_fields(self):
@@ -202,8 +219,6 @@ class Invoice(models.Model):
                 if item.bookkeeping != 'p':
                     bookkeeping = 'k'
             self.bookkeeping = bookkeeping
-
-
 
     def validate(self):
         if self.pk is not None and len(self.invoiceitem_set.all()):

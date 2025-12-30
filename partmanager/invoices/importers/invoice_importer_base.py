@@ -3,11 +3,12 @@ import logging
 
 from django.conf import settings
 
-from invoices.models import Invoice, InvoiceItem
+from invoices.models import Invoice, InvoiceAttachment, InvoiceItem, Tag
 from distributors.models import Distributor, DistributorOrderNumber
 from django.db import IntegrityError
 from django.core.files import File
 from partmanager.choices import Currency
+from .invoice_attachment_importer import get_or_create_invoice_attachment
 from .payment_confirmation_importer import create_payment_confirmation
 
 logger = logging.getLogger('invoices')
@@ -23,20 +24,26 @@ class InvoiceImporterBase:
         for item in invoice_items:
             self.update_or_create_invoice_item(distributor, item['invoice_model'], item)
 
+    def tag_invoice(self, invoice, invoice_dict):
+        for tag_name in invoice_dict['tags']:
+            tag, created = Tag.objects.get_or_create(name=tag_name)
+            invoice.tags.add(tag)
+
     def create_invoice(self, distributor, invoice_dict, files_dir):
         invoice = Invoice(
             distributor=distributor,
             number=invoice_dict['invoice_number'],
-            is_income=invoice_dict['is_income'] if 'is_income' in invoice_dict else False,
             invoice_date=invoice_dict['invoice_date'],
             due_date=invoice_dict['due_date'] if 'due_date' in invoice_dict else None,
             price_exchange_rate=decimal.Decimal(invoice_dict['price_exchange_rate']) if 'price_exchange_rate' in invoice_dict else 1,
+            is_income=invoice_dict['is_income'] if 'is_income' in invoice_dict else False,
+            payment_expected_title=invoice_dict['payment_expected_title'] if 'payment_expected_title' in invoice_dict else None,
             paid=invoice_dict['paid'] if 'paid' in invoice_dict else False,
             paid_date=invoice_dict['paid_date'] if 'paid_date' in invoice_dict else None,
             note=invoice_dict['note'] if 'note' in invoice_dict else None
         )
-        if 'bookkeeping' in invoice_dict:
-            invoice.bookkeeping=invoice_dict['bookkeeping']
+        self.tag_invoice(invoice, invoice_dict)
+
         if 'price' in invoice_dict:
             invoice.price.net = invoice_dict['price']['net']
             invoice.price.gross = invoice_dict['price']['gross']
@@ -53,6 +60,7 @@ class InvoiceImporterBase:
                 f = open(files_dir.joinpath(invoice_dict['file']['filename']), mode='rb')
                 django_file = File(f)
                 invoice.invoice_file.save(invoice_dict['file']['filename'], django_file)
+            invoice.save()
         return invoice
 
     def get_or_create_invoice(self, distributor, invoice_dict, files_dir):
@@ -92,6 +100,13 @@ class InvoiceImporterBase:
             if 'payment_confirmations' in invoice_dict:
                 for payment_confirmation_dict in invoice_dict['payment_confirmations']:
                     create_payment_confirmation(db_invoice, payment_confirmation_dict, files_dir.joinpath('confirmations'))
+            if 'attachments' in invoice_dict:
+                for attachment_dict in invoice_dict['attachments']:
+                    get_or_create_invoice_attachment(
+                        db_invoice,
+                        attachment_dict,
+                        files_dir.joinpath('attachments')
+                    )
             db_invoice.save()
         else:
             logger.error(f"Unable to find distributor: {invoice_dict['distributor']}, Skipping")

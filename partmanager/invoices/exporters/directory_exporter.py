@@ -18,6 +18,11 @@ def copy_payment_confirmation_files(invoice, destination):
         if payment_confirmation.confirmation_file:
             shutil.copy(payment_confirmation.confirmation_file.path, destination)
 
+def copy_attachments_files(invoice, destination):
+    for attachment in invoice.invoiceattachment_set.all():
+        if attachment.attachment:
+            shutil.copy(attachment.attachment.path, destination)
+
 
 def export(invoices, workdir=None):
     if workdir is None:
@@ -25,9 +30,11 @@ def export(invoices, workdir=None):
     os.makedirs(workdir)
     os.makedirs(workdir + '/files')
     os.makedirs(workdir + '/files/confirmations')
+    os.makedirs(workdir + '/files/attachments')
     for invoice in invoices:
         filename = "{}_{}.json".format(invoice.distributor.name, invoice.number.replace('/', '_'))
         create_invoice_file(invoice, workdir + '/' + filename)
         copy_invoice_files(invoice, workdir + '/files')
+        copy_attachments_files(invoice, workdir + '/files/attachments')
         copy_payment_confirmation_files(invoice, workdir + '/files/confirmations')
     return workdir
