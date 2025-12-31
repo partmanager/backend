@@ -25,8 +25,8 @@ class InvoiceImporterBase:
             self.update_or_create_invoice_item(distributor, item['invoice_model'], item)
 
     def tag_invoice(self, invoice, invoice_dict):
-        for tag_name in invoice_dict['tags']:
-            tag, created = Tag.objects.get_or_create(name=tag_name)
+        for tag_dict in invoice_dict['tags']:
+            tag, created = Tag.objects.get_or_create(name=tag_dict['name'])
             invoice.tags.add(tag)
 
     def create_invoice(self, distributor, invoice_dict, files_dir):
@@ -42,11 +42,10 @@ class InvoiceImporterBase:
             paid_date=invoice_dict['paid_date'] if 'paid_date' in invoice_dict else None,
             note=invoice_dict['note'] if 'note' in invoice_dict else None
         )
-        self.tag_invoice(invoice, invoice_dict)
 
         if 'price' in invoice_dict:
-            invoice.price.net = invoice_dict['price']['net']
-            invoice.price.gross = invoice_dict['price']['gross']
+            invoice.price.net = decimal.Decimal(invoice_dict['price']['net'])
+            invoice.price.gross = decimal.Decimal(invoice_dict['price']['gross'])
             invoice.price.currency = invoice_dict['price']['currency']
         else:
             invoice.price.net = 0
@@ -56,6 +55,7 @@ class InvoiceImporterBase:
         if not self.dry:
             invoice.save()
             logger.info('New invoice was created: %s', invoice.number)
+            self.tag_invoice(invoice, invoice_dict)
             if 'file' in invoice_dict and invoice_dict['file']:
                 f = open(files_dir.joinpath(invoice_dict['file']['filename']), mode='rb')
                 django_file = File(f)

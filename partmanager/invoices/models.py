@@ -210,7 +210,7 @@ class Invoice(models.Model):
             self.local_price = self.price
         else:
             self.local_price.net = self.price.net * self.price_exchange_rate
-            self.local_price.gross = self.price.net * self.price_exchange_rate
+            self.local_price.gross = self.price.gross * self.price_exchange_rate
             self.local_price.currency = settings.LOCAL_CURRENCY
 
         if self.pk is not None and len(self.invoiceitem_set.all()):
