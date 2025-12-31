@@ -1,11 +1,15 @@
 import decimal
 import logging
 
-from invoices.models import Invoice, InvoiceItem
+from django.conf import settings
+
+from invoices.models import Invoice, InvoiceAttachment, InvoiceItem, Tag
 from distributors.models import Distributor, DistributorOrderNumber
 from django.db import IntegrityError
 from django.core.files import File
 from partmanager.choices import Currency
+from .invoice_attachment_importer import get_or_create_invoice_attachment
+from .payment_confirmation_importer import create_payment_confirmation
 
 logger = logging.getLogger('invoices')
 
@@ -20,17 +24,43 @@ class InvoiceImporterBase:
         for item in invoice_items:
             self.update_or_create_invoice_item(distributor, item['invoice_model'], item)
 
+    def tag_invoice(self, invoice, invoice_dict):
+        for tag_dict in invoice_dict['tags']:
+            tag, created = Tag.objects.get_or_create(name=tag_dict['name'])
+            invoice.tags.add(tag)
+
     def create_invoice(self, distributor, invoice_dict, files_dir):
-        invoice = Invoice(number=invoice_dict['invoice_number'],
-                          distributor=distributor,
-                          invoice_date=invoice_dict['invoice_date'])
+        invoice = Invoice(
+            distributor=distributor,
+            number=invoice_dict['invoice_number'],
+            invoice_date=invoice_dict['invoice_date'],
+            due_date=invoice_dict['due_date'] if 'due_date' in invoice_dict else None,
+            price_exchange_rate=decimal.Decimal(invoice_dict['price_exchange_rate']) if 'price_exchange_rate' in invoice_dict else 1,
+            is_income=invoice_dict['is_income'] if 'is_income' in invoice_dict else False,
+            payment_expected_title=invoice_dict['payment_expected_title'] if 'payment_expected_title' in invoice_dict else None,
+            paid=invoice_dict['paid'] if 'paid' in invoice_dict else False,
+            paid_date=invoice_dict['paid_date'] if 'paid_date' in invoice_dict else None,
+            note=invoice_dict['note'] if 'note' in invoice_dict else None
+        )
+
+        if 'price' in invoice_dict:
+            invoice.price.net = decimal.Decimal(invoice_dict['price']['net'])
+            invoice.price.gross = decimal.Decimal(invoice_dict['price']['gross'])
+            invoice.price.currency = invoice_dict['price']['currency']
+        else:
+            invoice.price.net = 0
+            invoice.price.gross = 0
+            invoice.price.currency = settings.LOCAL_CURRENCY
+
         if not self.dry:
             invoice.save()
             logger.info('New invoice was created: %s', invoice.number)
+            self.tag_invoice(invoice, invoice_dict)
             if 'file' in invoice_dict and invoice_dict['file']:
                 f = open(files_dir.joinpath(invoice_dict['file']['filename']), mode='rb')
                 django_file = File(f)
                 invoice.invoice_file.save(invoice_dict['file']['filename'], django_file)
+            invoice.save()
         return invoice
 
     def get_or_create_invoice(self, distributor, invoice_dict, files_dir):
@@ -67,6 +97,16 @@ class InvoiceImporterBase:
                 #         invoice_item.save()
                 # except IntegrityError as e:
                 #     logger.error(e)
+            if 'payment_confirmations' in invoice_dict:
+                for payment_confirmation_dict in invoice_dict['payment_confirmations']:
+                    create_payment_confirmation(db_invoice, payment_confirmation_dict, files_dir.joinpath('confirmations'))
+            if 'attachments' in invoice_dict:
+                for attachment_dict in invoice_dict['attachments']:
+                    get_or_create_invoice_attachment(
+                        db_invoice,
+                        attachment_dict,
+                        files_dir.joinpath('attachments')
+                    )
             db_invoice.save()
         else:
             logger.error(f"Unable to find distributor: {invoice_dict['distributor']}, Skipping")
@@ -111,13 +151,21 @@ class InvoiceImporterBase:
             invoice=invoice_model,
             position_in_invoice=int(position['position']),
             defaults={
+                "description": position['description'] if 'description' in position else None,
                 "order_number": position['order_number'] if 'order_number' in position else None,
                 "distributor_order_number": distributor_order_number,
                 "ordered_quantity": position['ordered_quantity'],
                 "shipped_quantity": position['shipped_quantity'],
+                "quantity_unit": position['quantity_unit'],
                 "price_net": net_price,
                 "price_gross": gross_price,
                 "price_vat_tax": tax,
-                "price_currency": Currency[position['price']['currency_display']]
+                "price_currency": Currency[position['price']['currency_display']],
+                "bookkeeping": position['bookkeeping'] if 'bookkeeping' in position else 'p',
+                "serial_number": position['serial_number'] if 'serial_number' in position else None,
+                "LOT": position['LOT'] if 'LOT' in position else None,
+                "ECCN": position['ECCN'] if 'ECCN' in position else None,
+                "COO": position['COO'] if 'COO' in position else None,
+                "TARIC": position['TARIC'] if 'TARIC' in position else None
             })
         return invoice_item, created

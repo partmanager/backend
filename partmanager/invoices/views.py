@@ -1,7 +1,7 @@
 import os
 import tempfile
 
-from .models import Invoice, InvoiceItem
+from .models import Invoice, InvoiceItem, PaymentConfirmation, InvoiceAttachment, Tag
 from rest_framework import status
 from rest_framework import filters
 from rest_framework.viewsets import ModelViewSet
@@ -11,7 +11,17 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .serializers import InvoiceSerializer, InvoiceItemSerializer, InvoiceItemDetailSerializer, InvoiceItemCreateSerializer, InvoiceItemDetailWithStorageSerializer, InvoiceCreateSerializer
+from .serializers import \
+    InvoiceSerializer, \
+    InvoiceItemSerializer, \
+    InvoiceItemDetailSerializer, \
+    InvoiceItemCreateSerializer, \
+    InvoiceItemDetailWithStorageSerializer, \
+    InvoiceCreateSerializer, \
+    PaymentConfirmationSerializer, \
+    InvoiceAttachmentSerializer, \
+    TagSerializer
+
 from .tasks import update_invoice_item_don_assignments, import_invoice_from_file
 from .filters import InvoiceItemFilter
 
@@ -30,13 +40,53 @@ class InvoiceViewSet(ModelViewSet):
     pagination_class = StandardResultsSetPagination
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ['number', 'distributor__name']
-    filterset_fields = ['distributor', 'bookkeeping']
+    filterset_fields = {'distributor': ['in', 'exact'],
+                        'bookkeeping': ['exact'],
+                        'is_income': ['exact'],
+                        'paid': ['exact'],
+                        'paid_date': ['in', 'exact', 'gte', 'lte'],
+                        'invoice_date': ['in', 'exact', 'gte', 'lte'],
+                        'due_date': ['in', 'exact', 'gte', 'lte']}
     queryset = Invoice.objects.all()
 
     def get_serializer_class(self):
         if self.action in ['create', 'update']:
             return InvoiceCreateSerializer
         return InvoiceSerializer
+
+
+class PaymentConfirmationViewSet(ModelViewSet):
+    """
+    Used by frontend to display payment confirmation
+    """
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    search_fields = ['payment_date', 'note']
+    filterset_fields = ['invoice', 'payment_date', 'payment_method']
+    queryset = PaymentConfirmation.objects.all()
+
+    def get_serializer_class(self):
+        if self.action in ['create', 'update']:
+            return PaymentConfirmationSerializer
+        return PaymentConfirmationSerializer
+
+
+class InvoiceAttachmentViewSet(ModelViewSet):
+    serializer_class = InvoiceAttachmentSerializer
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    search_fields = ['description', 'note']
+    filterset_fields = ['invoice', 'description', 'note']
+    queryset = InvoiceAttachment.objects.all()
+
+
+class TagViewSet(ModelViewSet):
+    serializer_class = TagSerializer
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    search_fields = ['name']
+    filterset_fields = ['name']
+    queryset = Tag.objects.all()
 
 
 class InvoiceItemViewSet(ModelViewSet):
@@ -81,11 +131,16 @@ class InvoiceImportView(APIView):
 
         importer = request.data['importer']
         invoice_import_file = request.FILES['file']
-        distributor_name = request.data['distributor']
-        invoice_date = request.data['invoice_date']
-
+        invoice_date = None
+        distributor_name = None
         if importer not in ['Archive importer', 'TME CSV file importer', 'Generic CSV file importer']:
             return Response({'error': 'Incorrect importer'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if importer == 'TME CSV file importer':
+            distributor_name = "TME"
+        elif importer == 'Generic CSV file importer':
+            distributor_name = request.data['distributor']
+            invoice_date = request.data['invoice_date']
 
         fd, tmp_invoice_import_file = tempfile.mkstemp()
         with open(tmp_invoice_import_file, 'wb') as f:

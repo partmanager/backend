@@ -1,9 +1,33 @@
 import decimal
 
-from .models import Invoice, InvoiceItem
+from .models import BankAccount, Invoice, InvoiceAttachment, Tag, InvoiceItem, PaymentConfirmation, INVOICE_STATUS_CHOICES
 from partmanager.choices import QuantityUnit
 from rest_framework import serializers
 from distributors.serializers import DistributorOrderNumberDetailSerializer, DistributorSerializer, DistributorOrderNumberSerializer
+
+
+class BankAccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BankAccount
+        fields = '__all__'
+
+
+class PaymentConfirmationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentConfirmation
+        fields = '__all__'
+
+
+class InvoiceAttachmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InvoiceAttachment
+        fields = '__all__'
+
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = '__all__'
 
 
 class InvoiceMinimalSerializer(serializers.ModelSerializer):
@@ -13,8 +37,12 @@ class InvoiceMinimalSerializer(serializers.ModelSerializer):
         model = Invoice
         fields = ['id',
                   'number',
+                  'is_income',
                   'invoice_date',
-                  'distributor'
+                  'due_date',
+                  'paid',
+                  'distributor',
+                  'tags'
                   ]
         extra_kwargs = {
             'id': {'read_only': True},
@@ -25,20 +53,31 @@ class InvoiceSerializer(serializers.ModelSerializer):
     distributor = DistributorSerializer(read_only=True)
     price = serializers.SerializerMethodField()
     local_price = serializers.SerializerMethodField()
+    status = serializers.MultipleChoiceField(choices=INVOICE_STATUS_CHOICES)
+    tags = TagSerializer(read_only=True, many=True)
 
     class Meta:
         model = Invoice
         fields = ['id',
                   'number',
+                  'is_income',
+                  'distributor',
                   'bookkeeping',
                   'invoice_date',
+                  'due_date',
                   'distributor',
                   'invoice_file',
-                  'payment_confirmation_file',
+                  'price_exchange_rate',
                   'item_count',
-                  'all_items_mapped',
                   'price',
-                  'local_price']
+                  'local_price',
+                  'paid',
+                  'paid_date',
+                  'note',
+                  'tags',
+                  'status',
+                  'status_message',
+                  'paymentconfirmation_set']
         extra_kwargs = {
             'id': {'read_only': True},
             'bookkeeping': {'read_only': True}
@@ -52,13 +91,25 @@ class InvoiceSerializer(serializers.ModelSerializer):
 
 
 class InvoiceCreateSerializer(serializers.ModelSerializer):
+    tags = serializers.PrimaryKeyRelatedField(many=True, queryset=Tag.objects.all())
+
     class Meta:
         model = Invoice
-        fields = ['number',
-                  'invoice_date',
-                  'distributor',
-                  'invoice_file',
-                  'payment_confirmation_file']
+        fields = [
+            'number',
+            'is_income',
+            'invoice_date',
+            'due_date',
+            'price_net',
+            'price_gross',
+            'price_currency',
+            'paid',
+            'note',
+            'tags',
+            'distributor',
+            'invoice_file',
+            'price_exchange_rate'
+        ]
 
 
 class InvoiceItemSerializer(serializers.ModelSerializer):
@@ -80,8 +131,9 @@ class InvoiceItemDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = InvoiceItem
         fields = ['id', 'invoice', 'unit_price', 'extended_price', 'order_number', 'type',
-                  'position_in_invoice', 'ordered_quantity', 'shipped_quantity',
-                  'delivered_quantity', 'quantity_unit', 'bookkeeping', 'LOT', 'ECCN', 'COO', 'TARIC',
+                  'position_in_invoice', 'description', 'ordered_quantity', 'shipped_quantity',
+                  'delivered_quantity', 'quantity_unit', 'bookkeeping',
+                  'serial_number', 'LOT', 'ECCN', 'COO', 'TARIC',
                   'distributor_order_number']
         extra_kwargs = {
             'id': {'read_only': True},
@@ -104,7 +156,6 @@ class InvoiceItemDetailWithStorageSerializer(serializers.ModelSerializer):
     local_price = serializers.SerializerMethodField()
     quantity = serializers.SerializerMethodField()
     type_display = serializers.SerializerMethodField()
-    bookkeeping_display = serializers.SerializerMethodField()
 
     class Meta:
         model = InvoiceItem
@@ -113,8 +164,8 @@ class InvoiceItemDetailWithStorageSerializer(serializers.ModelSerializer):
                   'type',
                   'type_display',
                   'position_in_invoice',
+                  'description',
                   'bookkeeping',
-                  'bookkeeping_display',
                   'invoice',
                   'quantity',
                   'unit_price',
@@ -122,14 +173,11 @@ class InvoiceItemDetailWithStorageSerializer(serializers.ModelSerializer):
                   'local_price',
                   'stock_data',
                   'distributor_order_number',
+                  'serial_number',
                   'LOT',
                   'ECCN',
                   'COO',
                   'TARIC']
-        # extra_kwargs = {
-        #     'id': {'read_only': True},
-        #     'invoice': {'read_only': True}
-        # }
 
     def get_unit_price(self, obj):
         return obj.unit_price.to_dict()
@@ -149,9 +197,6 @@ class InvoiceItemDetailWithStorageSerializer(serializers.ModelSerializer):
 
     def get_type_display(self, obj):
         return obj.get_type_display()
-
-    def get_bookkeeping_display(self, obj):
-        return obj.get_bookkeeping_display()
 
     def get_stock_data(self, obj):
         response = {'storage_location': [],
@@ -175,20 +220,3 @@ class InvoiceItemCreateSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'id': {'read_only': True}
         }
-
-
-class InvoiceWithItemsSerializer(serializers.ModelSerializer):
-    invoiceitem_set = InvoiceItemDetailSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Invoice
-        fields = ['id',
-                  'number',
-                  'bookkeeping',
-                  'invoice_date',
-                  'distributor',
-                  'invoice_file',
-                  'item_count',
-                  'all_items_mapped',
-                  'price_net',
-                  'invoiceitem_set']

@@ -19,13 +19,20 @@ class StandardResultsSetPagination(PageNumberPagination):
 
 
 class DistributorViewSet(ModelViewSet):
-    serializer_class = DistributorSerializer
     queryset = Distributor.objects.all()
+    serializer_class = DistributorSerializer
+    pagination_class = StandardResultsSetPagination
+    search_fields = ['name']
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = {
+        'name': ['in', 'exact']
+    }
 
-    def get_serializer_class(self):
-        if self.action == 'retrieve':
-            return DistributorDetailSerializer
-        return DistributorSerializer
+    # def get_serializer_class(self):
+    #     if self.action == 'retrieve':in
+
+    #         return DistributorDetailSerializer
+    #     return DistributorSerializer
 
 
 class DistributorOrderNumberViewSet(ModelViewSet):
