@@ -25,9 +25,10 @@ class InvoiceImporterBase:
             self.update_or_create_invoice_item(distributor, item['invoice_model'], item)
 
     def tag_invoice(self, invoice, invoice_dict):
-        for tag_dict in invoice_dict['tags']:
-            tag, created = Tag.objects.get_or_create(name=tag_dict['name'])
-            invoice.tags.add(tag)
+        if 'tags' in invoice_dict:
+            for tag_dict in invoice_dict['tags']:
+                tag, created = Tag.objects.get_or_create(name=tag_dict['name'])
+                invoice.tags.add(tag)
 
     def create_invoice(self, distributor, invoice_dict, files_dir):
         invoice = Invoice(
