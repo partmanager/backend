@@ -1,5 +1,7 @@
-from .part import Part
 from django.db import models
+
+from .part import Part
+from .choices import PART_TYPE
 from .fields.max_power import MaxPower
 from .fields.resistance import Resistance
 from .fields.temperature_coefficient import TemperatureCoefficient
@@ -7,7 +9,7 @@ from .fields.max_voltage import MaxVoltage
 
 
 class Resistor(Part):
-    part_type_subset = list(dict(dict(Part.PART_TYPE)['Resistors']).keys())
+    part_type_subset = list(dict(dict(PART_TYPE)['Resistors']).keys())
     resistance = Resistance()
     power = MaxPower()
     power_derating_temp = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
@@ -42,12 +44,12 @@ class Resistor(Part):
     class Meta:
         ordering = ['resistance_typ', 'resistance_tolerance_type', 'resistance_relative_tolerance', 'power_max']
 
+    def process_generic(self):
+        if self.generic:
+            if self.filters:
+                pass
+            else:
+                pass
+
     def __str__(self):
         return '{} {}'.format(self.manufacturer.name, self.manufacturer_part_number)
-
-    # def to_view_ajax_response(self):
-    #     ajax = Part.to_view_ajax_response(self)
-    #     ajax[0]["resistance"] = self.resistance.get_resistance_display()
-    #     ajax[0]["tolerance"] = self.resistance.get_tolerance_display()
-    #     ajax[0]["power"] = str(self.power)
-    #     return ajax

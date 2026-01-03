@@ -109,10 +109,10 @@
         },
         "orderNumbers": {
             "TESTBRIDGERECTIFIERA": {
-                "Packaging Code": "13",
-                "Packaging Type": "Embossed Tape / Reel",
-                "Packaging Qty": 5000,
-                "Packaging Data": {}
+                "Code": "13",
+                "Type": "Embossed Tape / Reel",
+                "Qty": 5000,
+                "PackagingData": {}
             }
         }
     }

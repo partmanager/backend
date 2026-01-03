@@ -54,10 +54,10 @@
         },
         "orderNumbers": {
             "TESTBALUNA": {
-                "Packaging Code": "A",
-                "Packaging Type": "Embossed Tape / Reel",
-                "Packaging Qty": 1000,
-                "Packaging Data": {
+                "Code": "A",
+                "Type": "Embossed Tape / Reel",
+                "Qty": 1000,
+                "PackagingData": {
                     "reel": {
                         "Diameter": "7\u201d"
                     },

@@ -16,7 +16,7 @@
         "storageConditions": {
             "temperature": "-55\u00b0C ~ 125\u00b0C",
             "humidity": "",
-            "MSLevel": "Level 1"
+            "MSLevel": "MSL-1 UNLIM"
         },
         "parameters": {
             "Supply Voltage": {
@@ -78,10 +78,10 @@
         },
         "orderNumbers": {
             "ASE-8.000MHZ-E-T": {
-                "Packaging Code": "T",
-                "Packaging Type": "Embossed Tape / Reel",
-                "Packaging Qty": "1000",
-                "Packaging Data": {
+                "Code": "T",
+                "Type": "Embossed Tape / Reel",
+                "Qty": 1000,
+                "PackagingData": {
                     "reel": {
                         "Diameter": "178mm \u00b11mm"
                     },

@@ -57,10 +57,10 @@
         },
         "orderNumbers": {
             "TESTRESISTORARRAYA": {
-                "Packaging Code": "A",
-                "Packaging Type": "Paper Tape / Reel",
-                "Packaging Qty": 15000,
-                "Packaging Data": {
+                "Code": "A",
+                "Type": "Paper Tape / Reel",
+                "Qty": 15000,
+                "PackagingData": {
                     "reel": {
                         "Diameter": "178.5mm",
                         "Width": "12.5mm"

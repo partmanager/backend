@@ -69,7 +69,7 @@ class Distributor(models.Model):
                                 manufacturer = get_manufacturer_by_name(
                                     self.convert_manufacturer_name(component['Manufacturer']))
                                 mon = ManufacturerOrderNumber.objects.filter(
-                                    manufacturer_order_number=component['Manufacturer Part Number'],
+                                    MON=component['Manufacturer Part Number'],
                                     manufacturer=manufacturer)
                                 don = DistributorOrderNumber(distributor=self,
                                                              don=distributor_order_number,
@@ -229,7 +229,7 @@ class DistributorOrderNumber(models.Model):
                 self.distributor.convert_manufacturer_name(self.manufacturer_name))
             order_number = self.mon if self.mon else self.don
             mon = ManufacturerOrderNumber.objects.filter(
-                manufacturer_order_number__iexact=order_number, manufacturer=manufacturer)
+                MON__iexact=order_number, manufacturer=manufacturer)
             print("Trying to assign part to DON:", self.don, "MON:",
                   self.mon, "Found Manufacturer:", manufacturer, "Found MON:", mon)
             if len(mon) == 1:
@@ -239,7 +239,7 @@ class DistributorOrderNumber(models.Model):
                 print("Distributor order number, found more than one MON:", mon)
 
     def __str__(self):
-        part_or_service = self.manufacturer_order_number.manufacturer_order_number if self.manufacturer_order_number else "" #self.service.name if self.service else ''
+        part_or_service = self.manufacturer_order_number.MON if self.MON else "" #self.service.name if self.service else ''
         return "{}, {}, {} -> {}{}".format(self.distributor.name, self.manufacturer_name,
                                            self.don, self.mon, " --> " + part_or_service)
 

@@ -58,4 +58,4 @@ admin.site.register(TransistorMosfet)
 
 @admin.register(Capacitor)
 class CapacitorAdmin(admin.ModelAdmin):
-    list_display = ('manufacturer_part_number', 'capacitance', 'voltage', 'manufacturer')
+    list_display = ('MPN', 'capacitance', 'voltage', 'manufacturer')

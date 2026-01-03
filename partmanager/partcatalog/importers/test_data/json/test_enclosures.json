@@ -48,10 +48,10 @@
         },
         "orderNumbers": {
             "TESTENCLOSUREA": {
-                "Packaging Code": "A",
-                "Packaging Type": "",
-                "Packaging Qty": "1",
-                "Packaging Data": {}
+                "Code": "A",
+                "Type": "",
+                "Qty": 1,
+                "PackagingData": {}
             }
         }
     }

@@ -47,10 +47,10 @@
         },
         "orderNumbers": {
             "TESTESDSUPPRESSORA": {
-                "Packaging Code": "A",
-                "Packaging Type": "",
-                "Packaging Qty": "",
-                "Packaging Data": {}
+                "Code": "A",
+                "Type": "",
+                "Qty": "",
+                "PackagingData": {}
             }
         }
     }

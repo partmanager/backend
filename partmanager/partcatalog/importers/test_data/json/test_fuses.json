@@ -37,10 +37,10 @@
         },
         "orderNumbers": {
             "TESTFUSEA": {
-                "Packaging Code": "A",
-                "Packaging Type": "Paper Tape / Reel",
-                "Packaging Qty": "",
-                "Packaging Data": {
+                "Code": "A",
+                "Type": "Paper Tape / Reel",
+                "Qty": "",
+                "PackagingData": {
                     "tape": {
                         "Pin 1 Quadrant": "Q1",
                         "W": "8mm"

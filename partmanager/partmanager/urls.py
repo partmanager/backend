@@ -35,7 +35,8 @@ from projects.views_api import AssemblyViewSet, AssemblyJobViewSet, BOMViewSet, 
     ProjectVersionViewSet, BOMImportView, GenerateAssemblyViewSet, AssemblyItemViewSet, ReworkViewSet, CloseReworkViewSet
 
 from packages.views import PackagePolimorphicViewSet
-from partcatalog.views import ManufacturerOrderNumberViewSet, PartPolimorphicViewSet, GenericPartViewSet, TaskViewSet
+from partcatalog.views import ManufacturerOrderNumberViewSet, PartPolimorphicViewSet, TaskViewSet, TestPartImportViewSet #GenericPartViewSet,
+from partcatalog.views_part import ResistorViewSet
 
 
 router = DefaultRouter()
@@ -75,8 +76,11 @@ router.register(r'api/packages', PackagePolimorphicViewSet, basename='PackagePol
 
 router.register(r'api/part/mon', ManufacturerOrderNumberViewSet, basename='ManufacturerOrderNumberViewSet')
 
-router.register(r'api/part-poli', PartPolimorphicViewSet, basename='PartPolimorphicViewSet')
-router.register(r'api/part-generic', GenericPartViewSet, basename='GenericPartViewSet')
+router.register(r'api/part/poly', PartPolimorphicViewSet, basename='PartPolymorphicViewSet')
+#router.register(r'api/part/generic', GenericPartViewSet, basename='GenericPartViewSet')
+
+router.register(r'api/part/resistors', ResistorViewSet, basename='ResistorViewSet')
+
 
 
 urlpatterns = [
@@ -90,6 +94,7 @@ urlpatterns = [
     path('invoices/', include('invoices.urls')),
     path('api/invoiceImport', InvoiceImportView.as_view()),
     path('api/part-tasks', TaskViewSet.as_view()),
+    path('api/part-import-testdata', TestPartImportViewSet.as_view()),
 
     path('parts/', include('partcatalog.urls')),
     path('api/assembly-job-generate/<int:pk>/', GenerateAssemblyViewSet.as_view()),

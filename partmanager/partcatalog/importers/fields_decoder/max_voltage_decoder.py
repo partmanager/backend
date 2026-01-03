@@ -6,11 +6,13 @@ from .si_unit_decoder import temperature_decode as __si_temperature_decode
 
 def max_voltage_decoder(json_data):
     value = parameter_str_to_dict(json_data['value'], __voltage_decode)
+    voltage = MaxVoltage()
     if value:
         assert value['min'] is None and value['typ'] is None, value
-        voltage = MaxVoltage()
         voltage.max = value['max']
-        return voltage
+    else:
+        voltage.max = None
+    return voltage
 
 
 def max_voltage_at_temp_decoder(json_data):

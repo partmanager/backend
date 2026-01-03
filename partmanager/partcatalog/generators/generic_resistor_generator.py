@@ -1,4 +1,4 @@
-from ..models.generic_part import GenericPart
+#from ..models.generic_part import GenericPart
 from ..models.to_string_conversions import decimal_resistance_to_str
 from manufacturers.models import get_manufacturer_by_name
 from decimal import Decimal

@@ -1,7 +1,6 @@
 from rest_framework.views import APIView
 
 from .models.part import Part
-from .models.generic_part import GenericPart
 
 from .models.manufacturer_order_number import ManufacturerOrderNumber
 from django.http import JsonResponse
@@ -9,36 +8,30 @@ from django.core.paginator import Paginator
 
 from rest_framework import filters
 from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .serializers import ManufacturerOrderNumberSerializer, GenericPartSerializer
+from .serializers import ManufacturerOrderNumberSerializer
 from .part_serializers import PartPolymorphicSerializer
 
 from .tasks import generate_generic_parts
+from common.pagination import StandardResultsSetPagination
+from .importers.testpart_database_importer import import_test_parts
 
-menu = {"Passives": {"Balun": "/parts/balun", "Resistors": "/parts/0", "Capacitors": "/parts/1", "Inductors": "/parts/2", "Ferrite Bead": "/parts/8"},
-        "Diodes": {"Small signal": "/parts/3", "LED": "/parts/4", "Bridge Rectifiers": "/parts/17"},
-        "TVS": "/parts/5",
-        "Cristal": "/parts/9",
-        "Transistor Bipolar": "/parts/6",
-        "Integrated Circuits": "/parts/7",
-        "Connectors": {"Connector": "/parts/10"},
-        "Modules": "/parts/11",
-        "Enclosures": "/parts/12",
-        "Battery": "/parts/16",
-        "Battery Holders": "/parts/13",
-        "Switch": '/parts/14'
-        }
-
-
-class StandardResultsSetPagination(PageNumberPagination):
-    page_size = 15
-    page_query_param = 'pageNumber'
-    page_size_query_param = 'pageSize'
-    max_page_size = 1000
+# menu = {"Passives": {"Balun": "/parts/balun", "Resistors": "/parts/0", "Capacitors": "/parts/1", "Inductors": "/parts/2", "Ferrite Bead": "/parts/8"},
+#         "Diodes": {"Small signal": "/parts/3", "LED": "/parts/4", "Bridge Rectifiers": "/parts/17"},
+#         "TVS": "/parts/5",
+#         "Cristal": "/parts/9",
+#         "Transistor Bipolar": "/parts/6",
+#         "Integrated Circuits": "/parts/7",
+#         "Connectors": {"Connector": "/parts/10"},
+#         "Modules": "/parts/11",
+#         "Enclosures": "/parts/12",
+#         "Battery": "/parts/16",
+#         "Battery Holders": "/parts/13",
+#         "Switch": '/parts/14'
+#         }
 
 
 class ManufacturerOrderNumberViewSet(ModelViewSet):
@@ -90,17 +83,13 @@ class PartPolimorphicViewSet(ModelViewSet):
     queryset = Part.objects.all()
     serializer_class = PartPolymorphicSerializer
     pagination_class = StandardResultsSetPagination
-    search_fields = ['manufacturer_part_number', 'manufacturer_order_number_set__manufacturer_order_number']
+    search_fields = ['MPN', 'manufacturer_order_number_set__MON']
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = {
         'part_type': ["in", "exact"],
-        'manufacturer': ["exact"]
+        'manufacturer': ["exact"],
+        'generic': ["exact"]
     }
-
-class GenericPartViewSet(ModelViewSet):
-    queryset = GenericPart.objects.all()
-    serializer_class = GenericPartSerializer
-    pagination_class = StandardResultsSetPagination
 
 
 class TaskViewSet(APIView):
@@ -108,6 +97,11 @@ class TaskViewSet(APIView):
         generate_generic_parts()
         return Response()
 
+
+class TestPartImportViewSet(APIView):
+    def post(self, request):
+        import_test_parts('partcatalog/importers')
+        return Response()
 
 
 def api_get_part_list(request):

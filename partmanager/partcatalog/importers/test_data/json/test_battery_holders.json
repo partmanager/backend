@@ -33,8 +33,8 @@
         },
         "orderNumbers": {
             "TESTBATTERYHOLDERA": {
-                "Packaging Code": "A",
-                "Packaging Data": {}
+                "Code": "A",
+                "PackagingData": {}
             }
         }
     }

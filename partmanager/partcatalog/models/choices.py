@@ -58,6 +58,31 @@ class MSLevel(models.IntegerChoices):
             raise ValueError(f"Invalid MSL level: {type_str}")
 
 
+class ProductionStatus(models.IntegerChoices):
+    UNKNOWN = 0
+    PREVIEW = 1
+    IN_PRODUCTION = 2
+    NRD = 22 # Not Recommended for New Design
+    LTB = 3 # Last Time Buy
+    OBSOLETE = 4
+
+
+    @staticmethod
+    def from_string(type_str):
+        values = {
+            'Unknown': 0,
+            'Preview': 1,
+            'Production': 2,
+            'NRD': 3,
+            'LTB': 4,
+            'Obsolete': 5
+        }
+        if type_str in values:
+            return values[type_str]
+        else:
+            raise ValueError(f"Invalid Production status: {type_str}")
+
+
 class ToleranceType(models.IntegerChoices):
     RELATIVE = 1
     ABSOLUTE = 2
@@ -67,3 +92,90 @@ class ToleranceType(models.IntegerChoices):
     def from_string(type_str):
         values = {'relative': 1, 'absolute': 2, 'ppm': 3}
         return values[type_str]
+
+
+PART_TYPE = [
+        ('Resistors', (
+            ('GR', 'Generic Resistor'),
+            ('R', 'Resistor'),
+            ('RA', 'Resistor Array'),
+            ('RCF', 'Resistor Carbon Film'),
+            ('RTK', 'Resistor Thick Film'),
+            ('RTN', 'Resistor Thin Film'),
+            ('RMF', 'Resistor Metal Film'))
+        ),
+        ('Capacitors', (
+            ('C', 'Capacitor'),
+            ('CC', 'Ceramic Capacitor'),
+            ('MCC', 'Multi Layer Ceramic Capacitor'),
+            ('CE', 'Electrolitic Capacitor'),
+            ('CP', 'Polymer Capacitor'),
+            ('CT', 'Tantalum Capacitor'))
+        ),
+        ('I', 'Inductor'),
+        ('FB', 'Ferrite Bead'),
+        ('CMC', 'Common Mode Choke'),
+        ('BAL', 'Balun'),
+        ('Diodes', (
+            ('BRG', 'Bridge Rectifier'),
+            ('D', 'Small Signal Diode'),
+            ('DS', 'Schottky Diode'),
+            ('DLE', 'LED'),
+            ('DZ', 'Zener Diode'))
+         ),
+        ('TVS', 'Transient Voltage Suppressor'),
+        ('ESD', 'ESD Suppressor'),
+        ('SAR', 'Surge Arrester'),
+        ('Transistors', (
+            ('T', 'Transistor'),
+            ('TBN', 'Transistor NPN'),
+            ('MON', 'Transistor MOS N'),
+            ('MOP', 'Transistor MOS P'),
+            ('TBP', 'Transistor PNP'))
+        ),
+        ('COS', 'Crystal'),
+        ('CRO', 'Crystal Oscillator'),
+        ('F', 'Fuse'),
+        ('Integrated Circuits', (
+            ('IC', 'Integrated Circuit'),
+            ('ICL', 'IC Level translator'),
+            ('ICC', 'IC Current Sense'),
+            ('ICO', 'IC Comparator'),
+            ('IMC', 'IC MCU'),
+            ('IDA', 'IC DAC'),
+            ('IAD', 'IC ADC'),
+            ('ICN', 'IC Sensor'),
+            ('ICS', 'IC Load Switch'),
+            ('ICV', 'Integrated Circuit Voltage Regulator'),
+            ('ICR', 'Integrated Circuit Voltage Reference'),
+            ('IRF', 'Integrated Circuit RF Amplifier'),
+            ('IRS', 'Integrated Circuit RF Synthesizer'))
+        ),
+        ('Connectors', (
+            ('CON', 'Connector'),
+            ('COB', 'Connector Bus'),
+            ('COT', "Connector Terminal Block"),
+            ('COF', "Connector FFC/FPC"),
+            ('CO5', "Connector microSD Card"),
+            ('COI', 'Connector IDC'),
+            ('COA', 'Connector Accessory'))
+        ),
+        ('DIS', 'LCD Display'),
+        ('LDI', 'LED Display'),
+        ('LOI', 'OLED Display'),
+        ('LPI', 'Lightpipe'),
+        ('B', 'Battery'),
+        ('Materials', (
+            ('MSW', 'Solder Wire'),
+            ('MSP', 'Solder Paste'))
+         ),
+        ('Mechanical', (
+            ('BH', 'Battery Holder'),
+            ('E', 'Enclosure'),
+            ('EA', 'Enclosure Accessory'))
+        ),
+        ('M', 'Module'),
+        ('S', 'Switch'),
+        ('VAR', 'Varistor'),
+        ('PCB', 'PCB')
+    ]

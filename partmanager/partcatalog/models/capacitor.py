@@ -1,4 +1,5 @@
 from .part import Part
+from .choices import PART_TYPE
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from .fields.capacitance import Capacitance
@@ -60,7 +61,7 @@ class Capacitor(Part):
             values = {'Relative': '%', 'Absolute': 'pF'}
             return values[tolerance_str]
 
-    part_type_subset = list(dict(dict(Part.PART_TYPE)['Capacitors']).keys())
+    part_type_subset = list(dict(dict(PART_TYPE)['Capacitors']).keys())
     capacitance = Capacitance()
     voltage = MaxVoltageAtTemp()
     endurance = models.IntegerField(null=True, blank=True)  # for electrolytic capacitor

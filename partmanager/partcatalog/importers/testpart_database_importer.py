@@ -1,9 +1,9 @@
 from pathlib import Path
-from .csv_to_json import CSVToJson
 from .json_importer import json_importer
 
 
 def import_test_parts(path, dry=False):
+    print('Importing test_parts...')
     json_importer.parts_import(path + '/test_data/json/test_balun.json')
     json_importer.run(dry=dry)
 

@@ -57,10 +57,10 @@
         },
         "orderNumbers": {
             "TESTLEDA": {
-                "Packaging Code": "A",
-                "Packaging Type": "Paper Tape / Reel",
-                "Packaging Qty": 10000,
-                "Packaging Data": {
+                "Code": "A",
+                "Type": "Paper Tape / Reel",
+                "Qty": 10000,
+                "PackagingData": {
                     "reel": {
                         "Diameter": "7\"",
                         "Width": "11.5mm \u00b11.0mm"

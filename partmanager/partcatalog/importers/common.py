@@ -128,12 +128,12 @@ def str_to_voltage(voltage_str):
 
 
 def add_manufacturer_order_number(manufacturer, part, dictionary):
-    mon = ManufacturerOrderNumber.objects.all().filter(manufacturer_order_number=dictionary['Order Number'],
+    mon = ManufacturerOrderNumber.objects.all().filter(MON=dictionary['Order Number'],
                                                        manufacturer=manufacturer)
     if len(mon) == 0:
         print('Adding MON for part', part.manufacturer_part_number)
         packaging = decode_tape_reel_packaging(dictionary)
-        order_number = ManufacturerOrderNumber(manufacturer_order_number=dictionary['Order Number'],
+        order_number = ManufacturerOrderNumber(MON=dictionary['Order Number'],
                                                manufacturer=manufacturer,
                                                **packaging,
                                                part=part)

@@ -1,13 +1,11 @@
 import decimal
 from django.db import models
 from django.core.exceptions import FieldDoesNotExist  # NOQA
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
+from .choices import ProductionStatus, PART_TYPE
 from .files import File
 from .fields.operating_conditions import OperatingConditions
 from .fields.storage_conditions import StorageConditions
 from .to_string_conversions import decimal_ppm_to_str, decimal_celsius_to_str
-from symbolandfootprint.models import Footprint
 from polymorphic.models import PolymorphicModel
 from django.contrib.postgres.fields import ArrayField
 
@@ -37,14 +35,6 @@ def decimal_current_to_str(current):
     elif current >= decimal.Decimal('0.000000001'):
         return str(current * 1000000000).rstrip('0').rstrip('.') + 'nA'
 
-
-def decimal_to_str(value):
-    value_str = str(value)
-    if '.' in value_str:
-        value_str = value_str.rstrip('0').rstrip('.')
-    return value_str
-
-
 def decimal_resistance_to_str(frequency):
     if frequency >= 1000000:
         return str(frequency / 1000000).rstrip('0').rstrip('.') + 'M\u2126'
@@ -61,125 +51,43 @@ def decimal_resistance_to_str(frequency):
         return str(frequency * 1000000).rstrip('0').rstrip('.') + 'u\u2126'
 
 
-def decimal_impedance_to_str(impedance):
-    return decimal_resistance_to_str(impedance)
+class PartSeries(models.Model):
+    manufacturer = models.ForeignKey('manufacturers.Manufacturer', on_delete=models.PROTECT, null=True, blank=True)
+    name = models.CharField(max_length=100)
+    description = models.TextField()
 
 
 class Part(PolymorphicModel):
-    PART_TYPE = [
-        ('Resistors', (
-            ('GR', 'Generic Resistor'),
-            ('R', 'Resistor'),
-            ('RA', 'Resistor Array'),
-            ('RCF', 'Resistor Carbon Film'),
-            ('RTK', 'Resistor Thick Film'),
-            ('RTN', 'Resistor Thin Film'),
-            ('RMF', 'Resistor Metal Film'))
-        ),
-        ('Capacitors', (
-            ('C', 'Capacitor'),
-            ('CC', 'Ceramic Capacitor'),
-            ('MCC', 'Multi Layer Ceramic Capacitor'),
-            ('CE', 'Electrolitic Capacitor'),
-            ('CP', 'Polymer Capacitor'),
-            ('CT', 'Tantalum Capacitor'))
-        ),
-        ('I', 'Inductor'),
-        ('FB', 'Ferrite Bead'),
-        ('CMC', 'Common Mode Choke'),
-        ('BAL', 'Balun'),
-        ('Diodes', (
-            ('BRG', 'Bridge Rectifier'),
-            ('D', 'Small Signal Diode'),
-            ('DS', 'Schottky Diode'),
-            ('DLE', 'LED'),
-            ('DZ', 'Zener Diode'))
-         ),
-        ('TVS', 'Transient Voltage Suppressor'),
-        ('ESD', 'ESD Suppressor'),
-        ('SAR', 'Surge Arrester'),
-        ('Transistors', (
-            ('T', 'Transistor'),
-            ('TBN', 'Transistor NPN'),
-            ('MON', 'Transistor MOS N'),
-            ('MOP', 'Transistor MOS P'),
-            ('TBP', 'Transistor PNP'))
-        ),
-        ('COS', 'Crystal'),
-        ('CRO', 'Crystal Oscillator'),
-        ('F', 'Fuse'),
-        ('Integrated Circuits', (
-            ('IC', 'Integrated Circuit'),
-            ('ICL', 'IC Level translator'),
-            ('ICC', 'IC Current Sense'),
-            ('ICO', 'IC Comparator'),
-            ('IMC', 'IC MCU'),
-            ('IDA', 'IC DAC'),
-            ('IAD', 'IC ADC'),
-            ('ICN', 'IC Sensor'),
-            ('ICS', 'IC Load Switch'),
-            ('ICV', 'Integrated Circuit Voltage Regulator'),
-            ('ICR', 'Integrated Circuit Voltage Reference'),
-            ('IRF', 'Integrated Circuit RF Amplifier'),
-            ('IRS', 'Integrated Circuit RF Synthesizer'))
-        ),
-        ('Connectors', (
-            ('CON', 'Connector'),
-            ('COB', 'Connector Bus'),
-            ('COT', "Connector Terminal Block"),
-            ('COF', "Connector FFC/FPC"),
-            ('CO5', "Connector microSD Card"),
-            ('COI', 'Connector IDC'),
-            ('COA', 'Connector Accessory'))
-        ),
-        ('DIS', 'LCD Display'),
-        ('LDI', 'LED Display'),
-        ('LOI', 'OLED Display'),
-        ('LPI', 'Lightpipe'),
-        ('B', 'Battery'),
-        ('Materials', (
-            ('MSW', 'Solder Wire'),
-            ('MSP', 'Solder Paste'))
-         ),
-        ('Mechanical', (
-            ('BH', 'Battery Holder'),
-            ('E', 'Enclosure'),
-            ('EA', 'Enclosure Accessory'))
-        ),
-        ('M', 'Module'),
-        ('S', 'Switch'),
-        ('VAR', 'Varistor'),
-        ('PCB', 'PCB')
-    ]
-    PRODUCTION_STATUS = (
-        ('PRE', 'Preview'),
-        ('ACT', 'In Production'),
-        ('NRD', 'Not Recommended for New Design'),
-        ('LTB', 'Last Time Buy'),
-        ('OBS', 'Obsolete'),
-        ('UNK', 'Unknown')
-    )
-
     part_type = models.CharField(max_length=3, choices=PART_TYPE, default='UNK')
     generated = models.BooleanField(default=False)
-    manufacturer_part_number = models.CharField(max_length=200)
     manufacturer = models.ForeignKey('manufacturers.Manufacturer', on_delete=models.PROTECT)
-    series = models.CharField(max_length=100, null=True, blank=True)
-    series_description = models.CharField(max_length=250, null=True, blank=True)
-    package = models.ForeignKey('packages.Package', on_delete=models.PROTECT, blank=True, null=True)
+    MPN = models.CharField(max_length=200)
     description = models.CharField(max_length=300, blank=True)
-    production_status = models.CharField(max_length=3, choices=PRODUCTION_STATUS, default='UNK')
+    series = models.ManyToManyField('PartSeries', blank=True)
     device_marking_code = models.CharField(max_length=20, null=True, blank=True)
-    notes = models.TextField(max_length=200, null=True, blank=True)
-    comment = models.TextField(max_length=2000, null=True, blank=True)
-    product_url = models.URLField(null=True, blank=True)
+    notes = models.CharField(max_length=200, null=True, blank=True)
+    comment = models.TextField(null=True, blank=True) # TODO remove
+    product_url = models.URLField(null=True, blank=True) # in case of generic part calculated field pointing to part specs in frontend
     operating_conditions = OperatingConditions()
     storage_conditions = StorageConditions()
-    symbol = models.ForeignKey('symbolandfootprint.Symbol', on_delete=models.PROTECT, blank=True, null=True)
-    #footprints = models.ManyToManyField(Footprint)
     files = models.ManyToManyField(File, blank=True)
     thumbnail = models.ImageField(max_length=250, upload_to='part_catalog/images/', blank=True, null=True)
     images = ArrayField(models.ImageField(max_length=250, upload_to='part_catalog/images/'), blank=True, null=True)
+
+    # TODO fields that should be moved to different model
+    symbol = models.ForeignKey('symbolandfootprint.Symbol', on_delete=models.PROTECT, blank=True, null=True)
+    # footprints = models.ManyToManyField(Footprint)
+    package = models.ForeignKey('packages.Package', on_delete=models.PROTECT, blank=True, null=True)
+
+    # generic part fields
+    generic = models.BooleanField(default=False)
+    filters = models.JSONField(null=True, blank=True)
+    MONs = models.ManyToManyField('partcatalog.ManufacturerOrderNumber', related_name="generics", blank=True) # when
+    # generic is False this field is calculated. It contains references to ManufacturerOrderNumber model
+
+    # calculated fields
+    production_status = models.IntegerField(choices=ProductionStatus.choices, default=ProductionStatus.UNKNOWN) # calculated field
+
 
     fields_begin = {'MPN': 'manufacturer_part_number', 'OPN': 'manufacturer_order_number',
                     'Production Status': 'production_status', 'Description': 'description'}
@@ -189,12 +97,32 @@ class Part(PolymorphicModel):
     fields = {**fields_begin, **fields_end}
 
     class Meta:
-        unique_together = ['manufacturer', 'manufacturer_part_number']
-        ordering = ['manufacturer_part_number']
-        #indexes = ['manufacturer_part_number']
+        unique_together = ['manufacturer', 'MPN']
+        ordering = ['manufacturer', 'MPN']
         index_together = [
-            ["manufacturer", "manufacturer_part_number"],
+            ["manufacturer", "MPN"],
         ]
+
+    def save(self, *args, **kwargs):
+        self.update_calculated_fields()
+        super(Part, self).save(*args, **kwargs)
+
+    def update_calculated_fields(self):
+        self._update_production_status_field()
+        self._update_MONs_field()
+
+    def _update_production_status_field(self):
+        self.production_status = ProductionStatus.OBSOLETE
+        for mon in self.MONs.all():
+            if mon.productionStatus != ProductionStatus.OBSOLETE:
+                self.production_status = ProductionStatus.IN_PRODUCTION
+                break
+
+    def _update_MONs_field(self):
+        if not self.generic:
+            self.MONs.set(self.manufacturerordernumber_set.all())
+
+
 
     def operating_temperature_range(self):
         if self.operating_conditions.temperature_min and self.operating_conditions.temperature_max:
@@ -217,8 +145,8 @@ class Part(PolymorphicModel):
         else:
             return ''
 
-    def get_storage_conditions_display(self):
-        return str(self.storage_conditions)
+    # def get_storage_conditions_display(self):
+    #     return str(self.storage_conditions)
 
     def get_package_display(self):
         return self.package.name if self.package else 'Unknown'
@@ -248,19 +176,19 @@ class Part(PolymorphicModel):
             return "{}".format(self.package.name)
         return ""
 
-    def get_part_group_name(self):
-        part_type_dict = dict(Part.PART_TYPE)
-        part_group_names = list(part_type_dict.keys())
-        #print(part_group_names)
-        for part_group_name in part_group_names:
-            #print(part_type_dict[part_group_name])
-            try:
-                if dict(part_type_dict[part_group_name]):
-                    part_group = self.get_part_type_group(part_group_name)
-                    if self.part_type in part_group:
-                        return part_group_name
-            except:
-                pass
+    # def get_part_group_name(self):
+    #     part_type_dict = dict(Part.PART_TYPE)
+    #     part_group_names = list(part_type_dict.keys())
+    #     #print(part_group_names)
+    #     for part_group_name in part_group_names:
+    #         #print(part_type_dict[part_group_name])
+    #         try:
+    #             if dict(part_type_dict[part_group_name]):
+    #                 part_group = self.get_part_type_group(part_group_name)
+    #                 if self.part_type in part_group:
+    #                     return part_group_name
+    #         except:
+    #             pass
 
     @staticmethod
     def part_type_from_str(connector_str):
@@ -329,97 +257,16 @@ class Part(PolymorphicModel):
                   'PCB': 'PCB'}
         return values[connector_str]
 
-    @staticmethod
-    def get_part_type_group(part_group_name):
-        part_type_group = dict(Part.PART_TYPE)
-        if part_group_name == 'nongroup':
-            nongroup = []
-            for key in part_type_group:
-                try:
-                    dict(part_type_group[key])
-                except:
-                    nongroup.append(key)
-            return nongroup
-        else:
-            return list(dict(part_type_group[part_group_name]).keys())
-
-    def get_on_stock_quantity(self):
-        quantity = 0
-        average_price = 0
-        storage_locations = ""
-        storage_locations_array = []
-        for mon in self.manufacturer_order_number_set.all():
-            for inventory_position in mon.inventoryposition_set.all():
-                storage_dict = {'location': inventory_position.storage_location.location,
-                                'quantity': inventory_position.stock,
-                                'price': '-',
-                                'invoice': '-'}
-                quantity = quantity + inventory_position.stock
-                if len(storage_locations) > 0:
-                    storage_locations = storage_locations + ', ' + inventory_position.storage_location.location
-                else:
-                    storage_locations = inventory_position.storage_location.location
-                if inventory_position.invoice:
-                    average_price = average_price + inventory_position.stock * inventory_position.invoice.get_price_per_unit()
-                    storage_dict['price'] = inventory_position.invoice.get_price_per_unit_display()
-                    storage_dict['invoice'] = inventory_position.invoice.get_invoice_number_display()
-                storage_locations_array.append(storage_dict)
-
-        if average_price != 0:
-            average_price = average_price / quantity
-        return {"quantity": quantity, "storage_locations": storage_locations, 'average_price': average_price,
-                'locations_array': storage_locations_array}
-
-    def get_files_array(self):
-        files = []
-        for file in self.files.all():
-            files.append(file.to_ajax_response())
-        return files
-
-    # def to_view_ajax_response(self):
-    #     id_field = self.pk
-    #     result = [{"id": id_field,
-    #                "pid": 0,
-    #                'part_type': self.get_part_type_display(),
-    #                "manufacturer_part_number": self.manufacturer_part_number,
-    #                "description": self.description,
-    #                "production_status": dict(self.PRODUCTION_STATUS)[self.production_status],
-    #                "package": self.package.name if self.package else 'Unknown',
-    #                "working_temperature_range": self.working_temperature_range,
-    #                "storage_conditions": str(self.storage_conditions),
-    #                "manufacturer": self.manufacturer.name,
-    #                "product_url": self.product_url,
-    #                "files": self.get_files_array()
-    #                }]
-    #     if self.manufacturer_order_number_set:
-    #         mons = []
-    #         for manufacturer_order_number in self.manufacturer_order_number_set.all():
-    #             mons.append({'id': manufacturer_order_number.id,
-    #                          "manufacturer_order_number": manufacturer_order_number.manufacturer_order_number,
-    #                          "production_status": self.production_status})
-    #     #         order = {"id": -id_field,
-    #     #                  "pid": id_field,
-    #     #                  "manufacturer_part_number": self.manufacturer_part_number,
-    #     #                  "manufacturer_order_number": package.manufacturer_order_number,
-    #     #                  "production_status": dict(self.PRODUCTION_STATUS)[self.production_status],
-    #     #                  "description": package.description}
-    #     #         result.append(order)
-    #         result[0]['manufacturer_order_number'] = mons
-    #
-    #     return result
-
-    # def to_ajax_response(self):
-    #     id_field = self.pk
-    #     result = [{"id": id_field,
-    #                "pid": 0,
-    #                'part_type': self.get_part_type_display(),
-    #                "manufacturer_part_number": self.manufacturer_part_number,
-    #                "description": self.description,
-    #                "production_status": dict(self.PRODUCTION_STATUS)[self.production_status],
-    #                "package": self.package.name if self.package else 'Unknown',
-    #                "working_temperature_range": self.working_temperature_range,
-    #                "storage_temperature_range": self.storage_temperature_range,
-    #                "manufacturer": self.manufacturer.name,
-    #                "product_url": self.product_url
-    #                }]
-    #     return result
+    # @staticmethod
+    # def get_part_type_group(part_group_name):
+    #     part_type_group = dict(Part.PART_TYPE)
+    #     if part_group_name == 'nongroup':
+    #         nongroup = []
+    #         for key in part_type_group:
+    #             try:
+    #                 dict(part_type_group[key])
+    #             except:
+    #                 nongroup.append(key)
+    #         return nongroup
+    #     else:
+    #         return list(dict(part_type_group[part_group_name]).keys())

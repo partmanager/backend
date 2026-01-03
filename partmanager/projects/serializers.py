@@ -10,7 +10,7 @@ class PartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Part
-        fields = ['id', 'manufacturer_part_number', 'description', 'manufacturer']
+        fields = ['id', 'MPN', 'description', 'manufacturer']
 
 
 class AssemblyItemSerializer(serializers.ModelSerializer):

@@ -1,4 +1,5 @@
 from .part import Part
+from .choices import PART_TYPE
 from django.db import models
 
 
@@ -21,7 +22,7 @@ class Connector(Part):
             values = {"Top": 1, "Bottom": 2}
             return values[type_str]
 
-    part_type_subset = list(dict(dict(Part.PART_TYPE)['Connectors']).keys())
+    part_type_subset = list(dict(dict(PART_TYPE)['Connectors']).keys())
     contact_position = models.IntegerField(choices=ContactPositionChoices.choices, null=True, blank=True)
     bus_type = models.CharField(max_length=5, choices=BUS_TYPE, null=True, blank=True)
     pin_count = models.IntegerField(null=True, blank=True)

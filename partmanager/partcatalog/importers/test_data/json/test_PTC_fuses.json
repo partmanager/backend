@@ -40,10 +40,10 @@
         },
         "orderNumbers": {
             "SM005-60": {
-                "Packaging Code": "",
-                "Packaging Type": "",
-                "Packaging Qty": "",
-                "Packaging Data": {}
+                "Code": "",
+                "Type": "",
+                "Qty": "",
+                "PackagingData": {}
             }
         }
     }

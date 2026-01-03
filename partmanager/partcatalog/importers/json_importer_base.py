@@ -10,7 +10,7 @@ from django.db import IntegrityError
 from manufacturers.models import get_or_create_manufacturer_by_name
 from packages.importers.package_importer import get_or_create_package_from_dict
 from packages.models.common import Package
-from partcatalog.models.part import Part
+from partcatalog.models.part import Part, PartSeries
 from partcatalog.models.manufacturer_order_number import ManufacturerOrderNumber
 from partcatalog.models.packaging import Packaging
 from partcatalog.models.files import FileVersion, File
@@ -40,7 +40,7 @@ class ModelImporter:
 
     def get_part(self, manufacturer, part_number):
         try:
-            return self.model_class.objects.get(manufacturer=manufacturer, manufacturer_part_number=part_number)
+            return self.model_class.objects.get(manufacturer=manufacturer, MPN=part_number)
         except self.model_class.DoesNotExist as e:
             return None
         # if len(part) == 1:
@@ -50,6 +50,7 @@ class ModelImporter:
 
     def create_part(self, manufacturer, part_number, json_data):
         logger.info(f"Creating {part_number}")
+        print(part_number)
         package = self.get_or_create_package(json_data['package'])
         common_parameters = self.decode_common_part_parameters(json_data)
         #logger.debug(f"Decoded common part parameters: {common_parameters}")
@@ -58,7 +59,7 @@ class ModelImporter:
         #     symbol = self.decode_symbol_and_footprint(json_data)
         #logger.debug(f"Decoded symbol and footprint: {symbol}")
         try:
-            part = self.model_class(manufacturer_part_number=part_number,
+            part = self.model_class(MPN=part_number,
                                     manufacturer=manufacturer,
                                     operating_conditions=self.decode_operating_conditions(json_data),
                                     storage_conditions=self.decode_storage_conditions(json_data['storageConditions']),
@@ -67,6 +68,7 @@ class ModelImporter:
                                     **parameters)  #,
         #                                symbol=symbol)
         except Exception as e:
+            print(e)
             logger.error(f"Creating part error {repr(e)}, {json_data}")
             return None
         try:
@@ -87,6 +89,17 @@ class ModelImporter:
             return None
         return part
 
+    def add_series(self, manufacturer, json_data) -> PartSeries | None:
+        if 'series' in json_data and 'name' in json_data['series']:
+            generic = True if 'generic' in json_data['series'] and json_data['series']['generic'] else None
+            part_series, created = PartSeries.objects.get_or_create(
+                name=json_data['series']['name'],
+                description=json_data['series']['description'] if 'description' in json_data['series'] else None,
+                manufacturer=None if generic else manufacturer
+            )
+            return part_series
+        return None
+
     def decode_storage_conditions(self, json_data):
         return storage_conditions_decoder(json_data)
 
@@ -102,10 +115,6 @@ class ModelImporter:
             common_parameters['production_status'] = str_to_production_status(json_data['productionStatus'])
         if 'markingCode' in json_data and json_data['markingCode'] is not None and len(json_data['markingCode']):
             common_parameters['device_marking_code'] = json_data['markingCode']
-        if 'series' in json_data and 'name' in json_data['series']:
-            common_parameters['series'] = json_data['series']['name']
-            common_parameters['series_description'] = json_data['series']['description'] if 'description' in json_data[
-                'series'] else None
         if 'productUrl' in json_data and json_data['productUrl'] is not None and len(json_data['productUrl']):
             common_parameters['product_url'] = json_data['productUrl']
         if 'notes' in json_data and json_data['notes'] is not None and len(json_data['notes']):
@@ -205,6 +214,7 @@ class JsonImporterBase:
                 try:
                     self.add_part(part)
                 except Exception as e:
+                    print(e)
                     self.logger.error(e)
 
     def add_part(self, json_data):
@@ -219,12 +229,17 @@ class JsonImporterBase:
                 if imported_part:
                     part = imported_part
                     self.__save(imported_part)
-                    self.logger.info(f"{part.manufacturer_part_number} added")
+                    self.logger.info(f"{part.MPN} added")
+                else:
+                    print ("imported part is None")
             else:
                 self.update_part(part, imported_part, part_importer)
-                self.logger.info(f"{part.manufacturer_part_number} updated")
+                self.logger.info(f"{part.MPN} updated")
             if part is None:
                 raise ValueError("Part creation error")
+            series = part_importer.add_series(manufacturer, json_data)
+            if series:
+                part.series.add(series)
             self.add_manufacturer_order_numbers(manufacturer, part, json_data['orderNumbers'])
             if 'files' in json_data:
                 self.add_files(part, json_data['files'])
@@ -261,9 +276,9 @@ class JsonImporterBase:
     def add_manufacturer_order_numbers(self, manufacturer, part, order_numbers):
         for order_number in order_numbers:
             packaging = self.decode_packaging(order_numbers[order_number])
-            self.logger.debug(f'Updating MON: {order_number} for part {part.manufacturer_part_number}')
+            self.logger.debug(f'Updating MON: {order_number} for part {part.MPN}')
             if not self.dry_run:
-                ManufacturerOrderNumber.objects.update_or_create(manufacturer_order_number=order_number,
+                ManufacturerOrderNumber.objects.update_or_create(MON=order_number,
                                                                  manufacturer=manufacturer,
                                                                  defaults={"packaging": packaging,
                                                                            "part": part})
@@ -365,7 +380,7 @@ class JsonImporterBase:
                                                                                 "generator_data": symbol_generator_data,
                                                                                 "pinmap": symbol_footprint['pinmap']})
                     if created:
-                        self.logger.info(f"Symbol for {part.manufacturer_part_number} created")
+                        self.logger.info(f"Symbol for {part.MPN} created")
                     part.symbol = symbol
                     part.save()
                 except IntegrityError as e:

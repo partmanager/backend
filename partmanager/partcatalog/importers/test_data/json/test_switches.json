@@ -16,7 +16,7 @@
         "storageConditions": {
             "temperature": "5\u00b0C ~ 35\u00b0C",
             "humidity": "",
-            "MSLevel": "Level 1"
+            "MSLevel": "MSL-1 UNLIM"
         },
         "parameters": {
             "Switch Type": "Tact Switch",
@@ -59,10 +59,10 @@
         },
         "orderNumbers": {
             "TESTSWITCHA": {
-                "Packaging Code": "A",
-                "Packaging Type": "Embossed Tape / Reel",
-                "Packaging Qty": "2000",
-                "Packaging Data": {
+                "Code": "A",
+                "Type": "Embossed Tape / Reel",
+                "Qty": 2000,
+                "PackagingData": {
                     "tape": {
                         "Pin 1 Quadrant": "Q1",
                         "W": "12mm",

@@ -55,10 +55,10 @@
         },
         "orderNumbers": {
             "TESTBATTERYA": {
-                "Packaging Code": "A",
-                "Packaging Type": "Foil",
-                "Packaging Qty": 2,
-                "Packaging Data": {}
+                "Code": "A",
+                "Type": "Foil",
+                "Qty": 2,
+                "PackagingData": {}
             }
         }
     }

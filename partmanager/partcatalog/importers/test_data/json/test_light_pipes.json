@@ -40,10 +40,10 @@
         },
         "orderNumbers": {
             "TESTLIGHTPIPEA": {
-                "Packaging Code": "A",
-                "Packaging Type": "Bag",
-                "Packaging Qty": "2000",
-                "Packaging Data": {}
+                "Code": "A",
+                "Type": "Bag",
+                "Qty": 2000,
+                "PackagingData": {}
             }
         }
     }

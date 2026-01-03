@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.timezone import now
-from partcatalog.models.part import Part
+from partcatalog.models.choices import PART_TYPE
 from .fields import ChoiceArrayField
 from manufacturers.models import get_manufacturer_by_name
 from partcatalog.models.manufacturer_order_number import ManufacturerOrderNumber
@@ -17,7 +17,7 @@ class Category(models.Model):
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=500, null=True, blank=True)
     parent = models.ForeignKey('Category', on_delete=models.PROTECT, null=True, blank=True)
-    default_part_types = ChoiceArrayField(models.CharField(max_length=3, choices=Part.PART_TYPE), null=True, blank=True)
+    default_part_types = ChoiceArrayField(models.CharField(max_length=3, choices=PART_TYPE), null=True, blank=True)
 
     class Meta:
         unique_together = ["name", "parent"]

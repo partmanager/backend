@@ -31,7 +31,7 @@ from .models.transistor_mosfet import TransistorMosfet
 from rest_polymorphic.serializers import PolymorphicSerializer
 
 
-common_fields = ['id', 'manufacturer_part_number', 'manufacturer_order_number_set', 'product_url', 'production_status',
+common_fields = ['id', 'MPN', 'generic', 'manufacturer_order_number_set', 'product_url', 'production_status',
                  'operating_conditions', 'storage_conditions', 'package', 'symbol', 'manufacturer', 'description',
                  'notes', 'comment', 'distributors', 'files', 'thumbnail', 'images']
 
@@ -211,6 +211,12 @@ class ResistorSerializer(PartBaseSerializer):
 
     def get_power(self, obj):
         return obj.get_power_display()
+
+
+class ResistorCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Resistor
+        fields = '__all__'
 
 
 class SwitchSerializer(PartBaseSerializer):
