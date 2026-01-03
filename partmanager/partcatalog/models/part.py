@@ -54,7 +54,7 @@ def decimal_resistance_to_str(frequency):
 class PartSeries(models.Model):
     manufacturer = models.ForeignKey('manufacturers.Manufacturer', on_delete=models.PROTECT, null=True, blank=True)
     name = models.CharField(max_length=100)
-    description = models.TextField()
+    description = models.TextField(null=True, blank=True)
 
 
 class Part(PolymorphicModel):
@@ -104,8 +104,10 @@ class Part(PolymorphicModel):
         ]
 
     def save(self, *args, **kwargs):
+        if not self.pk:
+            super().save(*args, **kwargs)
         self.update_calculated_fields()
-        super(Part, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def update_calculated_fields(self):
         self._update_production_status_field()
@@ -120,7 +122,7 @@ class Part(PolymorphicModel):
 
     def _update_MONs_field(self):
         if not self.generic:
-            self.MONs.set(self.manufacturerordernumber_set.all())
+            self.MONs.set(self.manufacturer_order_number_set.all())
 
 
 

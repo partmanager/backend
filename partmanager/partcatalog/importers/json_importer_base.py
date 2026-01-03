@@ -9,13 +9,11 @@ from django.db import IntegrityError
 
 from manufacturers.models import get_or_create_manufacturer_by_name
 from packages.importers.package_importer import get_or_create_package_from_dict
-from packages.models.common import Package
 from partcatalog.models.part import Part, PartSeries
-from partcatalog.models.manufacturer_order_number import ManufacturerOrderNumber
-from partcatalog.models.packaging import Packaging
 from partcatalog.models.files import FileVersion, File
 from symbolandfootprint.models import Symbol
 from .common import  str_to_production_status
+from .manufacturer_order_number import add_manufacturer_order_numbers
 from .fields_decoder.storage_conditions_decoder import storage_conditions_decoder
 from .fields_decoder.operating_conditions_decoder import operating_conditions_decoder
 
@@ -214,7 +212,7 @@ class JsonImporterBase:
                 try:
                     self.add_part(part)
                 except Exception as e:
-                    print(e)
+                    print(f"Exception during adding part{e}")
                     self.logger.error(e)
 
     def add_part(self, json_data):
@@ -228,7 +226,7 @@ class JsonImporterBase:
             if not part:
                 if imported_part:
                     part = imported_part
-                    self.__save(imported_part)
+                    self.__save(part)
                     self.logger.info(f"{part.MPN} added")
                 else:
                     print ("imported part is None")
@@ -239,8 +237,11 @@ class JsonImporterBase:
                 raise ValueError("Part creation error")
             series = part_importer.add_series(manufacturer, json_data)
             if series:
-                part.series.add(series)
-            self.add_manufacturer_order_numbers(manufacturer, part, json_data['orderNumbers'])
+                try:
+                    part.series.add(series)
+                except Exception as e:
+                    print(f"Exception during adding series {e}")
+            add_manufacturer_order_numbers(self.dry_run, manufacturer, part, json_data['orderNumbers'])
             if 'files' in json_data:
                 self.add_files(part, json_data['files'])
             if "symbol&footprint" in json_data:
@@ -273,32 +274,6 @@ class JsonImporterBase:
             self.logger.info(f"************************** Saving updated part: {present}")
             present.save()
 
-    def add_manufacturer_order_numbers(self, manufacturer, part, order_numbers):
-        for order_number in order_numbers:
-            packaging = self.decode_packaging(order_numbers[order_number])
-            self.logger.debug(f'Updating MON: {order_number} for part {part.MPN}')
-            if not self.dry_run:
-                ManufacturerOrderNumber.objects.update_or_create(MON=order_number,
-                                                                 manufacturer=manufacturer,
-                                                                 defaults={"packaging": packaging,
-                                                                           "part": part})
-
-    def decode_packaging(self, packaging_json):
-        packaging = Packaging()
-        packaging.code = None
-        packaging.type = 'u'
-        packaging.quantity = None
-        packaging.packaging_data = None
-        if packaging_json:
-            packaging.code = packaging_json['Code'] if 'Code' in packaging_json else None
-            packaging.type = packaging_json['Type'] if 'Type' in packaging_json else 'u'
-            packaging.quantity = packaging_json['Qty'] if 'Qty' in packaging_json else None
-            if packaging.type in ["Paper Tape / Reel", "Embossed Tape / Reel"] and 'PackagingData' in packaging_json:
-                packaging.packaging_data = self.decode_tape_reel_packaging(packaging_json)
-        return packaging
-
-    def decode_tape_reel_packaging(self, packaging_json):
-        return packaging_json['PackagingData'] if packaging_json['PackagingData'] else None
 
     def add_files(self, part, files_json):
         def get_filetype(field):

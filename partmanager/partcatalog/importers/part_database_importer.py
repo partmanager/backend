@@ -6,7 +6,7 @@ logger = logging.getLogger('partcatalog')
 
 def import_form_file(file, dry=True):
     try:
-        logger.info(f"Loading {file}")
+        logger.info(f"Loading {file}, dry run: {dry}")
         json_importer.parts_import(file)
         json_importer.run(dry=dry)
     except KeyError as e:
