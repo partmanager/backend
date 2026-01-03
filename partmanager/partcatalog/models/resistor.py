@@ -52,4 +52,4 @@ class Resistor(Part):
                 pass
 
     def __str__(self):
-        return '{} {}'.format(self.manufacturer.name, self.manufacturer_part_number)
+        return '{} {}'.format(self.manufacturer.name, self.MPN)

@@ -55,7 +55,7 @@ class Diode(Part):
                                    str(self.repetitive_peak_reverse_voltage))
 
     def __str__(self):
-        return self.manufacturer_part_number
+        return self.MPN
 
 
 class ZenerDiode(Part):

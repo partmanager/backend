@@ -194,7 +194,7 @@ class InventoryPosition(models.Model):
                   'flagged': self.flagged}
         if self.mon is not None:
             result['part'] = {'manufacturer': self.mon.manufacturer.name,
-                              'order_number': self.mon.manufacturer_order_number,
+                              'order_number': self.mon.MON,
                               'description': self.mon.part.description}
         if self.invoice is not None:
             result['invoice'] = {'distributor': self.invoice.get_distributor_display(),
@@ -226,7 +226,7 @@ class InventoryPosition(models.Model):
             part_manufacturer = get_manufacturer_by_name(dictionary['part']['manufacturer'])
             try:
                 mon = ManufacturerOrderNumber.objects.get(manufacturer=part_manufacturer,
-                                                          manufacturer_order_number=dictionary['part']['order_number'])
+                                                          MON=dictionary['part']['order_number'])
             except ManufacturerOrderNumber.DoesNotExist:
                 mon = None
 
@@ -267,7 +267,7 @@ class InventoryPosition(models.Model):
 
     def get_name_display(self):
         if self.mon:
-            return self.mon.manufacturer_order_number
+            return self.mon.MON
         else:
             return self.name
 

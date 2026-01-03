@@ -44,4 +44,4 @@ class Inductor(Part):
         return "Inductor, {}".format(self.inductance)
 
     def __str__(self):
-        return self.manufacturer_part_number
+        return self.MPN

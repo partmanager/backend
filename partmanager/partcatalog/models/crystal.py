@@ -46,4 +46,4 @@ class Crystal(Part):
         return vibration_mode[string]
 
     def __str__(self):
-        return "{}, {}".format(self.manufacturer_part_number, self.description)
+        return "{}, {}".format(self.MPN, self.description)

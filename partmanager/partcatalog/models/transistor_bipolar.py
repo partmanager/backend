@@ -281,6 +281,6 @@ class TransistorBipolar(Part):
         return decimal_power_to_str(self.power_dissipation) if self.power_dissipation else ''
 
     def __str__(self):
-        return "{}, {}".format(self.manufacturer_part_number, self.description)
+        return "{}, {}".format(self.MPN, self.description)
 
 

@@ -92,7 +92,7 @@ class Capacitor(Part):
                 description += ' ' + self.package.name
             return description
         except TypeError as e:
-            print(self.manufacturer_part_number)
+            print(self.MPN)
             print(self.get_part_type_short_display())
             print(self.capacitance)
             print(self.voltage)
@@ -103,7 +103,7 @@ class Capacitor(Part):
         ordering = ['capacitance_typ', 'voltage_max', 'capacitance_relative_tolerance']
 
     def __str__(self):
-        return '{} {}'.format(self.manufacturer.name, self.manufacturer_part_number)
+        return '{} {}'.format(self.manufacturer.name, self.MPN)
 
     def get_capacitor_type_display(self):
         return self.get_part_type_short_display()
