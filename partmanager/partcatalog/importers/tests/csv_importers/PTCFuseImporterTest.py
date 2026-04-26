@@ -70,6 +70,6 @@ class PTCFuseCSVImportTest(TestCase):
         self.assertEqual(manufacturer_order_number.manufacturer_order_number, 'SM005-60')
         self.assertEqual(manufacturer_order_number.manufacturer.name, "ECE")
         #self.assertEqual(manufacturer_order_number.packaging,)
-        self.assertEqual(manufacturer_order_number.part, part)
+        self.assertEqual(manufacturer_order_number.product, part)
         self.assertEqual(manufacturer_order_number.note, None)
         self.assertEqual(manufacturer_order_number.description, None)

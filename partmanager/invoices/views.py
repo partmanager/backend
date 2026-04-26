@@ -1,6 +1,8 @@
 import os
 import tempfile
-
+import csv
+from django.http import JsonResponse
+from django.http import HttpResponse
 from .models import Invoice, InvoiceItem, PaymentConfirmation, InvoiceAttachment, Tag
 from rest_framework import status
 from rest_framework import filters
@@ -155,3 +157,51 @@ class InvoiceImportView(APIView):
 def update(request):
     result = update_invoice_item_don_assignments.delay()
     return Response({'task_id': result.task_id})
+
+
+def report_get(request):
+    response = HttpResponse(
+        content_type="text/csv",
+        headers={"Content-Disposition": 'attachment; filename="invoices_report.csv"'},
+    )
+    writer = csv.writer(response, quoting=csv.QUOTE_STRINGS)
+    row = {
+        'index': '',
+        'name': '',
+        'name don': '',
+        'unit': '',
+        'qty': '',
+        'Unit Price Net': '',
+        'Value Net': '',
+        'Ordered Qty': '',
+        'Distributor': '',
+        'Invoice': '',
+        'Invoice position': '',
+        'Invoice Date': ''
+    }
+    writer.writerow(row.keys())
+
+    for i, invoice_item in enumerate(InvoiceItem.objects.all().order_by('invoice__invoice_date', 'invoice__number', 'position_in_invoice')):
+        qty = 0
+        for position in invoice_item.inventoryposition_set.all():
+            qty += position.stock
+
+        row = {
+            'index': i,
+            'name': invoice_item.description,
+            'name don': invoice_item.distributor_order_number.don,
+            'unit': str(invoice_item.quantity_unit),
+            'qty': qty,
+            'Unit Price Net': invoice_item.unit_price.net,
+            'Value Net': invoice_item.unit_price.net * qty if invoice_item.unit_price.net else None,
+            'Ordered Qty': invoice_item.ordered_quantity,
+            'Distributor': invoice_item.invoice.distributor.name,
+            'Invoice': invoice_item.invoice.number,
+            'Invoice position': invoice_item.position_in_invoice,
+            'Invoice Date': invoice_item.invoice.invoice_date
+        }
+        row_array = []
+        for key, value in row.items():
+            row_array.append(value)
+        writer.writerow(row_array)
+    return response

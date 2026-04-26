@@ -25,11 +25,15 @@ class Resistor(Part):
         return str(self.power)
 
     def generate_description(self):
+        description = f"Resistor {self.resistance}, {self.power}"
+
         temperature_coefficient = str(self.temperature_coefficient)
         if temperature_coefficient:
-            return "Resistor {}, {}, {}".format(self.resistance, self.power, temperature_coefficient)
-        else:
-            return "Resistor {}, {}".format(self.resistance, self.power)
+            description = f"{description}, {temperature_coefficient}"
+        if self.package:
+            description = f"{description}, {self.package.name}"
+
+        return description
 
     @staticmethod
     def resistor_type_from_str(resistor_type_str):

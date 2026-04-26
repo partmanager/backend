@@ -1,5 +1,6 @@
-from .part import Part, decimal_celsius_to_str, decimal_current_to_str, decimal_voltage_to_str
-from .to_string_conversions import decimal_frequency_to_str, decimal_power_to_str, decimal_capacitance_to_str
+from .part import Part
+from .fields.si_unit_to_string import decimal_voltage_to_str, decimal_current_to_str
+from .to_string_conversions import decimal_frequency_to_str, decimal_power_to_str, decimal_capacitance_to_str, decimal_celsius_to_str
 from django.db import models
 from composite_field import CompositeField
 

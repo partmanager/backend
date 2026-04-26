@@ -176,7 +176,7 @@ def add_item_barcode_search(request):
                     manufacturer_order_number = don.manufacturer_order_number
                     manufacturer = ManufacturerSerializer(manufacturer_order_number.manufacturer, read_only=True)
                     new_item_candidate['manufacturer'] = manufacturer.data
-                    part_type = manufacturer_order_number.part.part_type
+                    part_type = manufacturer_order_number.product.part_type
                     default_categories = Category.objects.filter(default_part_types__contains=[part_type])
                     if len(default_categories) > 0:
                         print(default_categories)

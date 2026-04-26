@@ -29,12 +29,13 @@
         },
         "files": {},
         "package": {
-            "type": "Chip 0201",
+            "type": "Chip Inductor",
+            "name": "0201",
             "dimensions": {
                 "Length": "0.60mm \u00b10.09",
                 "Width": "0.30mm \u00b10.09",
                 "e": "0.15mm \u00b10.05",
-                "Height": "max. 0.33mm"
+                "thickness": "max. 0.33mm"
             }
         },
         "symbol&footprint": {

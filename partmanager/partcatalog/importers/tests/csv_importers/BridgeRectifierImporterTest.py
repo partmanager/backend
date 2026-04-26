@@ -97,6 +97,6 @@ class BridgeRectifierCSVImportTest(TestCase):
         self.assertEqual(manufacturer_order_number.manufacturer_order_number, 'HDS10M-13')
         self.assertEqual(manufacturer_order_number.manufacturer.name, "Diodes Incorporated")
         #self.assertEqual(manufacturer_order_number.packaging,)
-        self.assertEqual(manufacturer_order_number.part, part)
+        self.assertEqual(manufacturer_order_number.product, part)
         self.assertEqual(manufacturer_order_number.note, None)
         self.assertEqual(manufacturer_order_number.description, None)

@@ -20,7 +20,7 @@
         "parameters": {
             "Working Temp Range": "-55\u00b0C ~ 155\u00b0C",
             "Resistance": {
-                "value": "1000.00R \u00b10.05%"
+                "value": "1000.00R \u00b10.5%"
             },
             "TCR":  {
                 "value": "\u00b110ppm/\u00b0C"
@@ -40,11 +40,12 @@
         },
         "files": {},
         "package": {
-            "type": "Chip 0201",
+            "type": "Chip Resistor",
+            "name": "0201",
             "dimensions": {
                 "Length": "0.60mm \u00b10.03",
                 "Width": "0.30mm \u00b10.03",
-                "Height": "0.23mm\u00b10.03",
+                "thickness": "0.23mm\u00b10.03",
                 "t1": "0.15mm\u00b10.05",
                 "t2": "0.15\u00b10.05mm"
             }
@@ -77,6 +78,107 @@
                 }
             },
             "TESTRESISTORB": {
+                "productionStatus": null,
+                "Code": "B",
+                "Type": "Paper Tape / Reel",
+                "Qty": 5000,
+                "PackagingData": {
+                    "reel": {
+                        "Diameter": "178.5mm",
+                        "Width": "12.5mm"
+                    },
+                    "tape": {
+                        "Pin 1 Quadrant": "Q1",
+                        "W": "8mm",
+                        "E": "1.75mm\u00b10.1mm",
+                        "F": "3.50mm\u00b10.05mm",
+                        "P0": "4mm\u00b10.10mm",
+                        "P1": "2mm",
+                        "P2": "2mm\u00b10.05mm"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "manufacturer": "TestResistorManufacturer",
+        "partNumber": "TESTRESISTOR_0402_1%#",
+        "markingCode": null,
+        "partType": "Resistor Thin Film",
+        "series": {
+            "name": "TestResistorSeries",
+            "description": "Test Resistor Series"
+        },
+        "description": null,
+        "productUrl": "",
+        "notes": "",
+        "tags": [],
+        "storageConditions": {
+            "temperature": "5\u00b0C ~ 35\u00b0C",
+            "humidity": "",
+            "MSLevel": ""
+        },
+        "parameters": {
+            "Working Temp Range": "-55\u00b0C ~ 155\u00b0C",
+            "Resistance": {
+                "value": "1000.00R \u00b11%"
+            },
+            "TCR":  {
+                "value": "\u00b110ppm/\u00b0C"
+            },
+            "Rated Power": {
+                "value":  "max. 0.05W"
+            },
+            "Working Voltage": {
+                "value":  "max. 25V"
+            },
+            "Overload Voltage": {
+                "value":  "max. 50V"
+            },
+            "Dielectric Withstanding Voltage":  {
+                "value": ""
+            }
+        },
+        "files": {},
+        "package": {
+            "type": "Chip Resistor",
+            "name": "0402",
+            "dimensions": {
+                "Length": "0.60mm \u00b10.03",
+                "Width": "0.30mm \u00b10.03",
+                "thickness": "0.23mm\u00b10.03",
+                "t1": "0.15mm\u00b10.05",
+                "t2": "0.15\u00b10.05mm"
+            }
+        },
+        "symbol&footprint": {
+            "symbolName": "resistor",
+            "pinmap": {},
+            "footprints": []
+        },
+        "orderNumbers": {
+            "TESTRESISTOR_0402_1%A": {
+                "productionStatus": null,
+                "Code": "A",
+                "Type": "Paper Tape / Reel",
+                "Qty": 1500,
+                "PackagingData": {
+                    "reel": {
+                        "Diameter": "178.5mm",
+                        "Width": "12.5mm"
+                    },
+                    "tape": {
+                        "Pin 1 Quadrant": "Q1",
+                        "W": "8mm",
+                        "E": "1.75mm\u00b10.1mm",
+                        "F": "3.50mm\u00b10.05mm",
+                        "P0": "4mm\u00b10.10mm",
+                        "P1": "2mm",
+                        "P2": "2mm\u00b10.05mm"
+                    }
+                }
+            },
+            "TESTRESISTOR_0402_1%B": {
                 "productionStatus": null,
                 "Code": "B",
                 "Type": "Paper Tape / Reel",

@@ -30,6 +30,8 @@ from .json_importers.transistor_mosfet_importer import TransistorMosfetJsonImpor
 from .json_importers.tvs_importer import TVSJsonImporter
 from .json_importers.varistor_importer import VaristorJsonImporter
 
+from .json_importers.others.threeDFilament_importer import FilamentJsonImporter
+
 
 json_importer = JsonImporterBase()
 json_importer.register_model_importer(BalunJsonImporter())
@@ -62,4 +64,6 @@ json_importer.register_model_importer(SwitchJsonImporter())
 json_importer.register_model_importer(TransistorMosfetJsonImporter())
 json_importer.register_model_importer(TVSJsonImporter())
 json_importer.register_model_importer(VaristorJsonImporter())
+
+json_importer.register_model_importer(FilamentJsonImporter())
 

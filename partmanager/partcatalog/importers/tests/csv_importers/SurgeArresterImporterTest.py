@@ -73,6 +73,6 @@ class SurgeArresterCSVImportTest(TestCase):
         self.assertEqual(manufacturer_order_number.manufacturer_order_number, 'B88069X1023T203')
         self.assertEqual(manufacturer_order_number.manufacturer.name, "TDK")
         #self.assertEqual(manufacturer_order_number.packaging,)
-        self.assertEqual(manufacturer_order_number.part, part)
+        self.assertEqual(manufacturer_order_number.product, part)
         self.assertEqual(manufacturer_order_number.note, None)
         self.assertEqual(manufacturer_order_number.description, None)

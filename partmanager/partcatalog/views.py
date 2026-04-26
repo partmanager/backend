@@ -1,6 +1,8 @@
+import os
+import time
 from rest_framework.views import APIView
 
-from .models.part import Part
+from .models.product import Product
 
 from .models.manufacturer_order_number import ManufacturerOrderNumber
 from django.http import JsonResponse
@@ -15,9 +17,10 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .serializers import ManufacturerOrderNumberSerializer
 from .part_serializers import PartPolymorphicSerializer
 
-from .tasks import generate_generic_parts
+from .tasks import generate_generic_parts, import_components
 from common.pagination import StandardResultsSetPagination
 from .importers.testpart_database_importer import import_test_parts
+from .importers.part_database_importer import import_form_file
 
 # menu = {"Passives": {"Balun": "/parts/balun", "Resistors": "/parts/0", "Capacitors": "/parts/1", "Inductors": "/parts/2", "Ferrite Bead": "/parts/8"},
 #         "Diodes": {"Small signal": "/parts/3", "LED": "/parts/4", "Bridge Rectifiers": "/parts/17"},
@@ -80,7 +83,7 @@ def django_choices_to_dict(choices):
 
 
 class PartPolimorphicViewSet(ModelViewSet):
-    queryset = Part.objects.all()
+    queryset = Product.objects.all()
     serializer_class = PartPolymorphicSerializer
     pagination_class = StandardResultsSetPagination
     search_fields = ['MPN', 'manufacturer_order_number_set__MON']
@@ -102,6 +105,20 @@ class TestPartImportViewSet(APIView):
     def post(self, request):
         import_test_parts('partcatalog/importers')
         return Response()
+
+
+class PartImportViewSet(APIView):
+    def post(self, request):
+        import_file = request.FILES['file']
+        print(import_file)
+        workdir = '/tmp/shelftracker/import/' + time.strftime("%Y%m%d-%H%M%S")
+        os.makedirs(workdir)
+        archive_filename = workdir + '/' + import_file.name
+        with open(archive_filename, 'wb') as file:
+            file.write(import_file.read())
+        import_form_file(archive_filename, dry=False)
+
+        return Response({'task_id': None})
 
 
 def api_get_part_list(request):

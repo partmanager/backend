@@ -28,24 +28,29 @@ def update_all(self):
                                     branch,
                                     fs_repo_location,
                                     ssh_key=ssh_key,
-                                    credentials=repo_dict['credentials'])
+                                    credentials=repo_dict['credentials'],
+                                    env=repo_dict['env'] if 'env' in repo_dict else None)
         if repo:
             last_import_commit = get_last_import_commit(repository)
             head_commit = repo.head.commit
-            if last_import_commit is None or last_import_commit != head_commit.hexsha:
+            force_update = repo_dict['force_update'] if 'force_update' in repo_dict else False
+            if last_import_commit is None or last_import_commit != head_commit.hexsha or force_update:
                 progress_recorder.set_progress(1, 4, description='Updating manufacturers data')
                 update_manufacturers(fs_repo_location)
                 progress_recorder.set_progress(2, 4, description='Updating distributors data')
                 update_distributors(fs_repo_location)
-                progress_recorder.set_progress(3, 4, description='Generating components data')
-                generate_components(fs_repo_location)
-                component_files = generate_modified_component_list(fs_repo_location, repo, last_import_commit)
+                if 'generate' in repo_dict and repo_dict['generate']:
+                    progress_recorder.set_progress(3, 4, description='Generating components data')
+                    generate_components(fs_repo_location)
+                component_files = generate_modified_component_list(fs_repo_location, repo, last_import_commit,
+                                                                   force_update=force_update)
                 if len(component_files):
                     progress_recorder.set_progress(4, 4, description='Updating components data')
                     update_partcatalog(component_files, progress_recorder)
                     latest_commit = repo.commit(branch)
                     set_last_import_commit(repository, latest_commit)
-                    rename_generated_components_dir(fs_repo_location)
+                    if 'generate' in repo_dict and repo_dict['generate']:
+                        rename_generated_components_dir(fs_repo_location)
                     logger.info(f"Import done, new commit {latest_commit}")
                 else:
                     logger.info(f"Nothing changed skipping.")

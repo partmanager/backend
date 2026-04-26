@@ -59,6 +59,6 @@ class CapacitorCSVImportTest(TestCase):
         self.assertEqual(manufacturer_order_number.manufacturer_order_number, '04023C104KAT2A')
         self.assertEqual(manufacturer_order_number.manufacturer.name, "AVX")
         #self.assertEqual(manufacturer_order_number.packaging,)
-        self.assertEqual(manufacturer_order_number.part, part)
+        self.assertEqual(manufacturer_order_number.product, part)
         self.assertEqual(manufacturer_order_number.note, None)
         self.assertEqual(manufacturer_order_number.description, None)

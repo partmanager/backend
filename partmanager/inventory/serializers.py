@@ -55,11 +55,11 @@ class InventoryPositionSerializer(serializers.ModelSerializer):
 
     def get_distributors(self, obj):
         if obj.mon and obj.mon.distributorordernumber_set:
-            return obj.mon.part.distributor_pk_set()
+            return obj.mon.product.distributor_pk_set()
 
     def get_part(self, obj):
         if obj.mon and obj.mon:
-            return obj.mon.part.id
+            return obj.mon.product.id
 
     def get_alternative_locations(self, obj):
         def add_invoice_info(self, dictionary, invoice):
@@ -121,16 +121,16 @@ class InventoryPositionDetailSerializer(serializers.ModelSerializer):
     def get_mon(self, obj):
         return {
             'name': obj.mon.manufacturer_order_number if obj.mon else obj.name,
-            'description': obj.mon.part.description if obj.mon else obj.description,
+            'description': obj.mon.product.description if obj.mon else obj.description,
             'mon_id': obj.mon.pk if obj.mon else None,
         }
 
     def get_image(self, obj):
-        return str(obj.part.part.icon_image) if obj.part else None
+        return str(obj.product.product.icon_image) if obj.product else None
 
     def get_part_pk(self, obj):
-        if obj.part:
-            return obj.part.part.pk
+        if obj.product:
+            return obj.product.product.pk
 
     def get_manufacturer(self, obj):
         return obj.get_manufacturer_display()
@@ -169,12 +169,12 @@ class InventoryPositionDetailSerializer(serializers.ModelSerializer):
         return obj.invoice.shipped_quantity if obj.invoice else None
 
     def get_distributorordernumber_set(self, obj):
-        if obj.part and obj.part.distributorordernumber_set:
-            return obj.part.part.distributor_pk_set_urlencoded  # todo delete
+        if obj.product and obj.product.distributorordernumber_set:
+            return obj.product.product.distributor_pk_set_urlencoded  # todo delete
 
     def get_distributors(self, obj):
-        if obj.part and obj.part.distributorordernumber_set:
-            return obj.part.part.distributor_pk_set()
+        if obj.product and obj.product.distributorordernumber_set:
+            return obj.product.product.distributor_pk_set()
 
     def get_alternative_locations(self, obj):
         def add_invoice_info(self, dictionary, invoice):
@@ -186,9 +186,9 @@ class InventoryPositionDetailSerializer(serializers.ModelSerializer):
             dictionary['invoice_number'] = invoice.get_invoice_number_display()  # todo remove
             dictionary['shipped_quantity'] = invoice.shipped_quantity  # todo remove
 
-        if obj.part:
+        if obj.product:
             other_positions = []
-            for position in obj.part.inventoryposition_set.all():
+            for position in obj.product.inventoryposition_set.all():
                 if position != obj:
                     position_dict = {'storage_location': position.storage_location.location,
                                      'stock': position.stock,

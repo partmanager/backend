@@ -6,11 +6,13 @@ from .choices import ProductionStatus
 class ManufacturerOrderNumber(models.Model):
     manufacturer = models.ForeignKey('manufacturers.Manufacturer', on_delete=models.PROTECT)
     MON = models.CharField(max_length=200)
-    part = models.ForeignKey('Part', on_delete=models.CASCADE, related_name="manufacturer_order_number_set")
+    product = models.ForeignKey('partcatalog.Product', on_delete=models.CASCADE, related_name="manufacturer_order_number_set")
     packaging = Packaging()
     note = models.CharField(max_length=200, blank=True, null=True)
     description = models.CharField(max_length=250, blank=True, null=True)
     production_status = models.IntegerField(choices=ProductionStatus.choices, default=ProductionStatus.UNKNOWN)
+    EAN13 = models.CharField(max_length=13, blank=True, null=True)
+    SKU = models.CharField(max_length=30, blank=True, null=True)
     # distributorordernumber_set reverse key from DistributorOrderNumber
     # inventoryposition_set reverse key from InventoryPosition
 
@@ -28,12 +30,12 @@ class ManufacturerOrderNumber(models.Model):
     def to_ajax_response(self):
         id_field = self.pk
         result = [{"id": id_field,
-                   'part_type': self.part.get_part_type_display(),
+                   'part_type': self.product.get_part_type_display(),
                    "manufacturer": self.manufacturer.name,
                    "manufacturer_order_number": self.MON,
-                   "manufacturer_part_number": self.part.manufacturer_part_number,
-                   "part_description": self.part.description,
-                   "part_package": self.part.get_package_display(),
+                   "manufacturer_part_number": self.product.manufacturer_part_number,
+                   "part_description": self.product.description,
+                   "part_package": self.product.get_package_display(),
                    "packaging_type": self.packaging.type,
                    "packaging_code": self.packaging.code,
                    "packaging_quantity": self.packaging.quantity,

@@ -30,12 +30,12 @@ def decode_packaging(packaging_json):
     packaging.quantity = None
     packaging.packaging_data = None
     if packaging_json:
-        packaging.code = packaging_json['Code'] if 'Code' in packaging_json else None
-        packaging.type = packaging_json['Type'] if 'Type' in packaging_json else 'u'
-        packaging.quantity = packaging_json['Qty'] if 'Qty' in packaging_json else None
-        if packaging.type in ["Paper Tape / Reel", "Embossed Tape / Reel"] and 'PackagingData' in packaging_json:
+        packaging.code = packaging_json['code'] if 'code' in packaging_json else None
+        packaging.type = packaging_json['type'] if 'type' in packaging_json else 'u'
+        packaging.quantity = packaging_json['qty'] if 'qty' in packaging_json else None
+        if packaging.type in ["Paper Tape / Reel", "Embossed Tape / Reel"] and 'packagingData' in packaging_json:
             packaging.packaging_data = decode_tape_reel_packaging(packaging_json)
     return packaging
 
 def decode_tape_reel_packaging(packaging_json):
-    return packaging_json['PackagingData'] if packaging_json['PackagingData'] else None
+    return packaging_json['packagingData'] if packaging_json['packagingData'] else None

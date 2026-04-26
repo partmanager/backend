@@ -57,7 +57,7 @@ class CapacitorJsonImportTest(TestCase):
         self.assertEqual(manufacturer_order_number.manufacturer_order_number, 'TESTCAP123A')
         self.assertEqual(manufacturer_order_number.manufacturer.name, "TestCapacitorManufacturer")
         #self.assertEqual(manufacturer_order_number.packaging,)
-        self.assertEqual(manufacturer_order_number.part, part)
+        self.assertEqual(manufacturer_order_number.product, part)
         self.assertEqual(manufacturer_order_number.note, None)
         self.assertEqual(manufacturer_order_number.description, None)
 
@@ -65,6 +65,6 @@ class CapacitorJsonImportTest(TestCase):
         self.assertEqual(manufacturer_order_number.manufacturer_order_number, 'TESTCAP123B')
         self.assertEqual(manufacturer_order_number.manufacturer.name, "TestCapacitorManufacturer")
         #self.assertEqual(manufacturer_order_number.packaging,)
-        self.assertEqual(manufacturer_order_number.part, part)
+        self.assertEqual(manufacturer_order_number.product, part)
         self.assertEqual(manufacturer_order_number.note, None)
         self.assertEqual(manufacturer_order_number.description, None)

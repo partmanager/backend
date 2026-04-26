@@ -69,6 +69,6 @@ class ESDSuppressorJsonImportTest(TestCase):
         self.assertEqual(manufacturer_order_number.manufacturer_order_number, 'TESTESDSUPPRESSORA')
         self.assertEqual(manufacturer_order_number.manufacturer.name, "TestESDSuppressorManufacturer")
         #self.assertEqual(manufacturer_order_number.packaging,)
-        self.assertEqual(manufacturer_order_number.part, part)
+        self.assertEqual(manufacturer_order_number.product, part)
         self.assertEqual(manufacturer_order_number.note, None)
         self.assertEqual(manufacturer_order_number.description, None)

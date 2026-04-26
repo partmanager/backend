@@ -76,7 +76,7 @@ class BOMItem(models.Model):
     designators = ArrayField(models.CharField(max_length=10))
     group = models.CharField(max_length=1, choices=GROUP, default='u')
     part_not_found_fallback = models.JSONField(blank=True, null=True)
-    part = models.ForeignKey('partcatalog.Part', on_delete=models.CASCADE, related_name="bom_item_set", blank=True,
+    part = models.ForeignKey('partcatalog.Product', on_delete=models.CASCADE, related_name="bom_item_set", blank=True,
                              null=True)
     manufacturer_order_number = models.ForeignKey('partcatalog.ManufacturerOrderNumber', on_delete=models.PROTECT,
                                                   related_name="bom_item_set", blank=True, null=True)
@@ -90,7 +90,7 @@ class BOMItem(models.Model):
                      'part': {'mpn': self.part.manufacturer_part_number,
                               'manufacturer': self.part.manufacturer.name} if self.part else None,
                      'mon': {'mon': self.manufacturer_order_number.manufacturer_order_number,
-                             'manufacturer': self.manufacturer_order_number.part.manufacturer.name} if self.manufacturer_order_number else None,
+                             'manufacturer': self.manufacturer_order_number.product.manufacturer.name} if self.manufacturer_order_number else None,
                      'designators': self.designators,
                      'note': self.note}
         return item_dict
@@ -162,7 +162,7 @@ class AssemblyJob(models.Model):
                     assembly_item = AssemblyItem(assembly=assembly,
                                                  rework=rework,
                                                  designator=designator,
-                                                 part=item.part,
+                                                 part=item.product,
                                                  manufacturer_order_number=item.manufacturer_order_number)
                     assembly_item.save()
 
@@ -198,7 +198,7 @@ class AssemblyItem(models.Model):
     designator = models.CharField(max_length=10)
     assembled = models.BooleanField(default=False)
     sourced_externally = models.BooleanField(default=False)
-    part = models.ForeignKey('partcatalog.Part', on_delete=models.CASCADE, related_name="assembly_item_set", blank=True,
+    part = models.ForeignKey('partcatalog.Product', on_delete=models.CASCADE, related_name="assembly_item_set", blank=True,
                              null=True) # delete
     manufacturer_order_number = models.ForeignKey('partcatalog.ManufacturerOrderNumber', on_delete=models.PROTECT,
                                                   related_name="assembly_item_set", blank=True, null=True)

@@ -85,6 +85,6 @@ class CommonModeChokeJsonImportTest(TestCase):
         self.assertEqual(manufacturer_order_number.manufacturer_order_number, 'TESTCOMMONMODECHOKEA')
         self.assertEqual(manufacturer_order_number.manufacturer.name, "TestCommonModeChokeManufacturer")
         #self.assertEqual(manufacturer_order_number.packaging,)
-        self.assertEqual(manufacturer_order_number.part, part)
+        self.assertEqual(manufacturer_order_number.product, part)
         self.assertEqual(manufacturer_order_number.note, None)
         self.assertEqual(manufacturer_order_number.description, None)

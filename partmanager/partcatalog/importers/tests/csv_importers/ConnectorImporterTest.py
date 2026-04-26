@@ -56,6 +56,6 @@ class ConnectorCSVImportTest(TestCase):
         self.assertEqual(manufacturer_order_number.manufacturer_order_number, '2199230-3')
         self.assertEqual(manufacturer_order_number.manufacturer.name, "TE Connectivity")
         #self.assertEqual(manufacturer_order_number.packaging,)
-        self.assertEqual(manufacturer_order_number.part, part)
+        self.assertEqual(manufacturer_order_number.product, part)
         self.assertEqual(manufacturer_order_number.note, None)
         self.assertEqual(manufacturer_order_number.description, None)

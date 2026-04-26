@@ -55,6 +55,6 @@ class LightpipeJsonImportTest(TestCase):
         self.assertEqual(manufacturer_order_number.manufacturer_order_number, 'TESTLIGHTPIPEA')
         self.assertEqual(manufacturer_order_number.manufacturer.name, "TestLightPipeManufacturer")
         #self.assertEqual(manufacturer_order_number.packaging,)
-        self.assertEqual(manufacturer_order_number.part, part)
+        self.assertEqual(manufacturer_order_number.product, part)
         self.assertEqual(manufacturer_order_number.note, None)
         self.assertEqual(manufacturer_order_number.description, None)

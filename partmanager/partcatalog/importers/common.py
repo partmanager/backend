@@ -3,7 +3,7 @@ import os
 
 from .parameter_decoder import decode_temperature_parameter, decode_parameter, decode_distance_parameter
 from partcatalog.models.manufacturer_order_number import ManufacturerOrderNumber
-from partcatalog.models.part import Part
+from partcatalog.models.product import Product
 from partcatalog.models.files import FileVersion, File, create_file_version_from_url
 from symbolandfootprint.models import get_symbol_by_name
 from urllib.parse import urlparse
@@ -12,7 +12,8 @@ from urllib.parse import urlparse
 def decode_common_part_parameters(dictionary):
     working_temp_range = decode_temperature_parameter(dictionary['Working Temp Range'])
     storage_temp_range = decode_temperature_parameter(dictionary['Storage Temp Range'])
-    common_parameters = {'part_type': Part.part_type_from_str(dictionary['Part Type']),
+    product_type_key = 'productType' if 'ProductType' in dictionary else 'partType'
+    common_parameters = {'part_type': Product.part_type_from_str(dictionary[product_type_key]),
                          'series': dictionary['Series'],
                          'series_description': dictionary['Series Description'],
                          'production_status': str_to_production_status(dictionary['Production Status']),
@@ -125,25 +126,3 @@ def str_to_voltage(voltage_str):
                 return [voltage, tolerance_a, tolerance_b]
             else:
                 return [voltage, tolerance_b, tolerance_a]
-
-
-def add_manufacturer_order_number(manufacturer, part, dictionary):
-    mon = ManufacturerOrderNumber.objects.all().filter(MON=dictionary['Order Number'],
-                                                       manufacturer=manufacturer)
-    if len(mon) == 0:
-        print('Adding MON for part', part.manufacturer_part_number)
-        packaging = decode_tape_reel_packaging(dictionary)
-        order_number = ManufacturerOrderNumber(MON=dictionary['Order Number'],
-                                               manufacturer=manufacturer,
-                                               **packaging,
-                                               part=part)
-        order_number.save()
-        return order_number
-    # else:
-        #packaging = decode_tape_reel_packaging(dictionary)
-        #object, crated = ManufacturerOrderNumber.objects.update_or_create(
-        #    manufacturer_order_number=dictionary['Order Number'],
-        #    manufacturer=manufacturer,
-        #    part=part,
-        #    defaults=packaging)
-        #print(crated)

@@ -25,7 +25,7 @@ def get_part(manufacturer, manufacturer_part_number, manufacturer_order_number, 
                 found_part = Part.objects.all().filter(manufacturer=manufacturer,
                                                        manufacturer_part_number=manufacturer_part_number+'#')
         elif len(found_order_number) == 1:
-            found_part = [found_order_number[0].part]
+            found_part = [found_order_number[0].product]
 
         print("Searching part:", manufacturer_part_number, " \tfound manufacturer:", manufacturer.name if manufacturer else "No",
               "\tMON:", found_order_number[0] if len(found_order_number) == 1 else "None")

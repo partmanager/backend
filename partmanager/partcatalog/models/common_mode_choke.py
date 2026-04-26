@@ -1,4 +1,5 @@
-from .part import Part, decimal_resistance_to_str
+from .part import Part
+from .fields.si_unit_to_string import decimal_resistance_to_str
 from .fields.current import CurrentAtTemp
 from .fields.impedance import ImpedanceAtFreq
 from .fields.resistance import Resistance

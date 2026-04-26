@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from manufacturers.serializers import ManufacturerSerializer
 from symbolandfootprint.serializers import SymbolSerializer
+from packages.serializers import PackageBaseSerializer
 from .serializers import FileSerializer, ManufacturerOrderNumberWithLocationsSerializer
 
 from .models.part import Part
@@ -33,7 +34,7 @@ from rest_polymorphic.serializers import PolymorphicSerializer
 
 common_fields = ['id', 'MPN', 'generic', 'manufacturer_order_number_set', 'product_url', 'production_status',
                  'operating_conditions', 'storage_conditions', 'package', 'symbol', 'manufacturer', 'description',
-                 'notes', 'comment', 'distributors', 'files', 'thumbnail', 'images']
+                 'notes', 'distributors', 'files', 'thumbnail', 'images']
 
 
 class PartBaseSerializer(serializers.ModelSerializer):
@@ -44,6 +45,7 @@ class PartBaseSerializer(serializers.ModelSerializer):
     manufacturer_order_number_set = ManufacturerOrderNumberWithLocationsSerializer(many=True, read_only=True)
     distributors = serializers.SerializerMethodField()
     symbol = SymbolSerializer()
+    package = PackageBaseSerializer()
 
     class Meta:
         model = Part

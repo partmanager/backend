@@ -13,4 +13,5 @@ class InvoiceItemFilter(filters.FilterSet):
         model = InvoiceItem
         fields = {'invoice': ['exact'],
                   'shipped_quantity': ['gt'],
+                  'invoice__distributor': ['exact']
                   }

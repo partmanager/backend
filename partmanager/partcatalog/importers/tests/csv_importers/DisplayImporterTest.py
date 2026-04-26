@@ -56,6 +56,6 @@ class DisplayCSVImportTest(TestCase):
         self.assertEqual(manufacturer_order_number.manufacturer_order_number, 'DEM 128064N SBH-PW-N/V')
         self.assertEqual(manufacturer_order_number.manufacturer.name, "Display Elektronik")
         #self.assertEqual(manufacturer_order_number.packaging,)
-        self.assertEqual(manufacturer_order_number.part, part)
+        self.assertEqual(manufacturer_order_number.product, part)
         self.assertEqual(manufacturer_order_number.note, None)
         self.assertEqual(manufacturer_order_number.description, None)

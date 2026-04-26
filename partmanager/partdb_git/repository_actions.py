@@ -19,26 +19,48 @@ class Progress(RemoteProgress):
         print(self._cur_line)
 
 
-def update_or_clone_repo(repo_url, branch, local_path, ssh_key=None, credentials=None):
+def update_or_clone_repo(repo_url, branch, local_path, ssh_key=None, credentials=None, config=None, env=None):
     logger.info(f"Updating repository {repo_url}, in directory {local_path}")
+    args = {}
+    env_params = {}
+
+    if config:
+        args['config'] = config
+    if env:
+        env_params.update(env)
+
+    # if ssh_key:
+    #     env_params.update({"GIT_SSH_COMMAND": f"ssh -i {ssh_key}"})
+
     try:
         # Attempt to open the repository
         repo = git.Repo(local_path)
         # If the repository exists, pull the latest changes
         repo.git.checkout(branch)
-        repo.remote().pull()
+        repo.remote().pull(env=env)
         logger.info(f"Repository updated successfully. Latest commit is: {repo.head.commit.hexsha}")
     except NoSuchPathError:
         # If the repository doesn't exist locally, clone it
         if ssh_key:
-            repo = git.Repo.clone_from(repo_url, local_path, progress=Progress(), env={"GIT_SSH_COMMAND": f"ssh -i {ssh_key}"})
+            repo = git.Repo.clone_from(
+                repo_url,
+                local_path,
+                progress=Progress(),
+                env={"GIT_SSH_COMMAND": f"ssh -i {ssh_key}"},
+                **args)
         else:
             if credentials:
-                repo = git.Repo.clone_from(f"https://{credentials['user']}:{credentials['password']}@{repo_url}",
-                                           local_path,
-                                           progress=Progress())
+                repo = git.Repo.clone_from(
+                    f"https://{credentials['user']}:{credentials['password']}@{repo_url}",
+                    local_path,
+                    progress=Progress(),
+                    env=env_params)
             else:
-                repo = git.Repo.clone_from(repo_url, local_path, progress=Progress())
+                repo = git.Repo.clone_from(
+                    repo_url,
+                    local_path,
+                    progress=Progress(),
+                    **args)
         logger.info("Repository cloned successfully.")
     except Exception as e:
         logger.error("An error occurred:", repr(e))
@@ -72,9 +94,9 @@ def set_last_import_commit(repository_name, commit):
                                                            defaults={'part_db_last_import_commit': commit})
 
 
-def generate_modified_component_list(directory, repo, commit):
+def generate_modified_component_list(directory, repo, commit, force_update):
     logger.info(f"Preparing modified files list, commit diff: {commit}")
-    if commit:
+    if commit and force_update == False:
         try:
             head_commit = repo.head.commit
             if commit != head_commit.hexsha:
@@ -85,11 +107,11 @@ def generate_modified_component_list(directory, repo, commit):
                 modified_files = []
         except git.exc.GitCommandError as e:
             logger.warning(f"Error while checking for modified files in repository. Updating all files. Error: {e}")
-            modified_files = list(directory.joinpath("components").rglob('*.json'))
+            modified_files = list(directory.joinpath("db/products").rglob('*.json'))
             modified_files += generate_modified_generated_components_list(directory)
     else:
         logger.info(f"No commit provided. Loading all files from repository")
-        modified_files = list(directory.joinpath("components").rglob('*.json'))
+        modified_files = list(directory.joinpath("db/products").rglob('*.json'))
         modified_files += generate_modified_generated_components_list(directory)
     return modified_files
 

@@ -1,5 +1,4 @@
-from .part import Part, decimal_voltage_to_str
-
+from .part import Part
 from django.db import models
 from .fields.breakdown_voltage import BreakdownVoltage
 from .fields.forward_voltage import ForwardVoltage

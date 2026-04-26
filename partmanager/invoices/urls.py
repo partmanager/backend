@@ -5,4 +5,5 @@ from . import api
 urlpatterns = [
     path('api/invoice_items_options', api.invoice_items_options_list, name='api-invoice-items-options'),
     path('api/update', views.update, name='api-update'),
+    path('api/generate', views.report_get, name='api-generate'),
 ]

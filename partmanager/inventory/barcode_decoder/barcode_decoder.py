@@ -17,7 +17,7 @@ def decode_barcode(barcode):
             result_tmp['distributor_order_number']['don'] = don
             if don and don.manufacturer_order_number:
                 result_tmp['manufacturer']['id'] = don.manufacturer_order_number.manufacturer.pk
-            result_tmp['invoice'] = find_invoice(data, don)
+            result_tmp['invoice'] = find_invoice(data, don, data.quantity)
             result.append(result_tmp)
     return result
 
@@ -38,7 +38,7 @@ def find_don(data):
         return None
 
 
-def find_invoice(data, don):
+def find_invoice(data, don, qty):
     try:
         if data.invoice:
             invoice = InvoiceItem.objects.get(invoice__distributor__name=data.distributor,
@@ -47,7 +47,8 @@ def find_invoice(data, don):
         else:
             invoice = InvoiceItem.objects.get(invoice__distributor__name=data.distributor,
                                               order_number=data.order_number['number'],
-                                              distributor_order_number=don)
+                                              distributor_order_number=don,
+                                              ordered_quantity=qty)
         return invoice
     except InvoiceItem.DoesNotExist:
         print('Unable to find invoice:', data.invoice, data.order_number)

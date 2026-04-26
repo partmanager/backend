@@ -35,7 +35,7 @@ from projects.views_api import AssemblyViewSet, AssemblyJobViewSet, BOMViewSet, 
     ProjectVersionViewSet, BOMImportView, GenerateAssemblyViewSet, AssemblyItemViewSet, ReworkViewSet, CloseReworkViewSet
 
 from packages.views import PackagePolimorphicViewSet
-from partcatalog.views import ManufacturerOrderNumberViewSet, PartPolimorphicViewSet, TaskViewSet, TestPartImportViewSet #GenericPartViewSet,
+from partcatalog.views import ManufacturerOrderNumberViewSet, PartPolimorphicViewSet, TaskViewSet, TestPartImportViewSet, PartImportViewSet #GenericPartViewSet,
 from partcatalog.views_part import ResistorViewSet
 
 
@@ -95,6 +95,7 @@ urlpatterns = [
     path('api/invoiceImport', InvoiceImportView.as_view()),
     path('api/part-tasks', TaskViewSet.as_view()),
     path('api/part-import-testdata', TestPartImportViewSet.as_view()),
+    path('api/part-import', PartImportViewSet.as_view()),
 
     path('parts/', include('partcatalog.urls')),
     path('api/assembly-job-generate/<int:pk>/', GenerateAssemblyViewSet.as_view()),

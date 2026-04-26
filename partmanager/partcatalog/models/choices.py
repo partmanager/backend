@@ -95,6 +95,10 @@ class ToleranceType(models.IntegerChoices):
 
 
 PART_TYPE = [
+    ('3DFilament', (
+        ('ABS', 'ABS'),
+        ('PLA', 'PLA'))
+     ),
         ('Resistors', (
             ('GR', 'Generic Resistor'),
             ('R', 'Resistor'),
@@ -179,3 +183,92 @@ PART_TYPE = [
         ('VAR', 'Varistor'),
         ('PCB', 'PCB')
     ]
+
+part_type_tmp = {
+    'Mechanical': {
+        'id': 10000,
+        'children': {
+            'Bearings': {
+                'id': 11000
+            },
+            'Belts': {
+                'id': 12000
+            },
+            'Pulleys': {
+                'id': 13000
+            },
+            'Bolts': {
+                'id': 14000
+            },
+            'Nuts': {
+                'id': 15000
+            },
+            'Screws': {
+                'id': 16000
+            },
+            'Washers': {
+                'id': 17000
+            }
+        }
+    },
+    'Electromechanical': {
+        'id': 20000,
+        'children': {
+            'Connectors': {},
+            'Displays': {},
+            'Passives': {
+                'Capacitors': [
+                    'Generic Capacitor',
+                    'Capacitor',
+                    'Ceramic Capacitor',
+                    'Multi Layer Ceramic Capacitor',
+                    'Electrolytic Capacitor',
+                    'Polymer Capacitor',
+                    'Tantalum Capacitor'
+                ],
+                'Capacitor arrays': {},
+                'Resistors': {
+                    'Generic Resistor',
+                    'Resistor',
+                    'Resistor Carbon Film',
+                    'Resistor Thick Film',
+                    'Resistor Thin Film',
+                    'Resistor Metal Film'
+                },
+                'Resistor arrays': {},
+                'Inductors': {},
+                'Common mode chokes': {}
+            },
+            'Semiconductors': {
+                'Diodes': ['Schottky', 'Small Signal', 'Zener', 'LED'],
+                'Transistors': {
+                    'Bipolar': ['NPN', 'PNP'],
+                    'MOSFET': ['N', 'P'],
+                    'GaN': {},
+                    'SiC': {},
+                    'IGBT': {}
+                },
+                'Integrated Circuits': {},
+            },
+            'Modules': {},
+            'Wires': {}
+        }
+    },
+    'Consumables': {
+        'id': 30000,
+        'children': {
+            '3D Filaments': ['ABS', 'PLA', 'PET-G'],
+            'Glues': {},
+            'Solder Wires': {},
+            'Solder Pastes': {},
+            'Solvents': {},
+            'Grease': {},
+            'Oil': {}
+        }
+    },
+    'Computers': {},
+    'Other': {
+        'id': 40000,
+        'children': {}
+    }
+}

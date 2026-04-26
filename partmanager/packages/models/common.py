@@ -100,6 +100,6 @@ class ChipPackageBase(Package):
         return self.name
 
     def __str__(self):
-        return self.type + ' ' + self.name + '(' + inch_to_mm[self.name] + ')'
+        return f"{self.type} {self.name}"
 
 

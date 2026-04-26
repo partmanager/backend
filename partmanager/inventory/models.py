@@ -195,7 +195,7 @@ class InventoryPosition(models.Model):
         if self.mon is not None:
             result['part'] = {'manufacturer': self.mon.manufacturer.name,
                               'order_number': self.mon.MON,
-                              'description': self.mon.part.description}
+                              'description': self.mon.product.description}
         if self.invoice is not None:
             result['invoice'] = {'distributor': self.invoice.get_distributor_display(),
                                  'invoice_number': self.invoice.invoice.number,

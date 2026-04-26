@@ -46,9 +46,9 @@ def create_bom(bom_dict, project):
                 part = Part.objects.get(manufacturer_part_number=item_dict['part']['mpn'],
                                         manufacturer__name=item_dict['part']['manufacturer'])
                 if part is not None and mon is not None:
-                    if mon.part != part:
-                        logger.error(f"Parts don't match: MON part: {mon.part}, part: {part}, using MON part")
-                        part = mon.part
+                    if mon.product != part:
+                        logger.error(f"Parts don't match: MON part: {mon.product}, part: {part}, using MON part")
+                        part = mon.product
             except Part.DoesNotExist:
                 if fallback is None:
                     fallback = {}

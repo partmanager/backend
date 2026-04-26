@@ -85,6 +85,6 @@ class FerriteBeadJsonImportTest(TestCase):
         self.assertEqual(manufacturer_order_number.manufacturer_order_number, 'TESTFERRITEBEADA')
         self.assertEqual(manufacturer_order_number.manufacturer.name, "TestFerriteBeadManufacturer")
         #self.assertEqual(manufacturer_order_number.packaging,)
-        self.assertEqual(manufacturer_order_number.part, part)
+        self.assertEqual(manufacturer_order_number.product, part)
         self.assertEqual(manufacturer_order_number.note, None)
         self.assertEqual(manufacturer_order_number.description, None)
