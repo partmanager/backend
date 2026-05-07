@@ -15,6 +15,9 @@ class File(models.Model):
     description = models.TextField(null=True, blank=True)
     manufacturer = models.ForeignKey('manufacturers.Manufacturer', on_delete=models.SET_NULL, null=True, blank=True)
 
+    class Meta:
+        unique_together = ["manufacturer", "name"]
+
     def __str__(self):
         if self.manufacturer:
             return '{}, {}, ({}), pk={}'.format(self.manufacturer.name, self.name, len(self.fileversion_set.all()), self.pk)
@@ -28,6 +31,9 @@ class FileVersion(models.Model):
     md5sum = models.CharField(max_length=100, null=True, unique=True)
     url = models.URLField(max_length=500, null=True, blank=True)
     file = models.FileField(max_length=250, upload_to='part_catalog/docs/')
+
+    class Meta:
+        unique_together = ["file_container", 'version']
 
     def generate_filename(self, name):
         filename = pathlib.Path(name)

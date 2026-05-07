@@ -262,6 +262,11 @@ PARTSDB_CONFIG = {
             "branch": "main",
             "credentials": None
         }
+    },
+    "local_dir": {
+        "partsdb-local": {
+            "dir": "/var/partsdb/partsdb-local"
+        }
     }
 }
 LOCAL_CURRENCY = 3

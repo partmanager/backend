@@ -1,7 +1,5 @@
-import json
 from django.http import JsonResponse
-from .models.part import Part
-
+from .tasks import partsdb_directory_import
 
 menu = {
     'id': 500,
@@ -118,4 +116,8 @@ menu = {
 
 def get_part_menu(request):
     return JsonResponse(menu)
+
+def import_local_parts(request):
+    partsdb_directory_import()
+    return JsonResponse({"status": "OK"})
 
