@@ -13,10 +13,20 @@ from partcatalog.models.manufacturer_order_number import ManufacturerOrderNumber
 logger = logging.getLogger('partcatalog')
 
 def add_triac(part: Part, manufacturer):
-    return Triac.objects.update_or_create(
-        MPN=part.part_number,
-        manufacturer=manufacturer
-    )
+    try:
+        part_obj = Triac.objects.get(
+            MPN=part.part_number,
+            manufacturer=manufacturer
+        )
+        return part_obj, None
+    except Triac.DoesNotExist:
+        part_obj = Triac(
+            MPN=part.part_number,
+            manufacturer=manufacturer
+        )
+        return part_obj, True
+    finally:
+        print('finally')
 
 
 part_type_map = {
@@ -30,6 +40,7 @@ def import_part(part: Part):
     # Add part order numbers
     create_or_update_manufacturer_order_numbers(part, db_part)
     create_or_update_files(part, db_part)
+    create_or_update_pictures(part, db_part)
 
 
 def create_or_update_manufacturer_order_numbers(part: Part, db_part: Part_db):
@@ -57,7 +68,7 @@ def create_or_update_manufacturer_order_numbers(part: Part, db_part: Part_db):
 def create_or_update_files(part: Part, db_part: Part_db):
     output_dir = Path(settings.MEDIA_ROOT).joinpath('part_catalog', 'docs')
 
-    for key, attachment_file in part.files.items():
+    for attachment_file in part.files:
         defaults = {
           #  "url": attachment_file.url,
             "description": attachment_file.description,
@@ -83,3 +94,34 @@ def create_or_update_files(part: Part, db_part: Part_db):
                 }
             )
     db_part.save()
+
+
+def create_or_update_pictures(part: Part, db_part: Part_db):
+    part.load_pictures()
+    missing = []
+    consumed = []
+    for picture in part.pictures:
+        found = False
+        for db_picture in db_part.images:
+            if picture.name == db_picture:
+                consumed.append(db_picture)
+                found = True
+        if not found:
+            missing.append(picture)
+
+    need_save = False
+    # delete old/unused pictures
+    for picture in db_part.images:
+        if picture not in consumed:
+            need_save = True
+            pass # delete file from storage
+    db_part.images = consumed
+
+    # add missing pictures
+    for picture in missing:
+        need_save = True
+        db_part.images.append(picture)
+        # copy picture to storage
+
+    if need_save:
+        db_part.save()

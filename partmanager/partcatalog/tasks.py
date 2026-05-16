@@ -27,7 +27,7 @@ def partsdb_directory_import():
     partsdb_settings = settings.PARTSDB_CONFIG
     for local_dir in partsdb_settings["local_dir"]:
         source = Path(partsdb_settings['local_dir'][local_dir]['dir'])
-        for part_file in source.glob("*.json"):
+        for part_file in source.joinpath('db').rglob("*.json"):
             part = part_from_dict(load_json(part_file), part_file)
             if import_part(part):
                 print("Success")
