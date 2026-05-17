@@ -19,7 +19,7 @@ openpyxl
 lxml
 chardet
 barcode-decoder
-partsdb-tools>=0.2.5
+partsdb-tools>=0.2.7
 part_library_gen>=0.1.28a0
 distributors-api>=0.1.2a0
 #required by part db

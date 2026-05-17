@@ -4,13 +4,19 @@ import requests
 import pathlib
 
 
+class AttachmentType(models.IntegerChoices):
+    OTHER = 0
+    APPLICATION_NOTE = 1
+    CALCULATION_TOOL = 2
+    DATASHEET = 3
+    USER_MANUAL = 4
+    REFERENCE_DESIGN = 5
+    SERVICE_MANUAL = 6
+
+
 class File(models.Model):
-    FILE_TYPE = [
-        ('d', 'Datasheet'),
-        ('u', 'Unspecified')
-    ]
     name = models.CharField(max_length=250)
-    file_type = models.CharField(max_length=1, choices=FILE_TYPE, default='u')
+    file_type = models.IntegerField(choices=AttachmentType.choices, default=AttachmentType.OTHER)
     url = models.URLField(max_length=500, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     manufacturer = models.ForeignKey('manufacturers.Manufacturer', on_delete=models.SET_NULL, null=True, blank=True)

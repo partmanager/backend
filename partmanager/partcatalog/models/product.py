@@ -59,7 +59,7 @@ class Product(PolymorphicModel):
     def _update_production_status_field(self):
         self.production_status = ProductionStatus.OBSOLETE
         for mon in self.MONs.all():
-            if mon.productionStatus != ProductionStatus.OBSOLETE:
+            if mon.production_status != ProductionStatus.OBSOLETE:
                 self.production_status = ProductionStatus.IN_PRODUCTION
                 break
 
